@@ -62,7 +62,9 @@ return [
         // Features::profilePhotos(),
         // Features::api(),
         // Features::teams(['invitations' => true]),
-        Features::accountDeletion(),
+
+        // usuário não deve poder excluir sua própria conta.
+        // Features::accountDeletion(),
     ],
 
     /*

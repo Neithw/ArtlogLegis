@@ -5,6 +5,8 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -28,6 +30,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'camara_id',
         'name',
         'email',
         'password',
@@ -65,5 +68,32 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function camara(): BelongsTo
+    {
+        return $this->belongsTo(Camara::class);
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class)
+            ->withTimestamps();
+    }
+
+    public function hasRole(string $codigo): bool
+    {
+        return $this->roles()
+            ->where('roles.codigo', $codigo)
+            ->exists();
+    }
+
+    public function hasPermission(string $codigo): bool
+    {
+        return $this->roles()
+            ->whereHas('permissions', function ($query) use ($codigo) {
+                $query->where('permissions.codigo', $codigo);
+            })
+            ->exists();
     }
 }

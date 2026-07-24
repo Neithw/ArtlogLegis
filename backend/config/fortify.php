@@ -162,7 +162,9 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        // cadastro não deve ser público
+        // Features::registration(), 
+
         Features::resetPasswords(),
         // Features::emailVerification(),
         Features::updateProfileInformation(),
