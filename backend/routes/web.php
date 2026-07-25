@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CamaraController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -15,9 +16,21 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-    Route::get('/camaras', function () {
-        return 'Usuário autorizado a visualizar Câmaras.';
-    })
-        ->middleware('can:camaras.visualizar')
-        ->name('camaras.index');
+    Route::resource('/camaras', CamaraController::class)
+        ->middlewareFor(
+            ['index', 'show'],
+            'can:camaras.visualizar'
+        )
+        ->middlewareFor(
+            ['create', 'store'],
+            'can:camaras.criar'
+        )
+        ->middlewareFor(
+            ['edit', 'update'],
+            'can:camaras.editar'
+        )
+        ->middlewareFor(
+            'destroy',
+            'can:camaras.excluir'
+        );
 });

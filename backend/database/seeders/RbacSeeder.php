@@ -28,8 +28,8 @@ class RbacSeeder extends Seeder
                 'codigo' => 'camaras.editar',
             ],
             [
-                'nome' => 'Desativar Câmaras',
-                'codigo' => 'caramas.desativar',
+                'nome' => 'Excluir Câmaras',
+                'codigo' => 'camaras.excluir',
             ],
             [
                 'nome' => 'Visualizar Usuários',
@@ -44,8 +44,8 @@ class RbacSeeder extends Seeder
                 'codigo' => 'usuarios.editar',
             ],
             [
-                'nome' => 'Desativar Usuários',
-                'codigo' => 'usuarios.desativar',
+                'nome' => 'Excluir Usuários',
+                'codigo' => 'usuarios.excluir',
             ],
         ])->map(function (array $permission): Permission {
             return Permission::updateOrCreate(
