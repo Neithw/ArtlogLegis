@@ -2,11 +2,10 @@
 
 ## Decisão
 
-O sistema utilizará papéis e permissões em relações muitos-para-muitos.
-
+Cada usuário possuirá um único papel.
+Os papéis representam perfis e possuem pacotes padrão de permissões.
+As permissões efetivas serão atribuídas diretamente aos usuários e poderão ser personalizadas.
 Usuários comuns pertencerão inicialmente a uma única Câmara.
-
-O usuário com papel root será global e poderá possuir `camara_id` null.
 
 ## Estrutura
 
@@ -14,13 +13,17 @@ O usuário com papel root será global e poderá possuir `camara_id` null.
 - camaras
 - roles
 - permissions
-- role_user
 - permission_role
+- permission_user
 
 ## Regras
 
-- Papéis representam funções exercidas.
-- Permissões representam ações do sistema.
+- Permissões representam ações do sistema no padrão modulo:acao.
+- Um papel poderá estar associado a vários usuários.
+- Um papel poderá possuir várias permissões predefinidas.
+- As permissões efetivas serão vinculadas diretamente ao usuário.
+- A seleção de um papel carregará seu pacote padrão de permissões.
+- As permissões carregadas poderão ser ajustadas antes de serem atribuídas ao usuário.
 - O RBAC controla quais ações podem ser executadas.
-- O `camara_id` controla sobre quais dados o usuário pode atuar.
+- O camara_id controla sobre quais dados o usuário pode atuar.
 - Usuários não-root não poderão acessar dados internos de outra Câmara.

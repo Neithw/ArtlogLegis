@@ -6,7 +6,7 @@
             </p>
 
             <h2 class="text-2xl font-semibold tracking-tight text-gray-900">
-                Câmaras
+                Usuários
             </h2>
         </div>
     </x-slot>
@@ -26,18 +26,18 @@
                     class="flex flex-col gap-4 border-b border-gray-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h3 class="text-lg font-semibold text-gray-900">
-                            Câmaras cadastradas
+                            Usuários cadastrados
                         </h3>
 
                         <p class="mt-1 text-sm text-gray-500">
-                            Consulte e gerencie as Câmaras disponíveis no sistema.
+                            Gerencie os usuários, seus papéis e seus acessos ao sistema.
                         </p>
                     </div>
 
-                    @can('camaras:criar')
-                        <a href="{{ route('camaras.create') }}"
+                    @can('usuarios:criar')
+                        <a href="{{ route('usuarios.create') }}"
                             class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700">
-                            Cadastrar Câmara
+                            Cadastrar Usuário
                         </a>
                     @endcan
                 </header>
@@ -48,12 +48,17 @@
                             <tr>
                                 <th scope="col"
                                     class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                    Usuário
+                                </th>
+
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                                     Câmara
                                 </th>
 
                                 <th scope="col"
                                     class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                    CNPJ
+                                    Papel
                                 </th>
 
                                 <th scope="col"
@@ -62,78 +67,64 @@
                                 </th>
 
                                 <th scope="col"
-                                    class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                                     Ações
                                 </th>
                             </tr>
                         </thead>
 
-                        <tbody class="divide-y divide-gray-100 bg-white">
-                            @forelse ($camaras as $camara)
-                                <tr class="transition hover:bg-gray-50">
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                            @forelse ($usuarios as $usuario)
+                                <tr>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-xs text-indigo-600">
-                                                #{{ $camaras->firstItem() + $loop->index }}
-                                            </span>
-                                            <span class="font-semibold text-gray-900">
-                                                {{ $camara->nome }}
-                                            </span>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900">
+                                                {{ $usuario->name }}
+                                            </p>
+
+                                            <p class="text-sm text-gray-500">
+                                                {{ $usuario->email }}
+                                            </p>
                                         </div>
                                     </td>
 
                                     <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
-                                        {{ $camara->cnpj ?? 'Não informado' }}
+                                        {{ $usuario->camara?->nome ?? 'Acesso global' }}
+                                    </td>
+
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
+                                        {{ $usuario->role?->nome ?? 'Sem papel definido' }}
                                     </td>
 
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        @if ($camara->ativo)
+                                        @if ($usuario->ativo)
                                             <span
                                                 class="inline-flex rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
-                                                Ativa
+                                                Ativo
                                             </span>
                                         @else
                                             <span
-                                                class="inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">
-                                                Inativa
+                                                class="inline-flex rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700">
+                                                Inativo
                                             </span>
                                         @endif
                                     </td>
 
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        <div class="flex items-center justify-end gap-2">
-                                            @can('camaras:editar')
-                                                <a href="{{ route('camaras.edit', $camara) }}"
+                                    <td class="whitespace-nowrap px-6 py-4 text-right">
+                                        @if (!$usuario->hasRole('root'))
+                                            @can('usuarios:editar')
+                                                <a href="{{ route('usuarios.edit', $usuario) }}"
                                                     class="rounded-lg px-2 py-2 text-sm font-semibold text-yellow-700 transition hover:bg-yellow-50">
                                                     Editar
                                                 </a>
                                             @endcan
-
-                                            @can('camaras:excluir')
-                                                <form action="{{ route('camaras.destroy', $camara) }}" method="POST"
-                                                    onsubmit="return confirm('Deseja realmente excluir esta Câmara?')">
-                                                    @csrf
-                                                    @method('DELETE')
-
-                                                    <button type="submit"
-                                                        class="rounded-lg px-2 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50">
-                                                        Excluir
-                                                    </button>
-                                                </form>
-                                            @endcan
-                                        </div>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="px-6 py-16 text-center">
-                                        <p class="font-semibold text-gray-700">
-                                            Nenhuma Câmara cadastrada
-                                        </p>
-
-                                        <p class="mt-1 text-sm text-gray-500">
-                                            Cadastre uma Câmara para começar a utilizar o sistema.
-                                        </p>
+                                    <td colspan="5" class="px-6 py-12 text-center text-sm text-gray-500">
+                                        Nenhum usuário foi encontrado.
                                     </td>
                                 </tr>
                             @endforelse
@@ -141,10 +132,10 @@
                     </table>
                 </div>
 
-                @if ($camaras->hasPages())
-                    <footer class="border-t border-gray-200 px-6 py-4">
-                        {{ $camaras->links() }}
-                    </footer>
+                @if ($usuarios->hasPages())
+                    <div class="border-t border-gray-200 px-6 py-4">
+                        {{ $usuarios->links() }}
+                    </div>
                 @endif
             </section>
         </div>

@@ -31,9 +31,11 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'camara_id',
+        'role_id',
         'name',
         'email',
         'password',
+        'ativo',
     ];
 
     /**
@@ -67,6 +69,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'ativo' => 'boolean',
         ];
     }
 
@@ -75,25 +78,28 @@ class User extends Authenticatable
         return $this->belongsTo(Camara::class);
     }
 
-    public function roles(): BelongsToMany
+    public function role(): BelongsTo
     {
-        return $this->belongsToMany(Role::class)
+        return $this->belongsTo(Role::class);
+    }
+
+    public function permissions(): BelongsToMany
+    {
+        return $this->belongsToMany(Permission::class)
             ->withTimestamps();
     }
 
     public function hasRole(string $codigo): bool
     {
-        return $this->roles()
+        return $this->role()
             ->where('roles.codigo', $codigo)
             ->exists();
     }
 
     public function hasPermission(string $codigo): bool
     {
-        return $this->roles()
-            ->whereHas('permissions', function ($query) use ($codigo) {
-                $query->where('permissions.codigo', $codigo);
-            })
+        return $this->permissions()
+            ->where('permissions.codigo', $codigo)
             ->exists();
     }
 }

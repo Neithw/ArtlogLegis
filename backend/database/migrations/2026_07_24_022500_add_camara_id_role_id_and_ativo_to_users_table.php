@@ -15,6 +15,14 @@ return new class extends Migration {
                 ->nullable()
                 ->constrained()
                 ->restrictOnDelete();
+
+            $table->foreignId('role_id')
+                ->nullable()
+                ->constrained()
+                ->restrictOnDelete();
+
+            $table->boolean('ativo')
+                ->default(true);
         });
     }
 
@@ -25,6 +33,8 @@ return new class extends Migration {
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropConstrainedForeignId('camara_id');
+            $table->dropConstrainedForeignId('role_id');
+            $table->dropColumn('camara_id');
         });
     }
 };

@@ -17,35 +17,43 @@ class RbacSeeder extends Seeder
         $permissions = collect([
             [
                 'nome' => 'Visualizar Câmaras',
-                'codigo' => 'camaras.visualizar',
+                'codigo' => 'camaras:visualizar',
             ],
             [
                 'nome' => 'Cadastrar Câmaras',
-                'codigo' => 'camaras.criar',
+                'codigo' => 'camaras:criar',
             ],
             [
                 'nome' => 'Editar Câmaras',
-                'codigo' => 'camaras.editar',
+                'codigo' => 'camaras:editar',
             ],
             [
                 'nome' => 'Excluir Câmaras',
-                'codigo' => 'camaras.excluir',
+                'codigo' => 'camaras:excluir',
             ],
             [
                 'nome' => 'Visualizar Usuários',
-                'codigo' => 'usuarios.visualizar',
+                'codigo' => 'usuarios:visualizar',
             ],
             [
                 'nome' => 'Cadastrar Usuários',
-                'codigo' => 'usuarios.criar',
+                'codigo' => 'usuarios:criar',
             ],
             [
                 'nome' => 'Editar Usuários',
-                'codigo' => 'usuarios.editar',
+                'codigo' => 'usuarios:editar',
+            ],
+            [
+                'nome' => 'Desativar Usuários',
+                'codigo' => 'usuarios:desativar',
+            ],
+            [
+                'nome' => 'Reativar Usuários',
+                'codigo' => 'usuarios:reativar',
             ],
             [
                 'nome' => 'Excluir Usuários',
-                'codigo' => 'usuarios.excluir',
+                'codigo' => 'usuarios:excluir',
             ],
         ])->map(function (array $permission): Permission {
             return Permission::updateOrCreate(

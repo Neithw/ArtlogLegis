@@ -12,6 +12,12 @@ class Permission extends Model
         'codigo',
     ];
 
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)
+            ->withTimestamps();
+    }
+
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class)

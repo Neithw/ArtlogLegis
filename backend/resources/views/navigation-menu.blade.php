@@ -18,6 +18,9 @@
                     <x-nav-link href="{{ route('camaras.index') }}">
                         {{ __('Câmaras') }}
                     </x-nav-link>
+                    <x-nav-link href="{{ route('usuarios.index') }}">
+                        {{ __('Usuários') }}
+                    </x-nav-link>
                 </div>
             </div>
 
