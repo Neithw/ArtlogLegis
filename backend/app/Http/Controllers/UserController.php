@@ -6,15 +6,51 @@ use Illuminate\Http\Request;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\Camara;
-use App\Models\Permission;
+use App\Models\Permissao;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
+    private const PACOTES_PERMISSOES = [
+        'gerente' => [
+            'usuarios:visualizar',
+            'usuarios:criar',
+            'usuarios:editar'
+        ],
+
+        'usuario_comum' => [
+            'usuarios:visualizar'
+        ]
+    ];
+
+    private function montarPacotesPermissoes(Collection $permissoes, Collection $roles): array
+    {
+        $idsPermissoesPorCodigo = $permissoes->pluck('id', 'codigo');
+
+        $pacotes = [];
+
+        foreach ($roles as $role) {
+            $codigosPermissoes = self::PACOTES_PERMISSOES[$role->codigo] ?? [];
+
+            $pacotes[$role->id] = [];
+
+            foreach ($codigosPermissoes as $codigoPermissao) {
+                $permissaoId = $idsPermissoesPorCodigo->get($codigoPermissao);
+
+                if ($permissaoId !== null) {
+                    $pacotes[$role->id][] = (int) $permissaoId;
+                }
+            }
+        }
+
+        return $pacotes;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -72,7 +108,6 @@ class UserController extends Controller
 
         $roles = Role::query()
             ->where('codigo', '!=', 'root')
-            ->with(['permissions:id,nome,codigo'])
             ->orderBy('nome')
             ->get([
                 'id',
@@ -80,31 +115,21 @@ class UserController extends Controller
                 'codigo'
             ]);
 
-        $permissionsPorModulo = Permission::query()
-            ->orderBy('codigo')
-            ->get([
-                'id',
-                'nome',
-                'codigo'
-            ])
-            ->groupBy(function (Permission $permission) {
-                return explode(':', $permission->codigo, 2)[0];
-            });
+        $permissoes = Permissao::query()
+            ->orderBy('nome')
+            ->get();
 
-        $pacotesPermissoes = $roles->mapWithKeys(function (Role $role): array {
-            return [
-                (string) $role->id => $role->permissions
-                    ->pluck('id')
-                    ->map(fn($permissionId): string => (string) $permissionId)
-                    ->values()
-                    ->all()
-            ];
-        })->all();
+        $permissoesPorModulo = $permissoes->groupBy(
+            fn(Permissao $permissao): string =>
+            explode(':', $permissao->codigo, 2)[0]
+        );
+
+        $pacotesPermissoes = $this->montarPacotesPermissoes($permissoes, $roles);
 
         return view('usuarios.create', compact(
             'camaras',
             'roles',
-            'permissionsPorModulo',
+            'permissoesPorModulo',
             'pacotesPermissoes',
             'usuarioIsRoot'
         ));
@@ -117,14 +142,14 @@ class UserController extends Controller
     {
         $dadosValidados = $request->validated();
 
-        $permissionIds = $dadosValidados['permissions'] ?? [];
+        $permissionIds = $dadosValidados['permissoes'] ?? [];
 
-        unset($dadosValidados['permissions']);
+        unset($dadosValidados['permissoes']);
 
         DB::transaction(function () use ($dadosValidados, $permissionIds): void {
             $user = User::create($dadosValidados);
 
-            $user->permissions()->sync($permissionIds);
+            $user->permissoes()->sync($permissionIds);
         });
 
         return to_route('usuarios.index')
@@ -155,8 +180,12 @@ class UserController extends Controller
             abort(403);
         }
 
+        if (! $usuarioIsRoot && $usuarioAutenticado->camara_id === null) {
+            abort(403);
+        }
+
         $user->load([
-            'permissions:id,nome,codigo',
+            'permissoes:id,nome,codigo',
         ]);
 
         $camaras = Camara::query()
@@ -175,7 +204,6 @@ class UserController extends Controller
 
         $roles = Role::query()
             ->where('codigo', '!=', 'root')
-            ->with(['permissions:id,nome,codigo'])
             ->orderBy('nome')
             ->get([
                 'id',
@@ -183,33 +211,29 @@ class UserController extends Controller
                 'codigo'
             ]);
 
-        $permissionsPorModulo = Permission::query()
-            ->orderBy('codigo')
-            ->get([
-                'id',
-                'nome',
-                'codigo'
-            ])
-            ->groupBy(function (Permission $permission) {
-                return explode(':', $permission->codigo, 2)[0];
-            });
+        $permissoes = Permissao::query()
+            ->orderBy('nome')
+            ->get();
 
-        $pacotesPermissoes = $roles->mapWithKeys(function (Role $role): array {
-            return [
-                (string) $role->id => $role->permissions
-                    ->pluck('id')
-                    ->map(fn($permissionId): string => (string) $permissionId)
-                    ->values()
-                    ->all()
-            ];
-        })->all();
+        $permissoesPorModulo = $permissoes->groupBy(
+            fn(Permissao $permissao): string =>
+            explode(':', $permissao->codigo, 2)[0]
+        );
+
+        $pacotesPermissoes = $this->montarPacotesPermissoes($permissoes, $roles);
+
+        $permissoesSelecionadas = $user->permissoes()
+            ->pluck('permissoes.id')
+            ->map(fn($id) => (int) $id)
+            ->all();
 
         return view('usuarios.edit', compact(
             'user',
             'camaras',
             'roles',
-            'permissionsPorModulo',
+            'permissoesPorModulo',
             'pacotesPermissoes',
+            'permissoesSelecionadas',
             'usuarioIsRoot'
         ));
     }
@@ -220,9 +244,9 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user): RedirectResponse
     {
         $dadosValidados = $request->validated();
-        $permissionIds = $dadosValidados['permissions'] ?? [];
+        $permissionIds = $dadosValidados['permissoes'] ?? [];
 
-        unset($dadosValidados['permissions']);
+        unset($dadosValidados['permissoes']);
 
         if (empty($dadosValidados['password'])) {
             unset($dadosValidados['password']);
@@ -231,7 +255,7 @@ class UserController extends Controller
         DB::transaction(function () use ($user, $dadosValidados, $permissionIds): void {
             $user->update($dadosValidados);
 
-            $user->permissions()->sync($permissionIds);
+            $user->permissoes()->sync($permissionIds);
         });
 
         return to_route('usuarios.index')

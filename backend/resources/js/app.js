@@ -3,22 +3,20 @@ import Alpine from 'alpinejs';
 window.Alpine = Alpine;
 
 Alpine.data('formularioUsuario', ({
-    pacotes,
+    pacotes = {},
     papelInicial = '',
     permissoesIniciais = []
 }) => ({
     pacotes,
 
-    papelId: String(papelInicial),
+    papelId: String(papelInicial ?? ''),
 
-    permissoesSelecionadas: permissoesIniciais.map(String),
+    permissoesSelecionadas: permissoesIniciais.map(Number),
 
-    aplicarPacote(novoPapelId) {
-        this.papelId = String(novoPapelId);
+    aplicarPacote(roleId) {
+        const permissoesDoPacote = this.pacotes[String(roleId)] ?? [];
 
-        this.permissoesSelecionadas = [
-            ...(this.pacotes[this.papelId] ?? [])
-        ];
+        this.permissoesSelecionadas = permissoesDoPacote.map(Number);
     }
 
 }));

@@ -83,9 +83,9 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
-    public function permissions(): BelongsToMany
+    public function permissoes(): BelongsToMany
     {
-        return $this->belongsToMany(Permission::class)
+        return $this->belongsToMany(Permissao::class, 'permissao_user', 'user_id', 'permissao_id')
             ->withTimestamps();
     }
 
@@ -98,8 +98,8 @@ class User extends Authenticatable
 
     public function hasPermission(string $codigo): bool
     {
-        return $this->permissions()
-            ->where('permissions.codigo', $codigo)
+        return $this->permissoes()
+            ->where('permissoes.codigo', $codigo)
             ->exists();
     }
 }

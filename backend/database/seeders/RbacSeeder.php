@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Permission;
+use App\Models\Permissao;
 use App\Models\Role;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -17,52 +17,52 @@ class RbacSeeder extends Seeder
         $permissions = collect([
             [
                 'nome' => 'Visualizar Câmaras',
-                'codigo' => 'camaras:visualizar',
+                'codigo' => 'camaras:visualizar'
             ],
             [
                 'nome' => 'Cadastrar Câmaras',
-                'codigo' => 'camaras:criar',
+                'codigo' => 'camaras:criar'
             ],
             [
                 'nome' => 'Editar Câmaras',
-                'codigo' => 'camaras:editar',
+                'codigo' => 'camaras:editar'
             ],
             [
                 'nome' => 'Excluir Câmaras',
-                'codigo' => 'camaras:excluir',
+                'codigo' => 'camaras:excluir'
             ],
             [
                 'nome' => 'Visualizar Usuários',
-                'codigo' => 'usuarios:visualizar',
+                'codigo' => 'usuarios:visualizar'
             ],
             [
                 'nome' => 'Cadastrar Usuários',
-                'codigo' => 'usuarios:criar',
+                'codigo' => 'usuarios:criar'
             ],
             [
                 'nome' => 'Editar Usuários',
-                'codigo' => 'usuarios:editar',
+                'codigo' => 'usuarios:editar'
             ],
             [
                 'nome' => 'Desativar Usuários',
-                'codigo' => 'usuarios:desativar',
+                'codigo' => 'usuarios:desativar'
             ],
             [
                 'nome' => 'Reativar Usuários',
-                'codigo' => 'usuarios:reativar',
+                'codigo' => 'usuarios:reativar'
             ],
             [
                 'nome' => 'Excluir Usuários',
-                'codigo' => 'usuarios:excluir',
-            ],
-        ])->map(function (array $permission): Permission {
-            return Permission::updateOrCreate(
+                'codigo' => 'usuarios:excluir'
+            ]
+        ])->map(function (array $permission): Permissao {
+            return Permissao::updateOrCreate(
                 [
                     'codigo' => $permission['codigo'],
                 ],
                 [
                     'nome' => $permission['nome'],
-                ],
+                ]
             );
         });
 
@@ -72,7 +72,7 @@ class RbacSeeder extends Seeder
             ],
             [
                 'nome' => 'Administrador geral',
-            ],
+            ]
         );
 
         $usuarioComum = Role::updateOrCreate(
@@ -81,13 +81,16 @@ class RbacSeeder extends Seeder
             ],
             [
                 'nome' => 'Usuário Comum',
+            ]
+        );
+
+        $gerente = Role::updateOrCreate(
+            [
+                'codigo' => 'gerente'
             ],
+            [
+                'nome' => 'Gerente'
+            ]
         );
-
-        $root->permissions()->sync(
-            $permissions->pluck('id')->all(),
-        );
-
-        $usuarioComum->permissions()->sync([]);
     }
 }

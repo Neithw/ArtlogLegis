@@ -5,8 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Permission extends Model
+class Permissao extends Model
 {
+    protected $table = 'permissoes';
+
     protected $fillable = [
         'nome',
         'codigo',
@@ -14,13 +16,7 @@ class Permission extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class)
-            ->withTimestamps();
-    }
-
-    public function roles(): BelongsToMany
-    {
-        return $this->belongsToMany(Role::class)
+        return $this->belongsToMany(User::class, 'permissao_user', 'permissao_id', 'user_id')
             ->withTimestamps();
     }
 }

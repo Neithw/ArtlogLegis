@@ -17,7 +17,7 @@
             <form method="POST" action="{{ route('usuarios.store') }}" class="space-y-6" x-data="formularioUsuario({
                 pacotes: @js($pacotesPermissoes),
                 papelInicial: @js(old('role_id', '')),
-                permissoesIniciais: @js(old('permissions', [])),
+                permissoesIniciais: @js(old('permissoes', [])),
             })">
                 @csrf
 
@@ -182,45 +182,45 @@
                     </div>
 
                     <div class="space-y-6 p-6">
-                        @foreach ($permissionsPorModulo as $modulo => $permissions)
+                        @foreach ($permissoesPorModulo as $modulo => $permissoesDoModulo)
                             <section>
                                 <h4 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-500">
                                     {{ ucfirst($modulo) }}
                                 </h4>
 
                                 <div class="grid gap-3 md:grid-cols-2">
-                                    @foreach ($permissions as $permission)
+                                    @foreach ($permissoesDoModulo as $permissao)
                                         <label class="flex items-start gap-3 rounded-lg border border-gray-200 p-4">
-                                            <input type="checkbox" name="permissions[]" value="{{ $permission->id }}"
+                                            <input type="checkbox" name="permissoes[]" :value="{{ $permissao->id }}"
                                                 class="mt-0.5 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
                                                 x-model="permissoesSelecionadas">
 
                                             <span>
                                                 <span class="block text-sm font-medium text-gray-900">
-                                                    {{ $permission->nome }}
+                                                    {{ $permissao->nome }}
                                                 </span>
 
                                                 <span class="mt-1 block text-xs text-gray-500">
-                                                    {{ $permission->codigo }}
+                                                    {{ $permissao->codigo }}
                                                 </span>
                                             </span>
                                         </label>
                                     @endforeach
                                 </div>
                             </section>
+
+                            @error('permissoes')
+                                <p class="mt-2 text-sm text-red-600">
+                                    {{ $message }}
+                                </p>
+                            @enderror
+
+                            @error('permissoes.*')
+                                <p class="mt-2 text-sm text-red-600">
+                                    {{ $message }}
+                                </p>
+                            @enderror
                         @endforeach
-
-                        @error('permissions')
-                            <p class="mt-2 text-sm text-red-600">
-                                {{ $message }}
-                            </p>
-                        @enderror
-
-                        @error('permissions.*')
-                            <p class="mt-2 text-sm text-red-600">
-                                {{ $message }}
-                            </p>
-                        @enderror
                     </div>
                 </div>
 

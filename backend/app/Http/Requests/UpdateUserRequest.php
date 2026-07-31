@@ -90,15 +90,15 @@ class UpdateUserRequest extends FormRequest
                 'boolean'
             ],
 
-            'permissions' => [
+            'permissoes' => [
                 'nullable',
                 'array'
             ],
 
-            'permissions.*' => [
+            'permissoes.*' => [
                 'integer',
                 'distinct',
-                'exists:permissions,id'
+                'exists:permissoes,id'
             ]
         ];
     }
@@ -128,18 +128,18 @@ class UpdateUserRequest extends FormRequest
                     );
                 }
 
-                $permissionsSolicitadas = collect(
-                    $this->input('permissions', [])
+                $permissoesSolicitadas = collect(
+                    $this->input('permissoes', [])
                 )->map(fn($permissionId): int => (int) $permissionId);
 
-                $permissionsPermitidas = $usuarioAutenticado
-                    ->permissions()
-                    ->pluck('permissions.id')
+                $permissoesPermitidas = $usuarioAutenticado
+                    ->permissoes()
+                    ->pluck('permissoes.id')
                     ->map(fn($permissionId): int => (int) $permissionId);
 
-                if ($permissionsSolicitadas->diff($permissionsPermitidas)->isNotEmpty()) {
+                if ($permissoesSolicitadas->diff($permissoesPermitidas)->isNotEmpty()) {
                     $validator->errors()->add(
-                        'permissions',
+                        'permissoes',
                         'Você não pode conceder permissões que não possui.'
                     );
                 }
@@ -172,10 +172,10 @@ class UpdateUserRequest extends FormRequest
             'ativo.required' => 'Informe o status do usuário.',
             'ativo.boolean' => 'O status informado é inválido.',
 
-            'permissions.array' => 'As permissões devem ser enviadas em uma lista.',
-            'permissions.*.integer' => 'Uma das permissões selecionadas é inválida.',
-            'permissions.*.distinct' => 'Uma permissão foi enviada mais de uma vez.',
-            'permissions.*.exists' => 'Uma das permissões selecionadas não existe.',
+            'permissoes.array' => 'As permissões devem ser enviadas em uma lista.',
+            'permissoes.*.integer' => 'Uma das permissões selecionadas é inválida.',
+            'permissoes.*.distinct' => 'Uma permissão foi enviada mais de uma vez.',
+            'permissoes.*.exists' => 'Uma das permissões selecionadas não existe.',
         ];
     }
 }

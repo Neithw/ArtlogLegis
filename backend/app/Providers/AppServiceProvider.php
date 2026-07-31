@@ -22,6 +22,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::before(function (User $user, string $ability): ?bool {
+            if ($user->hasRole('root')) {
+                return true;
+            }
+
             if (! str_contains($ability, ':')) {
                 return null;
             }

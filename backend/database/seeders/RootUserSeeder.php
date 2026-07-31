@@ -36,11 +36,5 @@ class RootUserSeeder extends Seeder
             'role_id' => $rootRole->id,
             'ativo' => true,
         ]);
-
-        $rootUser->permissions()->sync(
-            $rootRole->permissions()
-                ->pluck('permissions.id')
-                ->all(),
-        );
     }
 }
