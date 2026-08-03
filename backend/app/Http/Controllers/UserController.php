@@ -321,8 +321,25 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user): RedirectResponse
     {
-        //
+        $usuarioAutenticado = $request->user();
+
+        if (! $usuarioAutenticado->hasRole('root')) {
+            abort(403);
+        }
+
+        if ($user->hasRole('root')) {
+            abort(403);
+        }
+
+        if ($usuarioAutenticado->is($user)) {
+            abort(403);
+        }
+
+        $user->delete();
+
+        return to_route('usuarios.index')
+            ->with('success', 'Usuário excluído com sucesso.');
     }
 }

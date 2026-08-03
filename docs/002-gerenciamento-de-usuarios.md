@@ -58,3 +58,14 @@ A tabela `users` deverá possuir inicialmente:
 - Contas root não poderão ser desativadas pelo fluxo administrativo comum.
 - Usuários inativos não poderão iniciar uma nova sessão.
 - Um usuário já autenticado que seja desativado terá sua sessão encerrada na próxima requisição.
+
+## Exclusão lógica
+
+- Usuários serão excluídos logicamente por meio de `SoftDeletes`.
+- A exclusão preencherá o campo `deleted_at` e preservará o registro no banco.
+- Usuários excluídos não aparecerão nas consultas e listagens comuns.
+- Usuários excluídos não poderão se autenticar.
+- A exclusão será restrita ao root.
+- Contas root não poderão ser excluídas pelo fluxo administrativo comum.
+- Um usuário não poderá excluir a própria conta.
+- As permissões associadas ao usuário serão preservadas na exclusão lógica.

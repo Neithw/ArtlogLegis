@@ -150,6 +150,22 @@
                                                         </form>
                                                     @endcan
                                                 @endif
+
+                                                @if (auth()->user()->hasRole('root'))
+                                                    @can('usuarios:excluir')
+                                                        <form action="{{ route('usuarios.destroy', $usuario) }}"
+                                                            onsubmit="return confirm('Deseja realmente excluir este usuário?')"
+                                                            method="POST">
+                                                            @csrf
+                                                            @method('DELETE')
+
+                                                            <button type="submit"
+                                                                class="rounded-lg p-2 text-sm font-semibold text-red-800 transition hover:bg-red-100">
+                                                                Excluir
+                                                            </button>
+                                                        </form>
+                                                    @endcan
+                                                @endif
                                             </div>
                                         @endif
                                     </td>
