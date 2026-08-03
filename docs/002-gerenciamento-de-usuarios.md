@@ -5,7 +5,7 @@
 O sistema possuirá um módulo interno para gerenciamento de usuários.
 Usuários comuns pertencerão a uma única Câmara.
 Cada usuário possuirá um único papel.
-A seleção de um papel carregará um pacote predefinido de permissões, que poderá ser personalizado antes de ser atribuído ao usuário.
+A seleção de um papel carregará um pacote predefinido de permissões mantido no back-end, no `UserController`, que poderá ser personalizado antes de ser atribuído ao usuário.
 Usuários poderão ser ativados, desativados e, quando autorizado, excluídos logicamente.
 A conta de usuário representará o acesso ao sistema e não substituirá entidades específicas, como vereador, assessor ou servidor.
 
@@ -14,9 +14,8 @@ A conta de usuário representará o acesso ao sistema e não substituirá entida
 - users
 - camaras
 - roles
-- permissions
-- permission_role
-- permission_user
+- permissoes
+- permissao_user
 
 A tabela `users` deverá possuir inicialmente:
 
@@ -31,10 +30,11 @@ A tabela `users` deverá possuir inicialmente:
 
 - Um usuário poderá possuir apenas um papel.
 - Um papel poderá estar associado a vários usuários.
-- Os papéis definirão pacotes padrão de permissões.
+- Os pacotes padrão serão definidos no `UserController` e associados aos códigos dos papéis.
 - As permissões efetivas serão atribuídas diretamente ao usuário.
 - A troca de papel poderá recarregar o pacote padrão de permissões.
 - As permissões poderão ser ajustadas individualmente antes do salvamento.
+- A alteração de um pacote no código não modificará automaticamente as permissões de usuários já cadastrados.
 - O root poderá gerenciar usuários de todas as Câmaras.
 - Usuários não-root somente poderão gerenciar usuários da própria Câmara.
 - Usuários comuns deverão possuir uma Câmara vinculada.
@@ -48,3 +48,13 @@ A tabela `users` deverá possuir inicialmente:
 - A exclusão de usuários será lógica e restrita ao root.
 - Gerentes poderão ativar e desativar usuários quando possuírem as permissões necessárias.
 - Dados parlamentares e institucionais não serão armazenados diretamente em `users`.
+
+## Controle de status
+
+- O status de um usuário não será alterado pela edição comum.
+- A desativação exigirá a permissão `usuarios:desativar`.
+- A reativação exigirá a permissão `usuarios:reativar`.
+- Um usuário não poderá desativar a própria conta.
+- Contas root não poderão ser desativadas pelo fluxo administrativo comum.
+- Usuários inativos não poderão iniciar uma nova sessão.
+- Um usuário já autenticado que seja desativado terá sua sessão encerrada na próxima requisição.

@@ -85,11 +85,6 @@ class UpdateUserRequest extends FormRequest
                     })
             ],
 
-            'ativo' => [
-                'required',
-                'boolean'
-            ],
-
             'permissoes' => [
                 'nullable',
                 'array'
@@ -108,14 +103,6 @@ class UpdateUserRequest extends FormRequest
         return [
             function (Validator $validator): void {
                 $usuarioAutenticado = $this->user();
-                $user = $this->route('user');
-
-                if ($usuarioAutenticado->is($user) && ! $this->boolean('ativo')) {
-                    $validator->errors()->add(
-                        'ativo',
-                        'Você não pode desativar a própria conta.'
-                    );
-                }
 
                 if ($usuarioAutenticado->hasRole('root')) {
                     return;
@@ -168,9 +155,6 @@ class UpdateUserRequest extends FormRequest
             'role_id.required' => 'Selecione um papel.',
             'role_id.integer' => 'O papel selecionado é inválido.',
             'role_id.exists' => 'O papel selecionado não está disponível.',
-
-            'ativo.required' => 'Informe o status do usuário.',
-            'ativo.boolean' => 'O status informado é inválido.',
 
             'permissoes.array' => 'As permissões devem ser enviadas em uma lista.',
             'permissoes.*.integer' => 'Uma das permissões selecionadas é inválida.',

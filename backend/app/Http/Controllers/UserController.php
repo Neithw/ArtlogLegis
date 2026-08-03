@@ -20,7 +20,9 @@ class UserController extends Controller
         'gerente' => [
             'usuarios:visualizar',
             'usuarios:criar',
-            'usuarios:editar'
+            'usuarios:editar',
+            'usuarios:desativar',
+            'usuarios:reativar',
         ],
 
         'usuario_comum' => [
@@ -260,6 +262,60 @@ class UserController extends Controller
 
         return to_route('usuarios.index')
             ->with('success', 'Usuário atualizado com sucesso.');
+    }
+
+    public function desativar(Request $request, User $user): RedirectResponse
+    {
+        $usuarioAutenticado = $request->user();
+        $usuarioIsRoot = $usuarioAutenticado->hasRole('root');
+
+        if ($user->hasRole('root')) {
+            abort(403);
+        }
+
+        if (! $usuarioIsRoot && $usuarioAutenticado->camara_id === null) {
+            abort(403);
+        }
+
+        if (! $usuarioIsRoot && (int) $user->camara_id !== (int) $usuarioAutenticado->camara_id) {
+            abort(403);
+        }
+
+        if ($usuarioAutenticado->is($user)) {
+            abort(403, 'Você não pode desativar a própria conta.');
+        }
+
+        $user->update([
+            'ativo' => false
+        ]);
+
+        return to_route('usuarios.index')
+            ->with('success', 'Usuário desativado com sucesso.');
+    }
+
+    public function reativar(Request $request, User $user): RedirectResponse
+    {
+        $usuarioAutenticado = $request->user();
+        $usuarioIsRoot = $usuarioAutenticado->hasRole('root');
+
+        if ($user->hasRole('root')) {
+            abort(403);
+        }
+
+        if (! $usuarioIsRoot && $usuarioAutenticado->camara_id === null) {
+            abort(403);
+        }
+
+        if (! $usuarioIsRoot && (int) $user->camara_id !== (int) $usuarioAutenticado->camara_id) {
+            abort(403);
+        }
+
+        $user->update([
+            'ativo' => true
+        ]);
+
+        return to_route('usuarios.index')
+            ->with('success', 'Usuário reativado com sucesso.');
     }
 
     /**

@@ -67,7 +67,7 @@
                                 </th>
 
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                    class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
                                     Ações
                                 </th>
                             </tr>
@@ -110,14 +110,47 @@
                                         @endif
                                     </td>
 
-                                    <td class="whitespace-nowrap px-6 py-4 text-right">
+                                    <td class="whitespace-nowrap px-4 py-4 text-right">
                                         @if (!$usuario->hasRole('root'))
-                                            @can('usuarios:editar')
-                                                <a href="{{ route('usuarios.edit', $usuario) }}"
-                                                    class="rounded-lg px-2 py-2 text-sm font-semibold text-yellow-700 transition hover:bg-yellow-50">
-                                                    Editar
-                                                </a>
-                                            @endcan
+                                            <div class="flex items-center justify-end gap-2">
+                                                @can('usuarios:editar')
+                                                    <a href="{{ route('usuarios.edit', $usuario) }}"
+                                                        class="rounded-lg p-2 text-sm font-semibold text-yellow-700 transition hover:bg-yellow-50">
+                                                        Editar
+                                                    </a>
+                                                @endcan
+
+                                                @if ($usuario->ativo)
+                                                    @can('usuarios:desativar')
+                                                        @if (!auth()->user()->is($usuario))
+                                                            <form action="{{ route('usuarios.desativar', $usuario) }}"
+                                                                onsubmit="return confirm('Deseja realmente desativar este usuário?');"
+                                                                method="POST">
+                                                                @csrf
+                                                                @method('PATCH')
+
+                                                                <button type="submit"
+                                                                    class="rounded-lg p-2 text-sm font-semibold text-red-700 transition hover:bg-red-50">
+                                                                    Desativar
+                                                                </button>
+                                                            </form>
+                                                        @endif
+                                                    @endcan
+                                                @else
+                                                    @can('usuarios:reativar')
+                                                        <form action="{{ route('usuarios.reativar', $usuario) }}"
+                                                            method="POST">
+                                                            @csrf
+                                                            @method('PATCH')
+
+                                                            <button type="submit"
+                                                                class="rounded-lg p-2 text-sm font-semibold text-green-700 transition hover:bg-green-50">
+                                                                Reativar
+                                                            </button>
+                                                        </form>
+                                                    @endcan
+                                                @endif
+                                            </div>
                                         @endif
                                     </td>
                                 </tr>

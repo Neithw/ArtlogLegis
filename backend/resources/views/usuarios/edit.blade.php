@@ -98,7 +98,7 @@
                         </h3>
 
                         <p class="mt-1 text-sm text-gray-500">
-                            Defina a Câmara e o pacote inicial de permissões.
+                            Defina a Câmara e o papel do usuário.
                         </p>
                     </div>
 
@@ -145,26 +145,6 @@
                             </select>
 
                             @error('role_id')
-                                <p class="mt-2 text-sm text-red-600">
-                                    {{ $message }}
-                                </p>
-                            @enderror
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <input type="hidden" name="ativo" value="0">
-
-                            <label class="inline-flex items-center gap-3">
-                                <input type="checkbox" name="ativo" value="1"
-                                    class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
-                                    @checked(old('ativo', (string) (int) $user->ativo) === '1')>
-
-                                <span class="text-sm font-medium text-gray-700">
-                                    Usuário ativo
-                                </span>
-                            </label>
-
-                            @error('ativo')
                                 <p class="mt-2 text-sm text-red-600">
                                     {{ $message }}
                                 </p>
