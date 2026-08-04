@@ -54,7 +54,23 @@ class RbacSeeder extends Seeder
             [
                 'nome' => 'Excluir Usuários',
                 'codigo' => 'usuarios:excluir'
-            ]
+            ],
+            [
+                'nome' => 'Visualizar Legislaturas',
+                'codigo' => 'legislaturas:visualizar'
+            ],
+            [
+                'nome' => 'Cadastrar Legislaturas',
+                'codigo' => 'legislaturas:criar',
+            ],
+            [
+                'nome' => 'Editar Legislaturas',
+                'codigo' => 'legislaturas:editar',
+            ],
+            [
+                'nome' => 'Excluir Legislaturas',
+                'codigo' => 'legislaturas:excluir',
+            ],
         ])->map(function (array $permission): Permissao {
             return Permissao::updateOrCreate(
                 [

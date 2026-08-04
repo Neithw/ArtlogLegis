@@ -98,6 +98,11 @@ class User extends Authenticatable
             ->exists();
     }
 
+    public function isRoot(): bool
+    {
+        return $this->hasRole('root');
+    }
+
     public function hasPermission(string $codigo): bool
     {
         return $this->permissoes()

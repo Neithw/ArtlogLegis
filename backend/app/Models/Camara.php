@@ -27,4 +27,9 @@ class Camara extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function legislaturas(): HasMany
+    {
+        return $this->hasMany(Legislatura::class);
+    }
 }

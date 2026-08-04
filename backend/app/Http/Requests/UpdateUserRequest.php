@@ -23,11 +23,11 @@ class UpdateUserRequest extends FormRequest
             return false;
         }
 
-        if ($user->hasRole('root')) {
+        if ($user->isRoot()) {
             return false;
         }
 
-        if (! $usuarioAutenticado->hasRole('root') && (int) $user->camara_id !== (int) $usuarioAutenticado->camara_id) {
+        if (! $usuarioAutenticado->isRoot() && (int) $user->camara_id !== (int) $usuarioAutenticado->camara_id) {
             return false;
         }
 
@@ -104,7 +104,7 @@ class UpdateUserRequest extends FormRequest
             function (Validator $validator): void {
                 $usuarioAutenticado = $this->user();
 
-                if ($usuarioAutenticado->hasRole('root')) {
+                if ($usuarioAutenticado->isRoot()) {
                     return;
                 }
 

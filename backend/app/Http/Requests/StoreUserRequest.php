@@ -88,7 +88,7 @@ class StoreUserRequest extends FormRequest
             function (Validator $validator): void {
                 $usuarioAutenticado = $this->user();
 
-                if ($usuarioAutenticado->hasRole('root')) {
+                if ($usuarioAutenticado->isRoot()) {
                     return;
                 }
 

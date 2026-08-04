@@ -23,10 +23,14 @@ class UserController extends Controller
             'usuarios:editar',
             'usuarios:desativar',
             'usuarios:reativar',
+            'legislaturas:visualizar',
+            'legislaturas:criar',
+            'legislaturas:editar',
+            'legislaturas:excluir'
         ],
 
         'usuario_comum' => [
-            'usuarios:visualizar'
+            'legislaturas:visualizar'
         ]
     ];
 
@@ -59,11 +63,6 @@ class UserController extends Controller
     public function index(): View
     {
         $usuarioAutenticado = request()->user();
-        $usuarioIsRoot = $usuarioAutenticado->hasRole('root');
-
-        if (! $usuarioIsRoot && $usuarioAutenticado->camara_id === null) {
-            abort(403);
-        }
 
         $usuarios = User::query()
             ->with([
@@ -71,7 +70,7 @@ class UserController extends Controller
                 'role:id,nome'
             ])
             ->when(
-                ! $usuarioIsRoot,
+                ! $usuarioAutenticado->isRoot(),
                 function ($query) use ($usuarioAutenticado) {
                     $query->where('camara_id', $usuarioAutenticado->camara_id);
                 }
@@ -87,54 +86,7 @@ class UserController extends Controller
      */
     public function create(Request $request): View
     {
-        $usuarioAutenticado = $request->user();
-        $usuarioIsRoot = $usuarioAutenticado->hasRole('root');
-
-        if (! $usuarioIsRoot && $usuarioAutenticado->camara_id === null) {
-            abort(403);
-        }
-
-        $camaras = Camara::query()
-            ->where('ativo', true)
-            ->when(
-                ! $usuarioIsRoot,
-                function ($query) use ($usuarioAutenticado) {
-                    $query->whereKey($usuarioAutenticado->camara_id);
-                }
-            )
-            ->orderBy('nome')
-            ->get([
-                'id',
-                'nome'
-            ]);
-
-        $roles = Role::query()
-            ->where('codigo', '!=', 'root')
-            ->orderBy('nome')
-            ->get([
-                'id',
-                'nome',
-                'codigo'
-            ]);
-
-        $permissoes = Permissao::query()
-            ->orderBy('nome')
-            ->get();
-
-        $permissoesPorModulo = $permissoes->groupBy(
-            fn(Permissao $permissao): string =>
-            explode(':', $permissao->codigo, 2)[0]
-        );
-
-        $pacotesPermissoes = $this->montarPacotesPermissoes($permissoes, $roles);
-
-        return view('usuarios.create', compact(
-            'camaras',
-            'roles',
-            'permissoesPorModulo',
-            'pacotesPermissoes',
-            'usuarioIsRoot'
-        ));
+        return view('usuarios.create', $this->dadosDoFormulario($request->user()));
     }
 
     /**
@@ -159,30 +111,11 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(User $user)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, User $user)
+    public function edit(Request $request, User $user): View
     {
-        $usuarioAutenticado = $request->user();
-        $usuarioIsRoot = $usuarioAutenticado->hasRole('root');
-
-        if ($user->hasRole('root')) {
-            abort(403);
-        }
-
-        if (! $usuarioIsRoot && (int) $user->camara_id !== (int) $usuarioAutenticado->camara_id) {
-            abort(403);
-        }
-
-        if (! $usuarioIsRoot && $usuarioAutenticado->camara_id === null) {
+        if ($user->isRoot()) {
             abort(403);
         }
 
@@ -190,54 +123,16 @@ class UserController extends Controller
             'permissoes:id,nome,codigo',
         ]);
 
-        $camaras = Camara::query()
-            ->where('ativo', true)
-            ->when(
-                ! $usuarioIsRoot,
-                function ($query) use ($usuarioAutenticado) {
-                    $query->whereKey($usuarioAutenticado->camara_id);
-                }
-            )
-            ->orderBy('nome')
-            ->get([
-                'id',
-                'nome'
-            ]);
-
-        $roles = Role::query()
-            ->where('codigo', '!=', 'root')
-            ->orderBy('nome')
-            ->get([
-                'id',
-                'nome',
-                'codigo'
-            ]);
-
-        $permissoes = Permissao::query()
-            ->orderBy('nome')
-            ->get();
-
-        $permissoesPorModulo = $permissoes->groupBy(
-            fn(Permissao $permissao): string =>
-            explode(':', $permissao->codigo, 2)[0]
-        );
-
-        $pacotesPermissoes = $this->montarPacotesPermissoes($permissoes, $roles);
-
         $permissoesSelecionadas = $user->permissoes()
             ->pluck('permissoes.id')
             ->map(fn($id) => (int) $id)
             ->all();
 
-        return view('usuarios.edit', compact(
-            'user',
-            'camaras',
-            'roles',
-            'permissoesPorModulo',
-            'pacotesPermissoes',
-            'permissoesSelecionadas',
-            'usuarioIsRoot'
-        ));
+        return view('usuarios.edit', [
+            ...$this->dadosDoFormulario($request->user()),
+            'user' => $user,
+            'permissoesSelecionadas' => $permissoesSelecionadas
+        ]);
     }
 
     /**
@@ -267,17 +162,8 @@ class UserController extends Controller
     public function desativar(Request $request, User $user): RedirectResponse
     {
         $usuarioAutenticado = $request->user();
-        $usuarioIsRoot = $usuarioAutenticado->hasRole('root');
 
-        if ($user->hasRole('root')) {
-            abort(403);
-        }
-
-        if (! $usuarioIsRoot && $usuarioAutenticado->camara_id === null) {
-            abort(403);
-        }
-
-        if (! $usuarioIsRoot && (int) $user->camara_id !== (int) $usuarioAutenticado->camara_id) {
+        if ($user->isRoot()) {
             abort(403);
         }
 
@@ -293,20 +179,9 @@ class UserController extends Controller
             ->with('success', 'Usuário desativado com sucesso.');
     }
 
-    public function reativar(Request $request, User $user): RedirectResponse
+    public function reativar(User $user): RedirectResponse
     {
-        $usuarioAutenticado = $request->user();
-        $usuarioIsRoot = $usuarioAutenticado->hasRole('root');
-
-        if ($user->hasRole('root')) {
-            abort(403);
-        }
-
-        if (! $usuarioIsRoot && $usuarioAutenticado->camara_id === null) {
-            abort(403);
-        }
-
-        if (! $usuarioIsRoot && (int) $user->camara_id !== (int) $usuarioAutenticado->camara_id) {
+        if ($user->isRoot()) {
             abort(403);
         }
 
@@ -325,11 +200,7 @@ class UserController extends Controller
     {
         $usuarioAutenticado = $request->user();
 
-        if (! $usuarioAutenticado->hasRole('root')) {
-            abort(403);
-        }
-
-        if ($user->hasRole('root')) {
+        if ($user->isRoot()) {
             abort(403);
         }
 
@@ -341,5 +212,52 @@ class UserController extends Controller
 
         return to_route('usuarios.index')
             ->with('success', 'Usuário excluído com sucesso.');
+    }
+
+    private function dadosDoFormulario(User $usuarioAutenticado): array
+    {
+        $usuarioIsRoot = $usuarioAutenticado->isRoot();
+
+        $camaras = Camara::query()
+            ->where('ativo', true)
+            ->when(
+                ! $usuarioIsRoot,
+                function ($query) use ($usuarioAutenticado) {
+                    $query->whereKey($usuarioAutenticado->camara_id);
+                }
+            )
+            ->orderBy('nome')
+            ->get([
+                'id',
+                'nome'
+            ]);
+
+        $roles = Role::query()
+            ->where('codigo', '!=', 'root')
+            ->orderBy('nome')
+            ->get([
+                'id',
+                'nome',
+                'codigo'
+            ]);
+
+        $permissoes = Permissao::query()
+            ->orderBy('nome')
+            ->get();
+
+        $permissoesPorModulo = $permissoes->groupBy(
+            fn(Permissao $permissao): string =>
+            explode(':', $permissao->codigo, 2)[0]
+        );
+
+        $pacotesPermissoes = $this->montarPacotesPermissoes($permissoes, $roles);
+
+        return compact(
+            'camaras',
+            'roles',
+            'permissoesPorModulo',
+            'pacotesPermissoes',
+            'usuarioIsRoot'
+        );
     }
 }

@@ -111,7 +111,7 @@
                                     </td>
 
                                     <td class="whitespace-nowrap px-4 py-4 text-right">
-                                        @if (!$usuario->hasRole('root'))
+                                        @if (!$usuario->isRoot())
                                             <div class="flex items-center justify-end gap-2">
                                                 @can('usuarios:editar')
                                                     <a href="{{ route('usuarios.edit', $usuario) }}"
@@ -151,7 +151,7 @@
                                                     @endcan
                                                 @endif
 
-                                                @if (auth()->user()->hasRole('root'))
+                                                @if (auth()->user()->isRoot())
                                                     @can('usuarios:excluir')
                                                         <form action="{{ route('usuarios.destroy', $usuario) }}"
                                                             onsubmit="return confirm('Deseja realmente excluir este usuário?')"
