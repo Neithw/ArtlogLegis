@@ -3,9 +3,11 @@
 use App\Http\Controllers\CamaraController;
 use App\Http\Controllers\LegislaturaController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VereadorController;
 use App\Http\Middleware\EnsureUserIsActive;
 use App\Models\Legislatura;
 use App\Models\User;
+use App\Models\Vereador;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -46,6 +48,17 @@ Route::middleware([
     Route::patch('/usuarios/{user}/reativar', [UserController::class, 'reativar'])
         ->name('usuarios.reativar')
         ->middleware('can:reativar,user');
+    // -----------------------------------------------------------------------------------------------
+
+    Route::resource('vereadores', VereadorController::class)
+        ->parameters([
+            'vereadores' => 'vereador'
+        ])
+        ->middlewareFor('index', 'can:viewAny,' . Vereador::class)
+        ->middlewareFor('show', 'can:view,vereador')
+        ->middlewareFor(['create', 'store'], 'can:create,' . Vereador::class)
+        ->middlewareFor(['edit', 'update'], 'can:update,vereador')
+        ->middlewareFor('destroy', 'can:delete,vereador');
     // -----------------------------------------------------------------------------------------------
 
     Route::resource('legislaturas', LegislaturaController::class)

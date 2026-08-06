@@ -24,6 +24,9 @@
                     <x-nav-link href="{{ route('legislaturas.index') }}">
                         {{ __('Legislaturas') }}
                     </x-nav-link>
+                    <x-nav-link href="{{ route('vereadores.index') }}">
+                        {{ __('Vereadores') }}
+                    </x-nav-link>
                 </div>
             </div>
 

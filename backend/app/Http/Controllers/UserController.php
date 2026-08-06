@@ -23,6 +23,12 @@ class UserController extends Controller
             'usuarios:editar',
             'usuarios:desativar',
             'usuarios:reativar',
+
+            'vereadores:visualizar',
+            'vereadores:criar',
+            'vereadores:editar',
+            'vereadores:excluir',
+
             'legislaturas:visualizar',
             'legislaturas:criar',
             'legislaturas:editar',
@@ -30,6 +36,7 @@ class UserController extends Controller
         ],
 
         'usuario_comum' => [
+            'vereadores:visualizar',
             'legislaturas:visualizar'
         ]
     ];
