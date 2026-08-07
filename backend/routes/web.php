@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\CamaraController;
 use App\Http\Controllers\LegislaturaController;
+use App\Http\Controllers\PartidoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VereadorController;
 use App\Http\Middleware\EnsureUserIsActive;
 use App\Models\Legislatura;
+use App\Models\Partido;
 use App\Models\User;
 use App\Models\Vereador;
 use Illuminate\Support\Facades\Route;
@@ -67,4 +69,22 @@ Route::middleware([
         ->middlewareFor(['create', 'store'], 'can:create,' . Legislatura::class)
         ->middlewareFor(['edit', 'update'], 'can:update,legislatura')
         ->middlewareFor('destroy', 'can:delete,legislatura');
+    // -----------------------------------------------------------------------------------------------
+
+    Route::resource('partidos', PartidoController::class)
+        ->except('show')
+        ->middlewareFor('index', 'can:viewAny,' . Partido::class)
+        ->middlewareFor(['create', 'store'], 'can:create,' . Partido::class)
+        ->middlewareFor(['edit', 'update'], 'can:update,partido')
+        ->middlewareFor('destroy', 'can:delete,partido');
+
+    Route::get('/partidos/arquivados', [PartidoController::class, 'arquivados'])
+        ->middleware('can:viewArchived,' . Partido::class)
+        ->name('partidos.arquivados');
+
+    Route::patch('/partidos/{partido}/restaurar', [PartidoController::class, 'restore'])
+        ->withTrashed()
+        ->middleware('can:restore,partido')
+        ->name('partidos.restore');
+    // -----------------------------------------------------------------------------------------------
 });

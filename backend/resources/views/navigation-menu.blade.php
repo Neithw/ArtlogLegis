@@ -27,6 +27,9 @@
                     <x-nav-link href="{{ route('vereadores.index') }}">
                         {{ __('Vereadores') }}
                     </x-nav-link>
+                    <x-nav-link href="{{ route('partidos.index') }}">
+                        {{ __('Partidos') }}
+                    </x-nav-link>
                 </div>
             </div>
 
