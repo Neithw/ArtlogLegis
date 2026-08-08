@@ -5,17 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Legislatura extends Model
+class Mandato extends Model
 {
     use HasFactory;
     use SoftDeletes;
 
     protected $fillable = [
-        'camara_id',
-        'numero',
+        'vereador_id',
+        'legislatura_id',
         'data_inicio',
         'data_fim',
     ];
@@ -23,19 +22,20 @@ class Legislatura extends Model
     protected function casts(): array
     {
         return [
-            'numero' => 'integer',
             'data_inicio' => 'date',
-            'data_fim' => 'date'
+            'data_fim' => 'date',
         ];
     }
 
-    public function camara(): BelongsTo
+    public function vereador(): BelongsTo
     {
-        return $this->belongsTo(Camara::class);
+        return $this->belongsTo(Vereador::class)
+            ->withTrashed();
     }
 
-    public function mandatos(): HasMany
+    public function legislatura(): BelongsTo
     {
-        return $this->hasMany(Mandato::class);
+        return $this->belongsTo(Legislatura::class)
+            ->withTrashed();
     }
 }

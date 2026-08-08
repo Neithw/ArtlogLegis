@@ -34,13 +34,20 @@ class UserController extends Controller
             'legislaturas:editar',
             'legislaturas:excluir',
 
-            'partidos:visualizar'
+            'partidos:visualizar',
+
+            'mandatos:visualizar',
+            'mandatos:criar',
+            'mandatos:editar',
+            'mandatos:excluir',
+            'mandatos:restaurar'
         ],
 
         'usuario_comum' => [
             'vereadores:visualizar',
             'legislaturas:visualizar',
-            'partidos:visualizar'
+            'partidos:visualizar',
+            'mandatos:visualizar',
         ]
     ];
 

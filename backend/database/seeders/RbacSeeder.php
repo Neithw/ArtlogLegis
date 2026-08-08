@@ -90,7 +90,27 @@ class RbacSeeder extends Seeder
             [
                 'nome' => 'Visualizar Partidos',
                 'codigo' => 'partidos:visualizar'
-            ]
+            ],
+            [
+                'nome' => 'Visualizar Mandatos',
+                'codigo' => 'mandatos:visualizar'
+            ],
+            [
+                'nome' => 'Cadastrar Mandatos',
+                'codigo' => 'mandatos:criar'
+            ],
+            [
+                'nome' => 'Editar Mandatos',
+                'codigo' => 'mandatos:editar'
+            ],
+            [
+                'nome' => 'Excluir Mandatos',
+                'codigo' => 'mandatos:excluir'
+            ],
+            [
+                'nome' => 'Restaurar Mandatos',
+                'codigo' => 'mandatos:restaurar'
+            ],
         ])->map(function (array $permission): Permissao {
             return Permissao::updateOrCreate(
                 [

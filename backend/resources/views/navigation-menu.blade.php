@@ -30,6 +30,9 @@
                     <x-nav-link href="{{ route('partidos.index') }}">
                         {{ __('Partidos') }}
                     </x-nav-link>
+                    <x-nav-link href="{{ route('mandatos.index') }}">
+                        {{ __('Mandatos') }}
+                    </x-nav-link>
                 </div>
             </div>
 

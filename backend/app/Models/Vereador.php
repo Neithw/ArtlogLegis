@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Vereador extends Model
@@ -33,5 +34,10 @@ class Vereador extends Model
     public function camara(): BelongsTo
     {
         return $this->belongsTo(Camara::class);
+    }
+
+    public function mandatos(): HasMany
+    {
+        return $this->hasMany(Mandato::class);
     }
 }

@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\CamaraController;
 use App\Http\Controllers\LegislaturaController;
+use App\Http\Controllers\MandatoController;
 use App\Http\Controllers\PartidoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VereadorController;
 use App\Http\Middleware\EnsureUserIsActive;
 use App\Models\Legislatura;
+use App\Models\Mandato;
 use App\Models\Partido;
 use App\Models\User;
 use App\Models\Vereador;
@@ -86,5 +88,22 @@ Route::middleware([
         ->withTrashed()
         ->middleware('can:restore,partido')
         ->name('partidos.restore');
+    // -----------------------------------------------------------------------------------------------
+
+    Route::resource('mandatos', MandatoController::class)
+        ->except('show')
+        ->middlewareFor('index', 'can:viewAny,' . Mandato::class)
+        ->middlewareFor(['create', 'store'], 'can:create,' . Mandato::class)
+        ->middlewareFor(['edit', 'update'], 'can:update,mandato')
+        ->middlewareFor('destroy', 'can:delete,mandato');
+
+    Route::get('/mandatos/arquivados', [MandatoController::class, 'arquivados'])
+        ->middleware('can:viewArchived,' . Mandato::class)
+        ->name('mandatos.arquivados');
+
+    Route::patch('/mandatos/{mandato}/restaurar', [MandatoController::class, 'restore'])
+        ->withTrashed()
+        ->middleware('can:restore,mandato')
+        ->name('mandatos.restore');
     // -----------------------------------------------------------------------------------------------
 });
