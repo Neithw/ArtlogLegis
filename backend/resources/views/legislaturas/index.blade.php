@@ -21,6 +21,13 @@
                 </div>
             @endif
 
+            @if (session('error'))
+                <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
+                    role="alert">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             <section class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
                 <header
                     class="flex flex-col gap-4 border-b border-gray-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
@@ -167,7 +174,7 @@
                         {{ $legislaturas->links() }}
                     </div>
                 @endif
+            </section>
         </div>
-    </div>
     </div>
 </x-app-layout>

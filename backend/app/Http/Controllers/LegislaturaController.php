@@ -43,6 +43,7 @@ class LegislaturaController extends Controller
         $usuarioIsRoot = $usuarioAutenticado->isRoot();
 
         $camaras = Camara::query()
+            ->where('ativo', true)
             ->when(! $usuarioIsRoot, function ($query) use ($usuarioAutenticado) {
                 $query->whereKey($usuarioAutenticado->camara_id);
             })
@@ -93,6 +94,11 @@ class LegislaturaController extends Controller
      */
     public function destroy(Legislatura $legislatura): RedirectResponse
     {
+        if ($legislatura->mandatos()->withTrashed()->exists()) {
+            return to_route('legislaturas.index')
+                ->with('error', 'Não é possível excluir uma legislatura que possui mandatos vinculados.');
+        }
+
         $legislatura->delete();
 
         return to_route('legislaturas.index')
