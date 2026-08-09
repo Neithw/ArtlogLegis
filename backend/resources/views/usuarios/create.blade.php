@@ -208,19 +208,19 @@
                                     @endforeach
                                 </div>
                             </section>
-
-                            @error('permissoes')
-                                <p class="mt-2 text-sm text-red-600">
-                                    {{ $message }}
-                                </p>
-                            @enderror
-
-                            @error('permissoes.*')
-                                <p class="mt-2 text-sm text-red-600">
-                                    {{ $message }}
-                                </p>
-                            @enderror
                         @endforeach
+
+                        @error('permissoes')
+                            <p class="mt-2 text-sm text-red-600">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
+                        @error('permissoes.*')
+                            <p class="mt-2 text-sm text-red-600">
+                                {{ $message }}
+                            </p>
+                        @enderror
                     </div>
                 </div>
 

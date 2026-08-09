@@ -84,7 +84,7 @@ class UserController extends Controller
         $usuarios = User::query()
             ->with([
                 'camara:id,nome',
-                'role:id,nome'
+                'role:id,nome,codigo'
             ])
             ->when(
                 ! $usuarioAutenticado->isRoot(),
@@ -109,7 +109,7 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreUserRequest $request)
+    public function store(StoreUserRequest $request): RedirectResponse
     {
         $dadosValidados = $request->validated();
 
@@ -136,19 +136,28 @@ class UserController extends Controller
             abort(403);
         }
 
-        $user->load([
-            'permissoes:id,nome,codigo',
-        ]);
+        $usuarioAutenticado = $request->user();
 
         $permissoesSelecionadas = $user->permissoes()
             ->pluck('permissoes.id')
-            ->map(fn($id) => (int) $id)
-            ->all();
+            ->map(fn($id) => (int) $id);
+
+        if (! $usuarioAutenticado->isRoot()) {
+            $usuarioAutenticado->loadMissing('permissoes');
+
+            $idsPermissoesGerenciaveis = $usuarioAutenticado->permissoes
+                ->pluck('id')
+                ->map(fn($id) => (int) $id);
+
+            $permissoesSelecionadas = $permissoesSelecionadas
+                ->intersect($idsPermissoesGerenciaveis)
+                ->values();
+        }
 
         return view('usuarios.edit', [
-            ...$this->dadosDoFormulario($request->user()),
+            ...$this->dadosDoFormulario($usuarioAutenticado),
             'user' => $user,
-            'permissoesSelecionadas' => $permissoesSelecionadas
+            'permissoesSelecionadas' => $permissoesSelecionadas->all()
         ]);
     }
 
@@ -158,7 +167,30 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user): RedirectResponse
     {
         $dadosValidados = $request->validated();
-        $permissionIds = $dadosValidados['permissoes'] ?? [];
+        $usuarioAutenticado = $request->user();
+
+        $permissionIds = collect($dadosValidados['permissoes'] ?? [])
+            ->map(fn($id) => (int) $id);
+
+        if (! $usuarioAutenticado->isRoot()) {
+            $usuarioAutenticado->loadMissing('permissoes');
+
+            $idsPermissoesGerenciaveis = $usuarioAutenticado->permissoes
+                ->pluck('id')
+                ->map(fn($id) => (int) $id);
+
+            $idsPermissoesAtuais = $user->permissoes()
+                ->pluck('permissoes.id')
+                ->map(fn($id) => (int) $id);
+
+            $idsPermissoesForaDoEscopo = $idsPermissoesAtuais
+                ->diff($idsPermissoesGerenciaveis);
+
+            $permissionIds = $permissionIds
+                ->merge($idsPermissoesForaDoEscopo)
+                ->unique()
+                ->values();
+        }
 
         unset($dadosValidados['permissoes']);
 
@@ -169,7 +201,7 @@ class UserController extends Controller
         DB::transaction(function () use ($user, $dadosValidados, $permissionIds): void {
             $user->update($dadosValidados);
 
-            $user->permissoes()->sync($permissionIds);
+            $user->permissoes()->sync($permissionIds->all());
         });
 
         return to_route('usuarios.index')
@@ -258,9 +290,17 @@ class UserController extends Controller
                 'codigo'
             ]);
 
-        $permissoes = Permissao::query()
-            ->orderBy('nome')
-            ->get();
+        if ($usuarioIsRoot) {
+            $permissoes = Permissao::query()
+                ->orderBy('nome')
+                ->get();
+        } else {
+            $usuarioAutenticado->loadMissing('permissoes');
+
+            $permissoes = $usuarioAutenticado->permissoes
+                ->sortBy('nome')
+                ->values();
+        }
 
         $permissoesPorModulo = $permissoes->groupBy(
             fn(Permissao $permissao): string =>

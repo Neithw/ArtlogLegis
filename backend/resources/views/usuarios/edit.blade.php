@@ -17,7 +17,7 @@
             <form method="POST" action="{{ route('usuarios.update', $user) }}" class="space-y-6" x-data="formularioUsuario({
                 pacotes: @js($pacotesPermissoes),
                 papelInicial: @js(old('role_id', $user->role_id)),
-                permissoesIniciais: @js(old('permissoes', $permissoesSelecionadas))
+                permissoesIniciais: @js(session()->hasOldInput() ? old('permissoes', []) : $permissoesSelecionadas)
             })">
                 @csrf
                 @method('PUT')
@@ -198,19 +198,19 @@
                                     @endforeach
                                 </div>
                             </section>
-
-                            @error('permissoes')
-                                <p class="mt-2 text-sm text-red-600">
-                                    {{ $message }}
-                                </p>
-                            @enderror
-
-                            @error('permissoes.*')
-                                <p class="mt-2 text-sm text-red-600">
-                                    {{ $message }}
-                                </p>
-                            @enderror
                         @endforeach
+
+                        @error('permissoes')
+                            <p class="mt-2 text-sm text-red-600">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
+                        @error('permissoes.*')
+                            <p class="mt-2 text-sm text-red-600">
+                                {{ $message }}
+                            </p>
+                        @enderror
                     </div>
                 </div>
 

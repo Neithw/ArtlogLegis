@@ -99,9 +99,7 @@ class User extends Authenticatable
 
     public function hasRole(string $codigo): bool
     {
-        return $this->role()
-            ->where('roles.codigo', $codigo)
-            ->exists();
+        return $this->role?->codigo === $codigo;
     }
 
     public function isRoot(): bool
@@ -111,8 +109,9 @@ class User extends Authenticatable
 
     public function hasPermission(string $codigo): bool
     {
-        return $this->permissoes()
-            ->where('permissoes.codigo', $codigo)
-            ->exists();
+        $this->loadMissing('permissoes');
+
+        return $this->permissoes
+            ->contains('codigo', $codigo);
     }
 }

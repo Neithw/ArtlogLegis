@@ -34,7 +34,7 @@
                         </p>
                     </div>
 
-                    @can('usuarios:criar')
+                    @can('create', App\Models\User::class)
                         <a href="{{ route('usuarios.create') }}"
                             class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700">
                             Cadastrar Usuário
@@ -113,7 +113,7 @@
                                     <td class="whitespace-nowrap px-4 py-4 text-right">
                                         @if (!$usuario->isRoot())
                                             <div class="flex items-center justify-end gap-2">
-                                                @can('usuarios:editar')
+                                                @can('update', $usuario)
                                                     <a href="{{ route('usuarios.edit', $usuario) }}"
                                                         class="rounded-lg p-2 text-sm font-semibold text-yellow-700 transition hover:bg-yellow-50">
                                                         Editar
@@ -121,7 +121,7 @@
                                                 @endcan
 
                                                 @if ($usuario->ativo)
-                                                    @can('usuarios:desativar')
+                                                    @can('desativar', $usuario)
                                                         @if (!auth()->user()->is($usuario))
                                                             <form action="{{ route('usuarios.desativar', $usuario) }}"
                                                                 onsubmit="return confirm('Deseja realmente desativar este usuário?');"
@@ -137,7 +137,7 @@
                                                         @endif
                                                     @endcan
                                                 @else
-                                                    @can('usuarios:reativar')
+                                                    @can('reativar', $usuario)
                                                         <form action="{{ route('usuarios.reativar', $usuario) }}"
                                                             method="POST">
                                                             @csrf
@@ -151,21 +151,19 @@
                                                     @endcan
                                                 @endif
 
-                                                @if (auth()->user()->isRoot())
-                                                    @can('usuarios:excluir')
-                                                        <form action="{{ route('usuarios.destroy', $usuario) }}"
-                                                            onsubmit="return confirm('Deseja realmente excluir este usuário?')"
-                                                            method="POST">
-                                                            @csrf
-                                                            @method('DELETE')
+                                                @can('delete', $usuario)
+                                                    <form action="{{ route('usuarios.destroy', $usuario) }}"
+                                                        onsubmit="return confirm('Deseja realmente excluir este usuário?')"
+                                                        method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
 
-                                                            <button type="submit"
-                                                                class="rounded-lg p-2 text-sm font-semibold text-red-800 transition hover:bg-red-100">
-                                                                Excluir
-                                                            </button>
-                                                        </form>
-                                                    @endcan
-                                                @endif
+                                                        <button type="submit"
+                                                            class="rounded-lg p-2 text-sm font-semibold text-red-800 transition hover:bg-red-100">
+                                                            Excluir
+                                                        </button>
+                                                    </form>
+                                                @endcan
                                             </div>
                                         @endif
                                     </td>

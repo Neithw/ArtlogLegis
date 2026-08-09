@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Permissao;
 use App\Models\Role;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class RbacSeeder extends Seeder
@@ -14,7 +13,7 @@ class RbacSeeder extends Seeder
      */
     public function run(): void
     {
-        $permissions = collect([
+        collect([
             [
                 'nome' => 'Visualizar Câmaras',
                 'codigo' => 'camaras:visualizar'
@@ -50,10 +49,6 @@ class RbacSeeder extends Seeder
             [
                 'nome' => 'Reativar Usuários',
                 'codigo' => 'usuarios:reativar'
-            ],
-            [
-                'nome' => 'Excluir Usuários',
-                'codigo' => 'usuarios:excluir'
             ],
             [
                 'nome' => 'Visualizar Vereadores',
@@ -111,8 +106,8 @@ class RbacSeeder extends Seeder
                 'nome' => 'Restaurar Mandatos',
                 'codigo' => 'mandatos:restaurar'
             ],
-        ])->map(function (array $permission): Permissao {
-            return Permissao::updateOrCreate(
+        ])->each(function (array $permission): void {
+            Permissao::updateOrCreate(
                 [
                     'codigo' => $permission['codigo'],
                 ],
@@ -122,7 +117,7 @@ class RbacSeeder extends Seeder
             );
         });
 
-        $root = Role::updateOrCreate(
+        Role::updateOrCreate(
             [
                 'codigo' => 'root',
             ],
@@ -131,7 +126,7 @@ class RbacSeeder extends Seeder
             ]
         );
 
-        $usuarioComum = Role::updateOrCreate(
+        Role::updateOrCreate(
             [
                 'codigo' => 'usuario_comum',
             ],
@@ -140,7 +135,7 @@ class RbacSeeder extends Seeder
             ]
         );
 
-        $gerente = Role::updateOrCreate(
+        Role::updateOrCreate(
             [
                 'codigo' => 'gerente'
             ],

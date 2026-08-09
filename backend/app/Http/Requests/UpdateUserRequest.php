@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -16,21 +15,6 @@ class UpdateUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $usuarioAutenticado = $this->user();
-        $user = $this->route('user');
-
-        if (! $usuarioAutenticado || ! $user instanceof User || ! $usuarioAutenticado->can('usuarios:editar')) {
-            return false;
-        }
-
-        if ($user->isRoot()) {
-            return false;
-        }
-
-        if (! $usuarioAutenticado->isRoot() && (int) $user->camara_id !== (int) $usuarioAutenticado->camara_id) {
-            return false;
-        }
-
         return true;
     }
 
