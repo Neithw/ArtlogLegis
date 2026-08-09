@@ -30,7 +30,7 @@
                     </div>
 
                     <div class="grid gap-6 p-6 md:grid-cols-2">
-                        <div>
+                        <div class="md:col-span-2">
                             <x-label value="Câmara" />
 
                             <div class="mt-1 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
@@ -44,7 +44,7 @@
                             </div>
                         </div>
 
-                        <div>
+                        <div class="md:col-span-2">
                             <x-label for="user_id" value="Conta de acesso" />
 
                             <select id="user_id" name="user_id"
@@ -58,8 +58,10 @@
                                     <option value="{{ $usuario->id }}" @selected((string) old('user_id', $vereador->user_id) === (string) $usuario->id)>
                                         {{ $usuario->name }} - {{ $usuario->email }}
 
-                                        @if (!$usuario->ativo)
-                                            Conta desativada
+                                        @if ($usuario->trashed())
+                                            (Conta arquivada)
+                                        @elseif (!$usuario->ativo)
+                                            (Conta desativada)
                                         @endif
                                     </option>
                                 @endforeach

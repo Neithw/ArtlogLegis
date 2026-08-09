@@ -102,10 +102,14 @@ class VereadorController extends Controller
             'user:id,name,email,ativo'
         ]);
 
-        $usuariosDisponiveis = User::query()
+        $usuariosDisponiveis = User::withTrashed()
             ->where('camara_id', $vereador->camara_id)
             ->where(function ($query) use ($vereador) {
-                $query->where('ativo', true);
+                $query->where(function ($query) {
+                    $query
+                        ->where('ativo', true)
+                        ->whereNull('deleted_at');
+                });
 
                 if ($vereador->user_id !== null) {
                     $query->orWhere('id', $vereador->user_id);
@@ -119,7 +123,7 @@ class VereadorController extends Controller
                     ->select('user_id')
             )
             ->orderBy('name')
-            ->get(['id', 'camara_id', 'name', 'email', 'ativo']);
+            ->get(['id', 'camara_id', 'name', 'email', 'ativo', 'deleted_at']);
 
         return view('vereadores.edit', compact('vereador', 'usuariosDisponiveis'));
     }
@@ -142,9 +146,14 @@ class VereadorController extends Controller
      */
     public function destroy(Vereador $vereador): RedirectResponse
     {
+        if ($vereador->mandatos()->withTrashed()->exists()) {
+            return to_route('vereadores.index')
+                ->with('error', 'Não é possível excluir um vereador que possui mandatos vinculados.');
+        }
+
         $vereador->delete();
 
         return to_route('vereadores.index')
-            ->with('success', 'Vereador excluido com sucesso.');
+            ->with('success', 'Vereador excluído com sucesso.');
     }
 }

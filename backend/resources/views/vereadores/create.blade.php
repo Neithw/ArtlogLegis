@@ -61,7 +61,7 @@
                                 @enderror
                             </div>
                         @else
-                            <div>
+                            <div class="md:col-span-2">
                                 <x-label value="Câmara" />
 
                                 <div class="mt-1 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
@@ -82,7 +82,7 @@
                             </div>
                         @endif
 
-                        <div>
+                        <div class="md:col-span-2">
                             <x-label for="user_id" value="Conta de acesso" />
 
                             <select id="user_id" name="user_id" x-model="userId" x-bind:disabled="!camaraId"

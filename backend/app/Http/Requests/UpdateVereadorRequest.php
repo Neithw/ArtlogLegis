@@ -34,7 +34,17 @@ class UpdateVereadorRequest extends FormRequest
                     ->where(function ($query) use ($vereador) {
                         $query
                             ->where('camara_id', $vereador->camara_id)
-                            ->whereNull('deleted_at');
+                            ->where(function ($query) use ($vereador) {
+                                $query->where(function ($query) {
+                                    $query
+                                        ->where('ativo', true)
+                                        ->whereNull('deleted_at');
+                                });
+
+                                if ($vereador->user_id !== null) {
+                                    $query->orWhere('id', $vereador->user_id);
+                                }
+                            });
                     }),
 
                 Rule::unique('vereadores', 'user_id')
