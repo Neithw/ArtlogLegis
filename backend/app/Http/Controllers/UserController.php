@@ -155,7 +155,7 @@ class UserController extends Controller
         }
 
         return view('usuarios.edit', [
-            ...$this->dadosDoFormulario($usuarioAutenticado),
+            ...$this->dadosDoFormulario($usuarioAutenticado, $user),
             'user' => $user,
             'permissoesSelecionadas' => $permissoesSelecionadas->all()
         ]);
@@ -166,6 +166,10 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user): RedirectResponse
     {
+        if ($user->isRoot()) {
+            abort(403);
+        }
+
         $dadosValidados = $request->validated();
         $usuarioAutenticado = $request->user();
 
@@ -263,18 +267,27 @@ class UserController extends Controller
             ->with('success', 'Usuário excluído com sucesso.');
     }
 
-    private function dadosDoFormulario(User $usuarioAutenticado): array
+    private function dadosDoFormulario(User $usuarioAutenticado, ?User $usuarioEditado = null): array
     {
         $usuarioIsRoot = $usuarioAutenticado->isRoot();
 
-        $camaras = Camara::query()
-            ->where('ativo', true)
-            ->when(
-                ! $usuarioIsRoot,
-                function ($query) use ($usuarioAutenticado) {
-                    $query->whereKey($usuarioAutenticado->camara_id);
+        $camarasQuery = Camara::query();
+
+        if ($usuarioIsRoot) {
+            $camarasQuery->where(function ($query) use ($usuarioEditado) {
+                $query->where('ativo', true);
+
+                if ($usuarioEditado?->camara_id !== null) {
+                    $query->orWhere('id', $usuarioEditado->camara_id);
                 }
-            )
+            });
+        } else {
+            $camarasQuery
+                ->where('ativo', true)
+                ->whereKey($usuarioAutenticado->camara_id);
+        }
+
+        $camaras = $camarasQuery
             ->orderBy('nome')
             ->get([
                 'id',

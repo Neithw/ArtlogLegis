@@ -6,7 +6,9 @@ use App\Http\Controllers\MandatoController;
 use App\Http\Controllers\PartidoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VereadorController;
+use App\Http\Middleware\EnsureUserHasActiveCamara;
 use App\Http\Middleware\EnsureUserIsActive;
+use App\Models\Camara;
 use App\Models\Legislatura;
 use App\Models\Mandato;
 use App\Models\Partido;
@@ -22,6 +24,7 @@ Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     EnsureUserIsActive::class,
+    EnsureUserHasActiveCamara::class,
     'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
@@ -29,10 +32,19 @@ Route::middleware([
     })->name('dashboard');
 
     Route::resource('/camaras', CamaraController::class)
-        ->middlewareFor(['index', 'show'], 'can:camaras:visualizar')
-        ->middlewareFor(['create', 'store'], 'can:camaras:criar')
-        ->middlewareFor(['edit', 'update'], 'can:camaras:editar')
-        ->middlewareFor('destroy', 'can:camaras:excluir');
+        ->except(['show', 'destroy'])
+        ->middlewareFor('index', 'can:viewAny,' . Camara::class)
+        ->middlewareFor(['create', 'store'], 'can:create,' . Camara::class)
+        ->middlewareFor(['edit', 'update'], 'can:update,camara');
+    // ->middlewareFor('destroy', 'can:delete,camara');
+
+    Route::patch('/camaras/{camara}/desativar', [CamaraController::class, 'desativar'])
+        ->name('camaras.desativar')
+        ->middleware('can:desativar,camara');
+
+    Route::patch('/camaras/{camara}/reativar', [CamaraController::class, 'reativar'])
+        ->name('camaras.reativar')
+        ->middleware('can:reativar,camara');
     // -----------------------------------------------------------------------------------------------
 
     Route::resource('usuarios', UserController::class)

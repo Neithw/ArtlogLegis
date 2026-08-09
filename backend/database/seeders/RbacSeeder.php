@@ -19,16 +19,8 @@ class RbacSeeder extends Seeder
                 'codigo' => 'camaras:visualizar'
             ],
             [
-                'nome' => 'Cadastrar Câmaras',
-                'codigo' => 'camaras:criar'
-            ],
-            [
                 'nome' => 'Editar Câmaras',
                 'codigo' => 'camaras:editar'
-            ],
-            [
-                'nome' => 'Excluir Câmaras',
-                'codigo' => 'camaras:excluir'
             ],
             [
                 'nome' => 'Visualizar Usuários',

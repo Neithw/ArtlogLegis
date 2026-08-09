@@ -26,6 +26,7 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         $user = $this->route('user');
+        $usuarioAutenticado = $this->user();
 
         return [
             'name' => [
@@ -52,10 +53,16 @@ class UpdateUserRequest extends FormRequest
                 'required',
                 'integer',
                 Rule::exists('camaras', 'id')
-                    ->where(function ($query) {
+                    ->where(function ($query) use ($usuarioAutenticado, $user) {
                         $query
-                            ->where('ativo', true)
-                            ->whereNull('deleted_at');
+                            ->whereNull('deleted_at')
+                            ->where(function ($query) use ($usuarioAutenticado, $user) {
+                                $query->where('ativo', true);
+
+                                if ($usuarioAutenticado->isRoot() && $user->camara_id !== null) {
+                                    $query->orWhere('id', $user->camara_id);
+                                }
+                            });
                     })
             ],
 

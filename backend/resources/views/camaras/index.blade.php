@@ -34,7 +34,7 @@
                         </p>
                     </div>
 
-                    @can('camaras:criar')
+                    @can('create', App\Models\Camara::class)
                         <a href="{{ route('camaras.create') }}"
                             class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700">
                             Cadastrar Câmara
@@ -102,25 +102,53 @@
 
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <div class="flex items-center justify-end gap-2">
-                                            @can('camaras:editar')
+                                            @can('update', $camara)
                                                 <a href="{{ route('camaras.edit', $camara) }}"
                                                     class="rounded-lg px-2 py-2 text-sm font-semibold text-yellow-700 transition hover:bg-yellow-50">
                                                     Editar
                                                 </a>
                                             @endcan
 
-                                            @can('camaras:excluir')
+                                            @if ($camara->ativo)
+                                                @can('desativar', $camara)
+                                                    <form action="{{ route('camaras.desativar', $camara) }}"
+                                                        onsubmit="return confirm('Deseja realmente desativar esta câmara?');"
+                                                        method="POST">
+                                                        @csrf
+                                                        @method('PATCH')
+
+                                                        <button type="submit"
+                                                            class="rounded-lg p-2 text-sm font-semibold text-red-700 transition hover:bg-red-50">
+                                                            Desativar
+                                                        </button>
+                                                    </form>
+                                                @endcan
+                                            @else
+                                                @can('reativar', $camara)
+                                                    <form action="{{ route('camaras.reativar', $camara) }}" method="POST">
+                                                        @csrf
+                                                        @method('PATCH')
+
+                                                        <button type="submit"
+                                                            class="rounded-lg p-2 text-sm font-semibold text-green-700 transition hover:bg-green-50">
+                                                            Reativar
+                                                        </button>
+                                                    </form>
+                                                @endcan
+                                            @endif
+
+                                            {{-- @can('delete', $camara)
                                                 <form action="{{ route('camaras.destroy', $camara) }}" method="POST"
                                                     onsubmit="return confirm('Deseja realmente excluir esta Câmara?')">
                                                     @csrf
                                                     @method('DELETE')
 
                                                     <button type="submit"
-                                                        class="rounded-lg px-2 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50">
+                                                        class="rounded-lg px-2 py-2 text-sm font-semibold text-red-800 transition hover:bg-red-100">
                                                         Excluir
                                                     </button>
                                                 </form>
-                                            @endcan
+                                            @endcan --}}
                                         </div>
                                     </td>
                                 </tr>

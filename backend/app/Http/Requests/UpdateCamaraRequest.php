@@ -16,6 +16,15 @@ class UpdateCamaraRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'cnpj' => $this->filled('cnpj')
+                ? preg_replace('/\D/', '', (string) $this->input('cnpj'))
+                : null
+        ]);
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -39,11 +48,6 @@ class UpdateCamaraRequest extends FormRequest
                 Rule::unique('camaras', 'cnpj')
                     ->ignore($this->route('camara')),
             ],
-
-            'ativo' => [
-                'required',
-                'boolean',
-            ],
         ];
     }
 
@@ -56,9 +60,6 @@ class UpdateCamaraRequest extends FormRequest
             'cnpj.size' => 'O CNPJ deve conter exatamente 14 dígitos.',
             'cnpj.regex' => 'O CNPJ deve conter apenas números.',
             'cnpj.unique' => 'O CNPJ já existe.',
-
-            'ativo.required' => 'Informe se a Câmara está ativa.',
-            'ativo.boolean' => 'O status informado é inválido.',
         ];
     }
 }

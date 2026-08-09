@@ -64,32 +64,6 @@
                                 </p>
                             @enderror
                         </div>
-
-                        <div>
-                            <div class="flex items-start gap-2">
-                                <div class="flex h-6 items-center">
-                                    <input type="hidden" name="ativo" value="0">
-                                    <input type="checkbox" name="ativo" id="ativo" value="1"
-                                        @checked(old('ativo', $camara->ativo))
-                                        class="h-4 w-4 rounded border-gray-300 text-indigo-600">
-                                </div>
-                                <div>
-                                    <label for="ativo" class="block text-sm font-medium text-gray-700">
-                                        Câmara ativa
-                                    </label>
-
-                                    <p class="mt-1 text-sm text-gray-500">
-                                        Câmaras ativas ficam disponíveis para utilização no sistema.
-                                    </p>
-                                </div>
-                            </div>
-
-                            @error('ativo')
-                                <p class="mt-2 text-sm text-red-600">
-                                    {{ $message }}
-                                </p>
-                            @enderror
-                        </div>
                     </div>
                     <footer
                         class="flex flex-col-reverse gap-3 border-t border-gray-200 bg-gray-50 px-6 py-4 sm:flex-row sm:items-center sm:justify-end">
