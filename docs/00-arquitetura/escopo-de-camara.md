@@ -10,7 +10,7 @@ O usuário root será global e poderá atuar sobre todas as Câmaras.
 
 - users
 - camaras
-- `camara_id` nas entidades com escopo institucional
+- `camara_id` nas entidades com vínculo direto à Câmara
 
 ## Regras
 
@@ -20,5 +20,5 @@ O usuário root será global e poderá atuar sobre todas as Câmaras.
 - As permissões definirão quais ações o usuário poderá executar.
 - O camara_id definirá sobre quais dados o usuário poderá executar essas ações.
 - O escopo será aplicado no back-end e não dependerá apenas da interface.
-- Cadastros realizados por usuários não-root receberão a Câmara do usuário autenticado.
+- Cadastros de entidades com escopo de Câmara realizados por usuários não-root receberão a Câmara do usuário autenticado.
 - Relacionamentos entre entidades institucionais deverão respeitar a mesma Câmara.

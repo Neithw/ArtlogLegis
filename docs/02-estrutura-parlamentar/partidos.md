@@ -46,10 +46,13 @@ A tabela `partidos` possuirá inicialmente:
 
 - `partidos:visualizar`
 
+A visualização é a única ação delegável a usuários não-root neste módulo.
+Criação, edição, arquivamento e restauração de partidos são operações exclusivas do root e, por isso, não possuem permissões próprias no catálogo do RBAC.
+
 ## Exclusão lógica
 
 - Partidos serão arquivados por meio de `SoftDeletes`.
-- A exclusão preencherá o campo deleted_at e preservará o registro no banco.
+- A exclusão preencherá o campo `deleted_at` e preservará o registro no banco.
 - Partidos arquivados não aparecerão nas consultas e listagens comuns.
 - Nome, sigla e número eleitoral de um partido arquivado continuarão reservados.
 - Um partido arquivado deverá ser restaurado em vez de ser cadastrado novamente.

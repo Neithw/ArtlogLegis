@@ -56,7 +56,8 @@ A tabela `users` deverá possuir inicialmente:
 - `usuarios:editar`
 - `usuarios:desativar`
 - `usuarios:reativar`
-- `usuarios:excluir`
+
+A exclusão lógica de usuários é restrita ao root e não possui uma permissão `usuarios:excluir` no catálogo do RBAC.
 
 ## Controle de status
 

@@ -1,4 +1,6 @@
 # Organização do sistema
+Esta pasta registra as principais decisões de arquitetura e de domínio adotadas durante o desenvolvimento do sistema.
+Os documentos estão organizados por área funcional, e não pela ordem cronológica de implementação.
 
 ## 00-arquitetura
 - decisões que afetam todo o sistema, como autorização e isolamento de dados.

@@ -28,6 +28,7 @@ A tabela `legislaturas` possuirá inicialmente:
 - O número da legislatura será único dentro de cada Câmara.
 - Câmaras diferentes poderão possuir legislaturas com o mesmo número.
 - A data de término deverá ser posterior à data de início.
+- Novas legislaturas somente poderão ser cadastradas para Câmaras ativas.
 - Legislaturas da mesma Câmara não poderão possuir períodos sobrepostos.
 - A Câmara vinculada não poderá ser alterada após o cadastro.
 - A situação da legislatura será calculada por suas datas.

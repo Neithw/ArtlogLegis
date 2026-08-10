@@ -35,9 +35,9 @@ A tabela `camaras` possuirá:
 ## Permissões
 
 - `camaras:visualizar`
-- `camaras:criar`
 - `camaras:editar`
-- `camaras:excluir`
+
+A criação, desativação e reativação de Câmaras são operações exclusivas do root e, por isso, não possuem permissões próprias no catálogo do RBAC.
 
 ## Exclusão lógica
 

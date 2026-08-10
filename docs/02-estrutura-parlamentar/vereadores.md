@@ -35,6 +35,7 @@ A tabela `vereadores` possuirá inicialmente:
 - Um vereador poderá possuir uma conta de acesso vinculada.
 - O vínculo com uma conta de acesso será opcional.
 - Uma conta de acesso poderá estar vinculada a apenas um vereador.
+- Novos vereadores somente poderão ser cadastrados para Câmaras ativas.
 - A conta vinculada deverá pertencer à mesma Câmara do vereador.
 - A Câmara vinculada não poderá ser alterada após o cadastro.
 - O vereador poderá existir sem uma conta de acesso.

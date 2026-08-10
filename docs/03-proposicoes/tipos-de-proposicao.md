@@ -22,6 +22,7 @@ A tabela `tipos_proposicao` possuirá inicialmente:
 ## Regras
 
 - Cada tipo de proposição pertencerá a uma única Câmara.
+- Novos tipos de proposição somente poderão ser cadastrados para Câmaras ativas.
 - Uma Câmara poderá possuir vários tipos de proposição.
 - O nome será obrigatório.
 - O nome será único dentro da mesma Câmara.
