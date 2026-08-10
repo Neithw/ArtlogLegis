@@ -49,6 +49,15 @@ A tabela `users` deverá possuir inicialmente:
 - Gerentes poderão ativar e desativar usuários quando possuírem as permissões necessárias.
 - Dados parlamentares e institucionais não serão armazenados diretamente em `users`.
 
+## Permissões
+
+- `usuarios:visualizar`
+- `usuarios:criar`
+- `usuarios:editar`
+- `usuarios:desativar`
+- `usuarios:reativar`
+- `usuarios:excluir`
+
 ## Controle de status
 
 - O status de um usuário não será alterado pela edição comum.
