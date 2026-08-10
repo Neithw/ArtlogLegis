@@ -37,4 +37,9 @@ class Camara extends Model
     {
         return $this->hasMany(Legislatura::class);
     }
+
+    public function tiposProposicao(): HasMany
+    {
+        return $this->hasMany(TipoProposicao::class);
+    }
 }

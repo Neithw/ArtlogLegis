@@ -98,6 +98,26 @@ class RbacSeeder extends Seeder
                 'nome' => 'Restaurar Mandatos',
                 'codigo' => 'mandatos:restaurar'
             ],
+            [
+                'nome' => 'Visualizar Tipos de Proposição',
+                'codigo' => 'tipos-proposicao:visualizar'
+            ],
+            [
+                'nome' => 'Cadastrar Tipos de Proposição',
+                'codigo' => 'tipos-proposicao:criar'
+            ],
+            [
+                'nome' => 'Editar Tipos de Proposição',
+                'codigo' => 'tipos-proposicao:editar'
+            ],
+            [
+                'nome' => 'Excluir Tipos de Proposição',
+                'codigo' => 'tipos-proposicao:excluir'
+            ],
+            [
+                'nome' => 'Restaurar Tipos de Proposição',
+                'codigo' => 'tipos-proposicao:restaurar'
+            ],
         ])->each(function (array $permission): void {
             Permissao::updateOrCreate(
                 [

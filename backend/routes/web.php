@@ -5,6 +5,7 @@ use App\Http\Controllers\FiliacaoPartidariaController;
 use App\Http\Controllers\LegislaturaController;
 use App\Http\Controllers\MandatoController;
 use App\Http\Controllers\PartidoController;
+use App\Http\Controllers\TipoProposicaoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VereadorController;
 use App\Http\Middleware\EnsureUserHasActiveCamara;
@@ -13,6 +14,7 @@ use App\Models\Camara;
 use App\Models\Legislatura;
 use App\Models\Mandato;
 use App\Models\Partido;
+use App\Models\TipoProposicao;
 use App\Models\User;
 use App\Models\Vereador;
 use Illuminate\Support\Facades\Route;
@@ -126,5 +128,25 @@ Route::middleware([
     Route::post('/mandatos/{mandato}/troca-partidaria', [FiliacaoPartidariaController::class, 'store'])
         ->middleware('can:update,mandato')
         ->name('mandatos.troca-partidaria.store');
+    // -----------------------------------------------------------------------------------------------
+
+    Route::resource('tipos-proposicao', TipoProposicaoController::class)
+        ->parameters([
+            'tipos-proposicao' => 'tipoProposicao'
+        ])
+        ->except('show')
+        ->middlewareFor('index', 'can:viewAny,' . TipoProposicao::class)
+        ->middlewareFor(['create', 'store'], 'can:create,' . TipoProposicao::class)
+        ->middlewareFor(['edit', 'update'], 'can:update,tipoProposicao')
+        ->middlewareFor('destroy', 'can:delete,tipoProposicao');
+
+    Route::get('/tipos-proposicao/arquivados', [TipoProposicaoController::class, 'arquivados'])
+        ->middleware('can:viewArchived,' . TipoProposicao::class)
+        ->name('tipos-proposicao.arquivados');
+
+    Route::patch('/tipos-proposicao/{tipoProposicao}/restaurar', [TipoProposicaoController::class, 'restore'])
+        ->withTrashed()
+        ->middleware('can:restore,tipoProposicao')
+        ->name('tipos-proposicao.restore');
     // -----------------------------------------------------------------------------------------------
 });
