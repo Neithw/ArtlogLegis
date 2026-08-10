@@ -21,6 +21,13 @@
                 </div>
             @endif
 
+            @if (session('error'))
+                <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800"
+                    role="alert">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             <section class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
                 <header
                     class="flex flex-col gap-4 border-b border-gray-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
@@ -70,6 +77,11 @@
 
                                 <th scope="col"
                                     class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                    Partido
+                                </th>
+
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                                     Início
                                 </th>
 
@@ -90,7 +102,7 @@
                                 <tr>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <p class="text-sm font-medium text-gray-900">
-                                            {{ $mandato->vereador->nome_parlamentar }}
+                                            {{ $mandato->vereador->nome_parlamentar ?? $mandato->vereador->nome }}
                                         </p>
                                     </td>
 
@@ -103,6 +115,12 @@
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <p class="text-sm font-medium text-gray-900">
                                             {{ $mandato->legislatura->camara->nome ?? 'Câmara indisponível' }}
+                                        </p>
+                                    </td>
+
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        <p class="text-sm font-medium text-gray-900">
+                                            {{ $mandato->ultimaFiliacaoPartidaria?->partido->sigla ?? 'Sem partido' }}
                                         </p>
                                     </td>
 
@@ -121,8 +139,13 @@
                                     <td class="whitespace-nowrap px-4 py-4 text-right">
                                         <div class="flex items-center justify-end gap-2">
                                             @can('update', $mandato)
+                                                <a href="{{ route('mandatos.troca-partidaria.create', $mandato) }}"
+                                                    class="rounded-lg p-2 text-sm font-semibold text-indigo-700 transition hover:bg-indigo-50">
+                                                    Trocar partido
+                                                </a>
+
                                                 <a href="{{ route('mandatos.edit', $mandato) }}"
-                                                    class="rounded-lg p-2 text-sm font-semibold text-yellow-700 transition hover:bg-yellow-50">
+                                                    class="rounded-lg p-2 text-sm font-semibold text-yellow-600 transition hover:bg-yellow-50">
                                                     Editar
                                                 </a>
                                             @endcan
@@ -135,7 +158,7 @@
                                                     @method('DELETE')
 
                                                     <button type="submit"
-                                                        class="rounded-lg p-2 text-sm font-semibold text-red-800 transition hover:bg-red-100">
+                                                        class="rounded-lg p-2 text-sm font-semibold text-red-700 transition hover:bg-red-100">
                                                         Arquivar
                                                     </button>
                                                 </form>
@@ -145,7 +168,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-6 py-12 text-center text-sm text-gray-500">
+                                    <td colspan="7" class="px-6 py-12 text-center text-sm text-gray-500">
                                         Nenhum mandato foi encontrado.
                                     </td>
                                 </tr>

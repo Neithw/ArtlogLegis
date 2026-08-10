@@ -6,7 +6,7 @@ O sistema possuirá um módulo interno para gerenciamento de legislaturas.
 Cada legislatura representará um período institucional de uma Câmara.
 A legislatura estabelecerá o contexto temporal da atividade parlamentar.
 Dados de vereadores, partidos, mandatos, afastamentos e substituições não serão armazenados diretamente em `legislaturas`.
-O vínculo entre vereador e legislatura será realizado futuramente por meio da entidade Mandato.
+O vínculo entre vereador e legislatura será realizado por meio da entidade Mandato.
 
 ## Estrutura
 
@@ -52,4 +52,4 @@ A tabela `legislaturas` possuirá inicialmente:
 - A exclusão preencherá o campo `deleted_at` e preservará o registro no banco.
 - Legislaturas excluídas não aparecerão nas consultas e listagens comuns.
 - O número de uma legislatura excluída continuará reservado para a respectiva Câmara.
-- Futuramente, a exclusão será impedida quando existirem mandatos ou outros registros legislativos vinculados.
+- A exclusão será impedida quando existirem mandatos vinculados, inclusive arquivados.

@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Mandato extends Model
@@ -37,5 +39,22 @@ class Mandato extends Model
     {
         return $this->belongsTo(Legislatura::class)
             ->withTrashed();
+    }
+
+    public function filiacoesPartidarias(): HasMany
+    {
+        return $this->hasMany(FiliacaoPartidaria::class);
+    }
+
+    public function ultimaFiliacaoPartidaria(): HasOne
+    {
+        return $this->hasOne(FiliacaoPartidaria::class)
+            ->latestOfMany('data_inicio');
+    }
+
+    public function primeiraFiliacaoPartidaria(): HasOne
+    {
+        return $this->hasOne(FiliacaoPartidaria::class)
+            ->oldestOfMany('data_inicio');
     }
 }

@@ -14,8 +14,36 @@
     <div class="py-4">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
+            @php
+                $configuracaoFormulario = [
+                    'vereadorId' => (string) old('vereador_id'),
+                    'legislaturaId' => (string) old('legislatura_id'),
 
-            <form action="{{ route('mandatos.store') }}" method="POST" class="space-y-6">
+                    'vereadores' => $vereadores
+                        ->map(
+                            fn($vereador) => [
+                                'id' => $vereador->id,
+                                'camara_id' => $vereador->camara_id,
+                            ],
+                        )
+                        ->values(),
+
+                    'legislaturas' => $legislaturas
+                        ->map(
+                            fn($legislatura) => [
+                                'id' => $legislatura->id,
+                                'camara_id' => $legislatura->camara_id,
+                                'rotulo' =>
+                                    $legislatura->numero .
+                                    'ª Legislatura' .
+                                    ($usuarioIsRoot ? ' - ' . $legislatura->camara->nome : ''),
+                            ],
+                        )
+                        ->values(),
+                ];
+            @endphp
+
+            <form action="{{ route('mandatos.store') }}" method="POST" class="space-y-6" x-data="formularioMandato({{ Js::from($configuracaoFormulario) }})">
                 @csrf
 
                 <div class="overflow-hidden rounded-xl bg-white shadow">
@@ -33,7 +61,8 @@
                         <div class="md:col-span-2">
                             <x-label for="vereador_id" value="Vereador" />
 
-                            <select name="vereador_id" id="vereador_id"
+                            <select name="vereador_id" id="vereador_id" x-model="vereadorId"
+                                x-on:change="alterarVereador"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 required>
                                 <option value="">
@@ -42,7 +71,7 @@
 
                                 @foreach ($vereadores as $vereador)
                                     <option value="{{ $vereador->id }}" @selected(old('vereador_id') == $vereador->id)>
-                                        {{ $vereador->nome_parlamentar }}
+                                        {{ $vereador->nome_parlamentar ?? $vereador->nome }}
 
                                         @if ($usuarioIsRoot)
                                             - {{ $vereador->camara->nome }}
@@ -57,25 +86,51 @@
                         <div class="md:col-span-2">
                             <x-label for="legislatura_id" value="Legislatura" />
 
-                            <select name="legislatura_id" id="legislatura_id"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            <select name="legislatura_id" id="legislatura_id" x-model="legislaturaId"
+                                x-bind:disabled="!vereadorId"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm disabled:bg-gray-100 disabled:text-gray-500 focus:border-indigo-500 focus:ring-indigo-500"
                                 required>
                                 <option value="">
                                     Selecione uma legislatura
                                 </option>
 
-                                @foreach ($legislaturas as $legislatura)
-                                    <option value="{{ $legislatura->id }}" @selected(old('legislatura_id') == $legislatura->id)>
-                                        {{ $legislatura->numero }}ª Legislatura
+                                <template x-for="legislatura in legislaturasFiltradas" x-bind:key="legislatura.rotulo">
+                                    <option x-bind:value="String(legislatura.id)" x-text="legislatura.rotulo">
+                                    </option>
+                                </template>
+                            </select>
 
-                                        @if ($usuarioIsRoot)
-                                            - {{ $legislatura->camara->nome }}
-                                        @endif
+                            <p x-show="!vereadorId" class="mt-2 text-sm text-gray-500">
+                                Selecione um vereador para visualizar as legislaturas disponíveis.
+                            </p>
+
+                            <p x-show="vereadorId && legislaturasFiltradas.length === 0"
+                                class="mt-2 text-sm text-gray-500">
+                                Nenhuma legislatura está disponível para a Câmara deste vereador.
+                            </p>
+
+                            <x-input-error for="legislatura_id" class="mt-2" />
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <x-label for="partido_id" value="Partido" />
+
+                            <select name="partido_id" id="partido_id"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                required>
+
+                                <option value="">
+                                    Selecione um partido
+                                </option>
+
+                                @foreach ($partidos as $partido)
+                                    <option value="{{ $partido->id }}" @selected(old('partido_id') == $partido->id)>
+                                        {{ $partido->sigla }} - {{ $partido->nome }}
                                     </option>
                                 @endforeach
                             </select>
 
-                            <x-input-error for="legislatura_id" class="mt-2" />
+                            <x-input-error for="partido_id" class="mt-2" />
                         </div>
 
                         <div>

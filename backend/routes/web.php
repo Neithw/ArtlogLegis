@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CamaraController;
+use App\Http\Controllers\FiliacaoPartidariaController;
 use App\Http\Controllers\LegislaturaController;
 use App\Http\Controllers\MandatoController;
 use App\Http\Controllers\PartidoController;
@@ -117,5 +118,13 @@ Route::middleware([
         ->withTrashed()
         ->middleware('can:restore,mandato')
         ->name('mandatos.restore');
+
+    Route::get('/mandatos/{mandato}/troca-partidaria', [FiliacaoPartidariaController::class, 'create'])
+        ->middleware('can:update,mandato')
+        ->name('mandatos.troca-partidaria.create');
+
+    Route::post('/mandatos/{mandato}/troca-partidaria', [FiliacaoPartidariaController::class, 'store'])
+        ->middleware('can:update,mandato')
+        ->name('mandatos.troca-partidaria.store');
     // -----------------------------------------------------------------------------------------------
 });

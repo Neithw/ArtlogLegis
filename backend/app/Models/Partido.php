@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Partido extends Model
@@ -16,4 +17,9 @@ class Partido extends Model
         'sigla',
         'numero_eleitoral'
     ];
+
+    public function filiacoesPartidarias(): HasMany
+    {
+        return $this->hasMany(FiliacaoPartidaria::class);
+    }
 }

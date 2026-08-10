@@ -63,6 +63,11 @@
 
                                 <th scope="col"
                                     class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                    Partido
+                                </th>
+
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                                     Início
                                 </th>
 
@@ -83,7 +88,7 @@
                                 <tr>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <p class="text-sm font-medium text-gray-900">
-                                            {{ $mandato->vereador->nome_parlamentar }}
+                                            {{ $mandato->vereador->nome_parlamentar ?? $mandato->vereador->nome }}
                                         </p>
                                     </td>
 
@@ -96,6 +101,12 @@
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <p class="text-sm font-medium text-gray-900">
                                             {{ $mandato->legislatura->camara->nome ?? 'Câmara indisponível' }}
+                                        </p>
+                                    </td>
+
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        <p class="text-sm font-medium text-gray-900">
+                                            {{ $mandato->ultimaFiliacaoPartidaria?->partido->sigla ?? 'Sem partido' }}
                                         </p>
                                     </td>
 
@@ -131,7 +142,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-6 py-12 text-center text-sm text-gray-500">
+                                    <td colspan="7" class="px-6 py-12 text-center text-sm text-gray-500">
                                         Nenhum mandato está arquivado.
                                     </td>
                                 </tr>

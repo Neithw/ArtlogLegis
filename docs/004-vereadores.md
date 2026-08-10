@@ -7,7 +7,8 @@ Cada vereador representará a pessoa parlamentar cadastrada institucionalmente e
 A conta de acesso será representada separadamente pela entidade User.
 O vínculo entre vereador e usuário será opcional.
 Dados de legislatura, partido, período de exercício, afastamentos e substituições não serão armazenados diretamente em `vereadores`.
-O vínculo temporal entre vereador, legislatura e partido será realizado futuramente por meio da entidade Mandato.
+O vínculo temporal entre vereador e legislatura será realizado por meio da entidade Mandato.
+O histórico partidário será registrado por meio de filiações partidárias vinculadas ao mandato.
 
 ## Estrutura
 
@@ -39,7 +40,8 @@ A tabela `vereadores` possuirá inicialmente:
 - O vereador poderá existir sem uma conta de acesso.
 - A conta de acesso poderá existir sem um vereador vinculado.
 - Dados temporais de exercício parlamentar não serão armazenados diretamente no vereador.
-- Partido, legislatura e período de exercício serão tratados futuramente pela entidade Mandato.
+- Legislatura e período de exercício serão tratados pela entidade Mandato.
+- O vínculo partidário será histórico e realizado por meio das filiações partidárias do mandato.
 - Afastamentos e substituições terão estruturas próprias futuramente.
 - O root poderá gerenciar vereadores de todas as Câmaras.
 - Usuários não-root somente poderão gerenciar vereadores da própria Câmara.
@@ -59,4 +61,4 @@ A tabela `vereadores` possuirá inicialmente:
 - A exclusão preencherá o campo `deleted_at` e preservará o registro no banco.
 - Vereadores excluídos não aparecerão nas consultas e listagens comuns.
 - A conta vinculada a um vereador excluído continuará reservada.
-- Futuramente, a exclusão será impedida quando existirem mandatos ou outros registros legislativos vinculados.
+- A exclusão será impedida quando existirem mandatos vinculados, inclusive arquivados.

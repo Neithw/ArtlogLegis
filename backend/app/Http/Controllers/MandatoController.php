@@ -6,10 +6,12 @@ use App\Http\Requests\StoreMandatoRequest;
 use App\Http\Requests\UpdateMandatoRequest;
 use App\Models\Legislatura;
 use App\Models\Mandato;
+use App\Models\Partido;
 use App\Models\Vereador;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MandatoController extends Controller
 {
@@ -22,7 +24,11 @@ class MandatoController extends Controller
         $usuarioIsRoot = $usuarioAutenticado->isRoot();
 
         $mandatos = Mandato::query()
-            ->with(['vereador', 'legislatura.camara'])
+            ->with([
+                'vereador',
+                'legislatura.camara',
+                'ultimaFiliacaoPartidaria.partido'
+            ])
             ->when(! $usuarioIsRoot, function ($query) use ($usuarioAutenticado) {
                 $query->whereRelation('legislatura', 'camara_id', $usuarioAutenticado->camara_id);
             })
@@ -42,6 +48,9 @@ class MandatoController extends Controller
 
         $vereadores = Vereador::query()
             ->with('camara:id,nome')
+            ->whereHas('camara', function ($query) {
+                $query->where('ativo', true);
+            })
             ->when(! $usuarioIsRoot, function ($query) use ($usuarioAutenticado) {
                 $query->where('camara_id', $usuarioAutenticado->camara_id);
             })
@@ -50,13 +59,24 @@ class MandatoController extends Controller
 
         $legislaturas = Legislatura::query()
             ->with('camara:id,nome')
+            ->whereHas('camara', function ($query) {
+                $query->where('ativo', true);
+            })
             ->when(! $usuarioIsRoot, function ($query) use ($usuarioAutenticado) {
                 $query->where('camara_id', $usuarioAutenticado->camara_id);
             })
             ->orderByDesc('data_inicio')
             ->get();
 
-        return view('mandatos.create', compact('vereadores', 'legislaturas', 'usuarioIsRoot'));
+        $partidos = Partido::query()
+            ->orderBy('nome')
+            ->get([
+                'id',
+                'nome',
+                'sigla'
+            ]);
+
+        return view('mandatos.create', compact('vereadores', 'legislaturas', 'partidos', 'usuarioIsRoot'));
     }
 
     /**
@@ -66,7 +86,19 @@ class MandatoController extends Controller
     {
         $dadosValidados = $request->validated();
 
-        Mandato::create($dadosValidados);
+        $partidoId = $dadosValidados['partido_id'];
+
+        unset($dadosValidados['partido_id']);
+
+        DB::transaction(function () use ($dadosValidados, $partidoId) {
+            $mandato = Mandato::create($dadosValidados);
+
+            $mandato->filiacoesPartidarias()->create([
+                'partido_id' => $partidoId,
+                'data_inicio' => $mandato->data_inicio,
+                'data_fim' => $mandato->data_fim
+            ]);
+        });
 
         return to_route('mandatos.index')
             ->with('success', 'Mandato cadastrado com sucesso.');
@@ -80,7 +112,11 @@ class MandatoController extends Controller
         $usuarioAutenticado = $request->user();
         $usuarioIsRoot = $usuarioAutenticado->isRoot();
 
-        $mandato->load(['vereador', 'legislatura.camara']);
+        $mandato->load([
+            'vereador',
+            'legislatura.camara',
+            'ultimaFiliacaoPartidaria.partido'
+        ]);
 
         return view('mandatos.edit', compact('mandato', 'usuarioIsRoot'));
     }
@@ -92,7 +128,25 @@ class MandatoController extends Controller
     {
         $dadosValidados = $request->validated();
 
-        $mandato->update($dadosValidados);
+        DB::transaction(function () use ($mandato, $dadosValidados) {
+            $primeiraFiliacao = $mandato->primeiraFiliacaoPartidaria;
+            $ultimaFiliacao = $mandato->ultimaFiliacaoPartidaria;
+
+            $mandato->update($dadosValidados);
+
+            if ($primeiraFiliacao) {
+                $primeiraFiliacao->update([
+                    'data_inicio' => $mandato->data_inicio
+                ]);
+            }
+
+            if ($ultimaFiliacao) {
+                $ultimaFiliacao->update([
+                    'data_fim' => $mandato->data_fim
+                ]);
+            }
+        });
+
 
         return to_route('mandatos.index')
             ->with('success', 'Mandato atualizado com sucesso.');
@@ -115,7 +169,11 @@ class MandatoController extends Controller
         $usuarioIsRoot = $usuarioAutenticado->isRoot();
 
         $arquivados = Mandato::onlyTrashed()
-            ->with(['vereador', 'legislatura.camara'])
+            ->with([
+                'vereador',
+                'legislatura.camara',
+                'ultimaFiliacaoPartidaria.partido'
+            ])
             ->when(! $usuarioIsRoot, function ($query) use ($usuarioAutenticado) {
                 $query->whereRelation('legislatura', 'camara_id', $usuarioAutenticado->camara_id);
             })

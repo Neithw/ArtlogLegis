@@ -6,7 +6,7 @@
             </p>
 
             <h2 class="text-2xl font-semibold leading-tight text-gray-900">
-                Editar mandato
+                Troca partidária
             </h2>
         </div>
     </x-slot>
@@ -15,18 +15,17 @@
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
 
-            <form action="{{ route('mandatos.update', $mandato) }}" method="POST" class="space-y-6">
+            <form action="{{ route('mandatos.troca-partidaria.store', $mandato) }}" method="POST" class="space-y-6">
                 @csrf
-                @method('PUT')
 
                 <div class="overflow-hidden rounded-xl bg-white shadow">
                     <div class="border-b border-gray-200 px-6 py-5">
                         <h3 class="text-lg font-semibold text-gray-900">
-                            Dados do mandato
+                            Registrar nova troca partidária
                         </h3>
 
                         <p class="mt-1 text-sm text-gray-500">
-                            Edite os dados do mandato.
+                            Informe os dados para a troca partidária.
                         </p>
                     </div>
 
@@ -51,37 +50,46 @@
 
                             <div class="mt-1 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
                                 <p class="text-sm font-medium text-gray-900">
-                                    @if ($mandato->ultimaFiliacaoPartidaria?->partido)
-                                        {{ $mandato->ultimaFiliacaoPartidaria->partido->sigla }}
-                                        -
-                                        {{ $mandato->ultimaFiliacaoPartidaria->partido->nome }}
-                                    @else
-                                        Sem partido informado
-                                    @endif
+                                    {{ $mandato->ultimaFiliacaoPartidaria->partido->sigla }}
+                                    -
+                                    {{ $mandato->ultimaFiliacaoPartidaria->partido->nome }}
                                 </p>
 
                                 <p class="mt-1 text-xs text-gray-500">
-                                    Alterações partidárias são registradas separadamente para preservar o histórico.
+                                    Início da filiação -
+                                    {{ $mandato->ultimaFiliacaoPartidaria->data_inicio->format('d/m/Y') }}
                                 </p>
                             </div>
                         </div>
 
                         <div>
-                            <x-label for="data_inicio" value="Data de início" />
+                            <x-label for="partido_id" value="Novo Partido" />
 
-                            <x-input id="data_inicio" name="data_inicio" type="date" class="mt-1 block w-full"
-                                :value="old('data_inicio', $mandato->data_inicio?->format('Y-m-d'))" required />
+                            <select name="partido_id" id="partido_id"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                required>
 
-                            <x-input-error for="data_inicio" class="mt-2" />
+                                <option value="">
+                                    Selecione um partido
+                                </option>
+
+                                @foreach ($partidos as $partido)
+                                    <option value="{{ $partido->id }}" @selected(old('partido_id') == $partido->id)>
+                                        {{ $partido->sigla }} - {{ $partido->nome }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <x-input-error for="partido_id" class="mt-2" />
                         </div>
 
                         <div>
-                            <x-label for="data_fim" value="Data de término" />
+                            <x-label for="data_troca" value="Data da troca" />
 
-                            <x-input id="data_fim" name="data_fim" type="date" class="mt-1 block w-full"
-                                :value="old('data_fim', $mandato->data_fim?->format('Y-m-d'))" />
+                            <x-input id="data_troca" name="data_troca" type="date" class="mt-1 block w-full"
+                                :value="old('data_troca')" required />
 
-                            <x-input-error for="data_fim" class="mt-2" />
+                            <x-input-error for="data_troca" class="mt-2" />
                         </div>
                     </div>
                 </div>
@@ -92,7 +100,7 @@
                     </a>
 
                     <x-button>
-                        Salvar alterações
+                        Registrar troca
                     </x-button>
                 </div>
             </form>

@@ -43,6 +43,13 @@ class StoreMandatoRequest extends FormRequest
                     ->whereNull('deleted_at')
             ],
 
+            'partido_id' => [
+                'required',
+                'integer',
+                Rule::exists('partidos', 'id')
+                    ->whereNull('deleted_at')
+            ],
+
             'data_inicio' => [
                 'required',
                 'date'
@@ -60,7 +67,7 @@ class StoreMandatoRequest extends FormRequest
     {
         return [
             function (Validator $validator) {
-                if ($validator->errors()->hasAny(['vereador_id', 'legislatura_id', 'data_inicio', 'data_fim'])) {
+                if ($validator->errors()->hasAny(['vereador_id', 'legislatura_id', 'partido_id', 'data_inicio', 'data_fim'])) {
                     return;
                 }
 
@@ -92,7 +99,18 @@ class StoreMandatoRequest extends FormRequest
                     return;
                 }
 
-                $mandatoExistente = Mandato::query()
+                $camara = $legislatura->camara;
+
+                if (! $camara || ! $camara->ativo) {
+                    $validator->errors()->add(
+                        'legislatura_id',
+                        'Não é possível cadastrar um mandato para uma Câmara inativa.'
+                    );
+
+                    return;
+                }
+
+                $mandatoExistente = Mandato::withTrashed()
                     ->where('vereador_id', $vereador->id)
                     ->where('legislatura_id', $legislatura->id)
                     ->exists();

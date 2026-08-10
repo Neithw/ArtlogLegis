@@ -75,6 +75,67 @@ class UpdateMandatoRequest extends FormRequest
                         'A data de término do mandato não pode ser posterior ao fim da legislatura.'
                     );
                 }
+
+                if ($validator->errors()->isNotEmpty()) {
+                    return;
+                }
+
+                $filiacoes = $mandato->filiacoesPartidarias()
+                    ->orderBy('data_inicio')
+                    ->get();
+
+                if ($filiacoes->isEmpty()) {
+                    return;
+                }
+
+                $primeiraFiliacao = $filiacoes->first();
+                $ultimaFiliacao = $filiacoes->last();
+
+                foreach ($filiacoes as $filiacao) {
+                    $inicioEfetivo = $filiacao->is($primeiraFiliacao)
+                        ? $dataInicio
+                        : $filiacao->data_inicio;
+
+                    $fimEfetivo = $filiacao->is($ultimaFiliacao)
+                        ? $dataFim
+                        : $filiacao->data_fim;
+
+                    if ($inicioEfetivo->lt($dataInicio)) {
+                        $validator->errors()->add(
+                            'data_inicio',
+                            'A data de início do mandato não pode ultrapassar uma filiação partidária já registrada.'
+                        );
+
+                        return;
+                    }
+
+                    if ($dataFim && $inicioEfetivo->gt($dataFim)) {
+                        $validator->errors()->add(
+                            'data_fim',
+                            'A data de término do mandato não pode ser anterior a uma filiação partidária já registrada.'
+                        );
+
+                        return;
+                    }
+
+                    if ($fimEfetivo && $fimEfetivo->lt($inicioEfetivo)) {
+                        $validator->errors()->add(
+                            'data_fim',
+                            'O período informado é incompatível com o histórico partidário do mandato.'
+                        );
+
+                        return;
+                    }
+
+                    if ($dataFim && $fimEfetivo && $fimEfetivo->gt($dataFim)) {
+                        $validator->errors()->add(
+                            'data_fim',
+                            'A data de término do mandato não pode ser anterior ao término de uma filiação partidária já registrada.'
+                        );
+
+                        return;
+                    }
+                }
             }
         ];
     }
