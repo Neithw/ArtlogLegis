@@ -38,4 +38,9 @@ class Legislatura extends Model
     {
         return $this->hasMany(Mandato::class);
     }
+
+    public function proposicoes(): HasMany
+    {
+        return $this->hasMany(Proposicao::class);
+    }
 }

@@ -33,6 +33,9 @@
                     <x-nav-link href="{{ route('mandatos.index') }}">
                         {{ __('Mandatos') }}
                     </x-nav-link>
+                    <x-nav-link href="{{ route('proposicoes.index') }}">
+                        {{ __('Proposições') }}
+                    </x-nav-link>
                 </div>
             </div>
 

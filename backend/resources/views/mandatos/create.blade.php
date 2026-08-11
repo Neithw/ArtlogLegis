@@ -94,8 +94,10 @@
                                     Selecione uma legislatura
                                 </option>
 
-                                <template x-for="legislatura in legislaturasFiltradas" x-bind:key="legislatura.rotulo">
-                                    <option x-bind:value="String(legislatura.id)" x-text="legislatura.rotulo">
+                                <template x-for="legislatura in legislaturasFiltradas" x-bind:key="legislatura.id">
+                                    <option x-bind:value="String(legislatura.id)"
+                                        x-bind:selected="String(legislatura.id) === String(legislaturaId)"
+                                        x-text="legislatura.rotulo">
                                     </option>
                                 </template>
                             </select>

@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -76,16 +77,6 @@ class User extends Authenticatable
         ];
     }
 
-    public function camara(): BelongsTo
-    {
-        return $this->belongsTo(Camara::class);
-    }
-
-    public function vereador(): HasOne
-    {
-        return $this->hasOne(Vereador::class);
-    }
-
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
@@ -113,5 +104,20 @@ class User extends Authenticatable
 
         return $this->permissoes
             ->contains('codigo', $codigo);
+    }
+
+    public function camara(): BelongsTo
+    {
+        return $this->belongsTo(Camara::class);
+    }
+
+    public function vereador(): HasOne
+    {
+        return $this->hasOne(Vereador::class);
+    }
+
+    public function proposicoesCriadas(): HasMany
+    {
+        return $this->hasMany(Proposicao::class, 'criado_por_id');
     }
 }

@@ -31,8 +31,7 @@ class Mandato extends Model
 
     public function vereador(): BelongsTo
     {
-        return $this->belongsTo(Vereador::class)
-            ->withTrashed();
+        return $this->belongsTo(Vereador::class);
     }
 
     public function legislatura(): BelongsTo
@@ -56,5 +55,11 @@ class Mandato extends Model
     {
         return $this->hasOne(FiliacaoPartidaria::class)
             ->oldestOfMany('data_inicio');
+    }
+
+    public function proposicoes(): HasMany
+    {
+        return $this->hasMany(Proposicao::class, 'autor_mandato_id')
+            ->withTrashed();
     }
 }

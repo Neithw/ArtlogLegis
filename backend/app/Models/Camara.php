@@ -42,4 +42,9 @@ class Camara extends Model
     {
         return $this->hasMany(TipoProposicao::class);
     }
+
+    public function proposicoes(): HasMany
+    {
+        return $this->hasMany(Proposicao::class);
+    }
 }

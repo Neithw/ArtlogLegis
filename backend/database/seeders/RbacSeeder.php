@@ -118,6 +118,26 @@ class RbacSeeder extends Seeder
                 'nome' => 'Restaurar Tipos de Proposição',
                 'codigo' => 'tipos-proposicao:restaurar'
             ],
+            [
+                'nome' => 'Visualizar Proposições',
+                'codigo' => 'proposicoes:visualizar'
+            ],
+            [
+                'nome' => 'Cadastrar Proposições',
+                'codigo' => 'proposicoes:criar'
+            ],
+            [
+                'nome' => 'Editar Proposições',
+                'codigo' => 'proposicoes:editar'
+            ],
+            [
+                'nome' => 'Excluir Proposições',
+                'codigo' => 'proposicoes:excluir'
+            ],
+            [
+                'nome' => 'Restaurar Proposições',
+                'codigo' => 'proposicoes:restaurar'
+            ],
         ])->each(function (array $permission): void {
             Permissao::updateOrCreate(
                 [
