@@ -106,8 +106,19 @@
                                 <tr class="transition hover:bg-gray-50">
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <div class="font-semibold text-gray-900">
-                                            Rascunho #{{ $proposicao->id }}
+                                            @if ($proposicao->situacao === 'protocolada')
+                                                Nº {{ $proposicao->numero }}/{{ $proposicao->ano }}
+                                            @else
+                                                Rascunho #{{ $proposicao->id }}
+                                            @endif
                                         </div>
+
+                                        @if ($proposicao->data_protocolo)
+                                            <div class="mt-1 text-xs text-gray-500">
+                                                Protocolada em
+                                                {{ $proposicao->data_protocolo->format('d/m/Y H:i') }}
+                                            </div>
+                                        @endif
                                     </td>
 
                                     <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
@@ -124,8 +135,14 @@
                                         {{ $proposicao->legislatura->numero }}ª Legislatura
                                     </td>
 
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                                        {{ ucfirst(str_replace('_', ' ', $proposicao->situacao)) }}
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        <span @class([
+                                            'inline-flex rounded-full px-3 py-2 text-xs font-semibold',
+                                            'bg-yellow-100 text-yellow-800' => $proposicao->situacao === 'rascunho',
+                                            'bg-green-100 text-green-800' => $proposicao->situacao === 'protocolada',
+                                        ])>
+                                            {{ ucfirst(str_replace('_', ' ', $proposicao->situacao)) }}
+                                        </span>
                                     </td>
 
                                     @if ($usuarioIsRoot)
@@ -143,26 +160,28 @@
                                                 </a>
                                             @endcan
 
-                                            @can('update', $proposicao)
-                                                <a href="{{ route('proposicoes.edit', $proposicao) }}"
-                                                    class="rounded-lg p-2 text-sm font-semibold text-yellow-700 transition hover:bg-yellow-50">
-                                                    Editar
-                                                </a>
-                                            @endcan
+                                            @if ($proposicao->situacao === 'rascunho')
+                                                @can('update', $proposicao)
+                                                    <a href="{{ route('proposicoes.edit', $proposicao) }}"
+                                                        class="rounded-lg p-2 text-sm font-semibold text-yellow-700 transition hover:bg-yellow-50">
+                                                        Editar
+                                                    </a>
+                                                @endcan
 
-                                            @can('delete', $proposicao)
-                                                <form action="{{ route('proposicoes.destroy', $proposicao) }}"
-                                                    method="POST"
-                                                    onsubmit="return confirm('Deseja realmente arquivar esta proposição?');">
-                                                    @csrf
-                                                    @method('DELETE')
+                                                @can('delete', $proposicao)
+                                                    <form action="{{ route('proposicoes.destroy', $proposicao) }}"
+                                                        method="POST"
+                                                        onsubmit="return confirm('Deseja realmente arquivar esta proposição?');">
+                                                        @csrf
+                                                        @method('DELETE')
 
-                                                    <button type="submit"
-                                                        class="rounded-lg p-2 text-sm font-semibold text-red-700 transition hover:bg-red-50">
-                                                        Arquivar
-                                                    </button>
-                                                </form>
-                                            @endcan
+                                                        <button type="submit"
+                                                            class="rounded-lg p-2 text-sm font-semibold text-red-700 transition hover:bg-red-50">
+                                                            Arquivar
+                                                        </button>
+                                                    </form>
+                                                @endcan
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>

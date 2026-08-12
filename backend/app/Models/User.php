@@ -120,4 +120,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Proposicao::class, 'criado_por_id');
     }
+
+    public function proposicoesProtocoladas(): HasMany
+    {
+        return $this->hasMany(Proposicao::class, 'protocolado_por_id');
+    }
 }

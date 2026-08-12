@@ -162,6 +162,10 @@ Route::middleware([
         ->middleware('can:restore,proposicao')
         ->name('proposicoes.restore');
 
+    Route::patch('/proposicoes/{proposicao}/protocolar', [ProposicaoController::class, 'protocolar'])
+        ->middleware('can:protocolar,proposicao')
+        ->name('proposicoes.protocolar');
+
     Route::resource('proposicoes', ProposicaoController::class)
         ->parameters([
             'proposicoes' => 'proposicao'

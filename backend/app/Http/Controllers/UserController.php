@@ -53,6 +53,7 @@ class UserController extends Controller
             'proposicoes:editar',
             'proposicoes:excluir',
             'proposicoes:restaurar',
+            'proposicoes:protocolar'
         ],
 
         'usuario_comum' => [

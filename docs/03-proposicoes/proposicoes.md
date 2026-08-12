@@ -6,7 +6,8 @@ O sistema possuirá um módulo interno para gerenciamento de proposições.
 Nesta etapa, cada proposição representará o cadastro inicial de um rascunho legislativo.
 Cada proposição pertencerá a uma Câmara, a uma legislatura e a um tipo de proposição.
 A autoria principal será vinculada a um mandato, enquanto o usuário responsável pelo cadastro será registrado separadamente.
-Numeração, protocolo e tramitação não farão parte desta etapa e serão implementados em módulos próprios.
+O fluxo de protocolação será documentado separadamente.
+Tramitação, documentos, assinaturas e votações serão implementados em etapas futuras.
 Proposições poderão ser arquivadas e restauradas quando autorizado.
 
 ## Estrutura
@@ -47,7 +48,9 @@ A tabela `proposicoes` possuirá inicialmente:
 - Vínculos históricos arquivados serão preservados e continuarão disponíveis para consulta.
 - Usuários não-root poderão acessar somente proposições da própria Câmara.
 - O root possuirá acesso global ao módulo.
-- Numeração, ano, protocolo, regime de tramitação, urgência e publicidade serão tratados futuramente.
+- Somente proposições em rascunho poderão ser editadas ou arquivadas.
+- A protocolação e sua numeração serão tratadas em fluxo próprio.
+- Tramitação, documentos, assinaturas e votações serão tratados futuramente.
 
 ## Permissões
 

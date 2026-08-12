@@ -138,6 +138,10 @@ class RbacSeeder extends Seeder
                 'nome' => 'Restaurar Proposições',
                 'codigo' => 'proposicoes:restaurar'
             ],
+            [
+                'nome' => 'Protocolar Proposições',
+                'codigo' => 'proposicoes:protocolar'
+            ],
         ])->each(function (array $permission): void {
             Permissao::updateOrCreate(
                 [

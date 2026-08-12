@@ -12,6 +12,8 @@ use App\Models\TipoProposicao;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class ProposicaoController extends Controller
 {
@@ -108,7 +110,9 @@ class ProposicaoController extends Controller
             'camara',
             'legislatura',
             'tipoProposicao',
-            'autorMandato.vereador'
+            'autorMandato.vereador',
+            'criadoPor',
+            'protocoladoPor'
         ]);
 
         return view('proposicoes.show', compact('proposicao'));
@@ -119,6 +123,10 @@ class ProposicaoController extends Controller
      */
     public function edit(Proposicao $proposicao): View
     {
+        if ($proposicao->situacao !== 'rascunho') {
+            abort(403, 'Somente proposições em rascunho podem ser alteradas ou arquivadas.');
+        }
+
         $proposicao->load(['camara']);
 
         $legislaturas = Legislatura::withTrashed()
@@ -166,7 +174,17 @@ class ProposicaoController extends Controller
     {
         $dadosValidados = $request->validated();
 
-        $proposicao->update($dadosValidados);
+        DB::transaction(function () use ($proposicao, $dadosValidados) {
+            $proposicao = Proposicao::query()
+                ->lockForUpdate()
+                ->findOrFail($proposicao->id);
+
+            if ($proposicao->situacao !== 'rascunho') {
+                abort(403, 'Somente proposições em rascunho podem ser alteradas.');
+            }
+
+            $proposicao->update($dadosValidados);
+        });
 
         return to_route('proposicoes.show', $proposicao)
             ->with('success', 'Proposição atualizada com sucesso.');
@@ -177,7 +195,17 @@ class ProposicaoController extends Controller
      */
     public function destroy(Proposicao $proposicao): RedirectResponse
     {
-        $proposicao->delete();
+        DB::transaction(function () use ($proposicao) {
+            $proposicao = Proposicao::query()
+                ->lockForUpdate()
+                ->findOrFail($proposicao->id);
+
+            if ($proposicao->situacao !== 'rascunho') {
+                abort(403, 'Somente proposições em rascunho podem ser arquivadas.');
+            }
+
+            $proposicao->delete();
+        });
 
         return to_route('proposicoes.index')
             ->with('success', 'Proposição arquivada com sucesso.');
@@ -207,5 +235,115 @@ class ProposicaoController extends Controller
 
         return to_route('proposicoes.arquivadas')
             ->with('success', 'Proposição restaurada com sucesso.');
+    }
+
+    public function protocolar(Request $request, Proposicao $proposicao): RedirectResponse
+    {
+        $usuarioAutenticadoId = $request->user()->id;
+
+        DB::transaction(function () use ($proposicao, $usuarioAutenticadoId) {
+            $proposicao = Proposicao::query()
+                ->lockForUpdate()
+                ->findOrFail($proposicao->id);
+
+            if ($proposicao->situacao !== 'rascunho') {
+                throw ValidationException::withMessages([
+                    'protocolo' => 'Somente proposições em rascunho podem ser protocoladas.'
+                ]);
+            }
+
+            $camposObrigatorios = [
+                'camara_id' => 'Câmara',
+                'legislatura_id' => 'Legislatura',
+                'tipo_proposicao_id' => 'Tipo de proposição',
+                'autor_mandato_id' => 'Autor',
+                'ementa' => 'Ementa',
+                'assunto' => 'Assunto',
+                'texto_integral' => 'Texto integral',
+            ];
+
+            $camposAusentes = collect($camposObrigatorios)
+                ->filter(
+                    fn(string $nome, string $campo) => blank($proposicao->{$campo})
+                )
+                ->values();
+
+            if ($camposAusentes->isNotEmpty()) {
+                throw ValidationException::withMessages([
+                    'protocolo' => 'Preencha os campos obrigatórios antes de protocolar: '
+                        . $camposAusentes->join(', ', ' e ')
+                        . '.'
+                ]);
+            }
+
+            $tipoProposicao = TipoProposicao::query()
+                ->whereKey($proposicao->tipo_proposicao_id)
+                ->where('camara_id', $proposicao->camara_id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $tipoProposicao) {
+                throw ValidationException::withMessages([
+                    'protocolo' => 'O tipo da proposição não está disponível para protocolo.'
+                ]);
+            }
+
+            $camaraValida = Camara::query()
+                ->whereKey($proposicao->camara_id)
+                ->where('ativo', true)
+                ->exists();
+
+            if (! $camaraValida) {
+                throw ValidationException::withMessages([
+                    'protocolo' => 'A Câmara da proposição não está disponível para protocolo.'
+                ]);
+            }
+
+            $legislaturaValida = Legislatura::query()
+                ->whereKey($proposicao->legislatura_id)
+                ->where('camara_id', $proposicao->camara_id)
+                ->exists();
+
+            if (! $legislaturaValida) {
+                throw ValidationException::withMessages([
+                    'protocolo' => 'A legislatura da proposição não está disponível para protocolo.'
+                ]);
+            }
+
+            $mandatoValido = Mandato::query()
+                ->whereKey($proposicao->autor_mandato_id)
+                ->where('legislatura_id', $proposicao->legislatura_id)
+                ->whereHas(
+                    'vereador',
+                    fn($query) => $query
+                        ->where('camara_id', $proposicao->camara_id)
+                )
+                ->exists();
+
+            if (! $mandatoValido) {
+                throw ValidationException::withMessages([
+                    'protocolo' => 'O mandato do autor não está disponível para protocolo.'
+                ]);
+            }
+
+            $dataProtocolo = now();
+            $ano = (int) $dataProtocolo->format('Y');
+
+            $ultimoNumero = Proposicao::withTrashed()
+                ->where('camara_id', $proposicao->camara_id)
+                ->where('tipo_proposicao_id', $proposicao->tipo_proposicao_id)
+                ->where('ano', $ano)
+                ->max('numero');
+
+            $proposicao->numero = ($ultimoNumero ?? 0) + 1;
+            $proposicao->ano = $ano;
+            $proposicao->data_protocolo = $dataProtocolo;
+            $proposicao->protocolado_por_id = $usuarioAutenticadoId;
+            $proposicao->situacao = 'protocolada';
+            $proposicao->save();
+        });
+
+        return to_route('proposicoes.show', $proposicao)
+            ->with('success', 'Proposição protocolada com sucesso.');
     }
 }

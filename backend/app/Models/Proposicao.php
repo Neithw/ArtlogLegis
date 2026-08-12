@@ -23,14 +23,14 @@ class Proposicao extends Model
         'texto_integral',
         'assunto',
         'area_tematica',
-        'palavras_chave',
-        'situacao',
+        'palavras_chave'
     ];
 
     protected function casts(): array
     {
         return [
             'palavras_chave' => 'array',
+            'data_protocolo' => 'datetime'
         ];
     }
 
@@ -61,6 +61,12 @@ class Proposicao extends Model
     public function criadoPor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'criado_por_id')
+            ->withTrashed();
+    }
+
+    public function protocoladoPor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'protocolado_por_id')
             ->withTrashed();
     }
 }

@@ -27,19 +27,46 @@
                 </div>
             @endif
 
+            @error('protocolo')
+                <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
+                    role="alert">
+                    {{ $message }}
+                </div>
+            @enderror
+
             <div class="overflow-hidden rounded-xl bg-white shadow">
                 <div
                     class="flex flex-col gap-4 border-b border-gray-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
                     <h3 class="text-lg font-semibold text-gray-900">
-                        Rascunho #{{ $proposicao->id }}
+                        @if ($proposicao->situacao === 'protocolada')
+                            {{ $proposicao->tipoProposicao->nome }}
+                            nº {{ $proposicao->numero }}/{{ $proposicao->ano }}
+                        @else
+                            Rascunho #{{ $proposicao->id }}
+                        @endif
                     </h3>
                     <div class="flex items-center gap-2">
-                        @can('update', $proposicao)
-                            <a href="{{ route('proposicoes.edit', $proposicao) }}"
-                                class="inline-flex items-center justify-center rounded-lg bg-yellow-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-yellow-700">
-                                Editar Proposição
-                            </a>
-                        @endcan
+                        @if ($proposicao->situacao === 'rascunho')
+                            @can('update', $proposicao)
+                                <a href="{{ route('proposicoes.edit', $proposicao) }}"
+                                    class="inline-flex items-center justify-center rounded-lg bg-yellow-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-yellow-700">
+                                    Editar Proposição
+                                </a>
+                            @endcan
+
+                            @can('protocolar', $proposicao)
+                                <form action="{{ route('proposicoes.protocolar', $proposicao) }}" method="POST"
+                                    onsubmit="return confirm('Deseja realmente protocolar esta proposição? Esta ação não poderá ser desfeita.')">
+                                    @csrf
+                                    @method('PATCH')
+
+                                    <button type="submit"
+                                        class="inline-flex items-center justify-center rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700">
+                                        Protocolar
+                                    </button>
+                                </form>
+                            @endcan
+                        @endif
 
                         <a href="{{ route('proposicoes.index') }}"
                             class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700">
@@ -116,14 +143,57 @@
                                     Situação
                                 </dt>
                                 <dd class="mt-2">
-                                    <span
-                                        class="inline-flex rounded-full bg-yellow-100 px-3 py-1 text-sm font-semibold text-yellow-800">
+                                    <span @class([
+                                        'inline-flex rounded-full px-3 py-1 text-sm font-semibold',
+                                        'bg-yellow-100 text-yellow-800' => $proposicao->situacao === 'rascunho',
+                                        'bg-green-100 text-green-800' => $proposicao->situacao === 'protocolada',
+                                    ])>
                                         {{ ucfirst(str_replace('_', ' ', $proposicao->situacao)) }}
                                     </span>
                                 </dd>
                             </div>
                         </dl>
                     </section>
+
+                    @if ($proposicao->situacao === 'protocolada')
+                        <section class="p-6">
+                            <h4 class="text-base font-semibold text-gray-900">
+                                Protocolo
+                            </h4>
+
+                            <dl class="mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-2">
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">
+                                        Número
+                                    </dt>
+
+                                    <dd class="mt-1 text-sm text-gray-900">
+                                        {{ $proposicao->numero }}/{{ $proposicao->ano }}
+                                    </dd>
+                                </div>
+
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">
+                                        Data do protocolo
+                                    </dt>
+
+                                    <dd class="mt-1 text-sm text-gray-900">
+                                        {{ $proposicao->data_protocolo->format('d/m/Y H:i') }}
+                                    </dd>
+                                </div>
+
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">
+                                        Protocolada por
+                                    </dt>
+
+                                    <dd class="mt-1 text-sm text-gray-900">
+                                        {{ $proposicao->protocoladoPor->name }}
+                                    </dd>
+                                </div>
+                            </dl>
+                        </section>
+                    @endif
 
                     <section class="p-6">
                         <h4 class="text-base font-semibold text-gray-900">

@@ -46,7 +46,8 @@ class ProposicaoPolicy
     public function update(User $user, Proposicao $proposicao): bool
     {
         return $this->pertenceAoEscopo($user, $proposicao)
-            && $user->hasPermission('proposicoes:editar');
+            && $user->hasPermission('proposicoes:editar')
+            && $proposicao->situacao === 'rascunho';
     }
 
     /**
@@ -55,7 +56,8 @@ class ProposicaoPolicy
     public function delete(User $user, Proposicao $proposicao): bool
     {
         return $this->pertenceAoEscopo($user, $proposicao)
-            && $user->hasPermission('proposicoes:excluir');
+            && $user->hasPermission('proposicoes:excluir')
+            && $proposicao->situacao === 'rascunho';
     }
 
     /**
@@ -70,6 +72,14 @@ class ProposicaoPolicy
     public function forceDelete(User $user, Proposicao $proposicao): bool
     {
         return false;
+    }
+
+    public function protocolar(User $user, Proposicao $proposicao): bool
+    {
+        return $this->pertenceAoEscopo($user, $proposicao)
+            && $user->hasPermission('proposicoes:protocolar')
+            && ! $proposicao->trashed()
+            && $proposicao->situacao === 'rascunho';
     }
 
     private function possuiCamara(User $user): bool

@@ -118,7 +118,10 @@
                                     </td>
 
                                     <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                                        {{ ucfirst(str_replace('_', ' ', $proposicao->situacao)) }}
+                                        <span
+                                            class="inline-flex rounded-full px-3 py-2 text-xs font-semibold bg-yellow-100 text-yellow-800">
+                                            {{ ucfirst(str_replace('_', ' ', $proposicao->situacao)) }}
+                                        </span>
                                     </td>
 
                                     @if ($usuarioIsRoot)
