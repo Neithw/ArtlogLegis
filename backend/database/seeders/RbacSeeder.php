@@ -142,6 +142,26 @@ class RbacSeeder extends Seeder
                 'nome' => 'Protocolar Proposições',
                 'codigo' => 'proposicoes:protocolar'
             ],
+            [
+                'nome' => 'Visualizar Unidades de Tramitação',
+                'codigo' => 'unidades-tramitacao:visualizar'
+            ],
+            [
+                'nome' => 'Cadastrar Unidades de Tramitação',
+                'codigo' => 'unidades-tramitacao:criar'
+            ],
+            [
+                'nome' => 'Editar Unidades de Tramitação',
+                'codigo' => 'unidades-tramitacao:editar'
+            ],
+            [
+                'nome' => 'Excluir Unidades de Tramitação',
+                'codigo' => 'unidades-tramitacao:excluir'
+            ],
+            [
+                'nome' => 'Restaurar Unidades de Tramitação',
+                'codigo' => 'unidades-tramitacao:restaurar'
+            ],
         ])->each(function (array $permission): void {
             Permissao::updateOrCreate(
                 [

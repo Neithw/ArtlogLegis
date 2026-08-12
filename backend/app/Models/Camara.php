@@ -47,4 +47,9 @@ class Camara extends Model
     {
         return $this->hasMany(Proposicao::class);
     }
+
+    public function unidadesTramitacao(): HasMany
+    {
+        return $this->hasMany(UnidadeTramitacao::class);
+    }
 }

@@ -53,7 +53,13 @@ class UserController extends Controller
             'proposicoes:editar',
             'proposicoes:excluir',
             'proposicoes:restaurar',
-            'proposicoes:protocolar'
+            'proposicoes:protocolar',
+
+            'unidades-tramitacao:visualizar',
+            'unidades-tramitacao:criar',
+            'unidades-tramitacao:editar',
+            'unidades-tramitacao:excluir',
+            'unidades-tramitacao:restaurar'
         ],
 
         'usuario_comum' => [
@@ -63,6 +69,7 @@ class UserController extends Controller
             'mandatos:visualizar',
             'tipos-proposicao:visualizar',
             'proposicoes:visualizar',
+            'unidades-tramitacao:visualizar',
         ]
     ];
 

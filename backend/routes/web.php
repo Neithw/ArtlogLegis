@@ -7,6 +7,7 @@ use App\Http\Controllers\MandatoController;
 use App\Http\Controllers\PartidoController;
 use App\Http\Controllers\ProposicaoController;
 use App\Http\Controllers\TipoProposicaoController;
+use App\Http\Controllers\UnidadeTramitacaoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VereadorController;
 use App\Http\Middleware\EnsureUserHasActiveCamara;
@@ -17,6 +18,7 @@ use App\Models\Mandato;
 use App\Models\Partido;
 use App\Models\Proposicao;
 use App\Models\TipoProposicao;
+use App\Models\UnidadeTramitacao;
 use App\Models\User;
 use App\Models\Vereador;
 use Illuminate\Support\Facades\Route;
@@ -175,5 +177,25 @@ Route::middleware([
         ->middlewareFor(['create', 'store'], 'can:create,' . Proposicao::class)
         ->middlewareFor(['edit', 'update'], 'can:update,proposicao')
         ->middlewareFor('destroy', 'can:delete,proposicao');
+    // -----------------------------------------------------------------------------------------------
+
+    Route::get('/unidades-tramitacao/arquivadas', [UnidadeTramitacaoController::class, 'arquivadas'])
+        ->middleware('can:viewArchived,' . UnidadeTramitacao::class)
+        ->name('unidades-tramitacao.arquivadas');
+
+    Route::patch('/unidades-tramitacao/{unidadeTramitacao}/restaurar', [UnidadeTramitacaoController::class, 'restore'])
+        ->withTrashed()
+        ->middleware('can:restore,unidadeTramitacao')
+        ->name('unidades-tramitacao.restore');
+
+    Route::resource('unidades-tramitacao', UnidadeTramitacaoController::class)
+        ->parameters([
+            'unidades-tramitacao' => 'unidadeTramitacao'
+        ])
+        ->except('show')
+        ->middlewareFor('index', 'can:viewAny,' . UnidadeTramitacao::class)
+        ->middlewareFor(['create', 'store'], 'can:create' . UnidadeTramitacao::class)
+        ->middlewareFor(['edit', 'update'], 'can:update,unidadeTramitacao')
+        ->middlewareFor('destroy', 'can:delete,unidadeTramitacao');
     // -----------------------------------------------------------------------------------------------
 });
