@@ -59,7 +59,11 @@ class UserController extends Controller
             'unidades-tramitacao:criar',
             'unidades-tramitacao:editar',
             'unidades-tramitacao:excluir',
-            'unidades-tramitacao:restaurar'
+            'unidades-tramitacao:restaurar',
+
+            'tramitacoes:visualizar',
+            'tramitacoes:encaminhar',
+            'tramitacoes:receber'
         ],
 
         'usuario_comum' => [
@@ -70,6 +74,7 @@ class UserController extends Controller
             'tipos-proposicao:visualizar',
             'proposicoes:visualizar',
             'unidades-tramitacao:visualizar',
+            'tramitacoes:visualizar'
         ]
     ];
 

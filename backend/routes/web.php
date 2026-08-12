@@ -7,6 +7,7 @@ use App\Http\Controllers\MandatoController;
 use App\Http\Controllers\PartidoController;
 use App\Http\Controllers\ProposicaoController;
 use App\Http\Controllers\TipoProposicaoController;
+use App\Http\Controllers\TramitacaoController;
 use App\Http\Controllers\UnidadeTramitacaoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VereadorController;
@@ -167,6 +168,14 @@ Route::middleware([
     Route::patch('/proposicoes/{proposicao}/protocolar', [ProposicaoController::class, 'protocolar'])
         ->middleware('can:protocolar,proposicao')
         ->name('proposicoes.protocolar');
+
+    Route::post('/proposicoes/{proposicao}/tramitacoes', [TramitacaoController::class, 'store'])
+        ->middleware('can:encaminhar,proposicao')
+        ->name('proposicoes.tramitacoes.store');
+
+    Route::patch('/tramitacoes/{tramitacao}/receber', [TramitacaoController::class, 'receber'])
+        ->middleware('can:receber,tramitacao')
+        ->name('tramitacoes.receber');
 
     Route::resource('proposicoes', ProposicaoController::class)
         ->parameters([

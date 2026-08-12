@@ -82,6 +82,14 @@ class ProposicaoPolicy
             && $proposicao->situacao === 'rascunho';
     }
 
+    public function encaminhar(User $user, Proposicao $proposicao): bool
+    {
+        return $this->pertenceAoEscopo($user, $proposicao)
+            && $user->hasPermission('tramitacoes:encaminhar')
+            && ! $proposicao->trashed()
+            && $proposicao->situacao === 'protocolada';
+    }
+
     private function possuiCamara(User $user): bool
     {
         return $user->camara_id !== null;

@@ -125,4 +125,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Proposicao::class, 'protocolado_por_id');
     }
+
+    public function tramitacoesEncaminhadas(): HasMany
+    {
+        return $this->hasMany(Tramitacao::class, 'encaminhado_por_id');
+    }
+
+    public function tramitacoesRecebidas(): HasMany
+    {
+        return $this->hasMany(Tramitacao::class, 'recebido_por_id');
+    }
 }

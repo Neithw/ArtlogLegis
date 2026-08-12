@@ -162,6 +162,18 @@ class RbacSeeder extends Seeder
                 'nome' => 'Restaurar Unidades de Tramitação',
                 'codigo' => 'unidades-tramitacao:restaurar'
             ],
+            [
+                'nome' => 'Visualizar Tramitações',
+                'codigo' => 'tramitacoes:visualizar'
+            ],
+            [
+                'nome' => 'Encaminhar Tramitações',
+                'codigo' => 'tramitacoes:encaminhar'
+            ],
+            [
+                'nome' => 'Receber Tramitações',
+                'codigo' => 'tramitacoes:receber'
+            ],
         ])->each(function (array $permission): void {
             Permissao::updateOrCreate(
                 [
