@@ -1,4 +1,4 @@
-# Sistema Câmaras
+# Artlog Legis
 
 Sistema web para gerenciamento das atividades administrativas, parlamentares e legislativas de Câmaras Municipais.
 
@@ -6,7 +6,7 @@ O projeto busca centralizar informações institucionais, organizar o processo l
 
 ## Sobre o projeto
 
-O Sistema Câmaras foi desenvolvido com uma arquitetura multi-Câmara, permitindo que diferentes instituições utilizem a mesma aplicação com isolamento de dados.
+O Artlog Legis foi desenvolvido com uma arquitetura multi-Câmara, permitindo que diferentes instituições utilizem a mesma aplicação com isolamento de dados.
 
 Com exceção do usuário root, que possui atuação global, cada usuário pertence a uma Câmara e possui permissões específicas de acesso.
 
