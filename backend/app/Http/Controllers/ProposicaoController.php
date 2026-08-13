@@ -9,7 +9,6 @@ use App\Models\Legislatura;
 use App\Models\Mandato;
 use App\Models\Proposicao;
 use App\Models\TipoProposicao;
-use App\Models\UnidadeTramitacao;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -105,7 +104,7 @@ class ProposicaoController extends Controller
             ->with('success', 'Proposição cadastrada com sucesso.');
     }
 
-    public function show(Request $request, Proposicao $proposicao): View
+    public function show(Proposicao $proposicao): View
     {
         $proposicao->load([
             'camara',
@@ -113,53 +112,10 @@ class ProposicaoController extends Controller
             'tipoProposicao',
             'autorMandato.vereador',
             'criadoPor',
-            'protocoladoPor',
-
-            'tramitacoes' => fn($query) => $query
-                ->with([
-                    'unidadeOrigem',
-                    'unidadeDestino',
-                    'encaminhadoPor',
-                    'recebidoPor'
-                ])
-                ->orderByDesc('data_encaminhamento')
-                ->orderByDesc('id')
+            'protocoladoPor'
         ]);
 
-        $tramitacaoPendente = $proposicao->tramitacoes
-            ->first(
-                fn($tramitacao) => $tramitacao->data_recebimento === null
-            );
-
-        $ultimaTramitacao = $proposicao->tramitacoes()->first();
-
-        $unidadeAtual = null;
-
-        if ($ultimaTramitacao !== null) {
-            $unidadeAtual = $tramitacaoPendente
-                ? $tramitacaoPendente->unidadeOrigem
-                : $ultimaTramitacao->unidadeDestino;
-        }
-
-        $unidadesDestino = collect();
-
-        if (
-            $proposicao->situacao === 'protocolada'
-            && $tramitacaoPendente === null
-            && $request->user()->can('encaminhar', $proposicao)
-        ) {
-            $unidadesDestino = UnidadeTramitacao::query()
-                ->where('camara_id', $proposicao->camara_id)
-                ->when(
-                    $unidadeAtual !== null,
-                    fn($query) => $query
-                        ->whereKeyNot($unidadeAtual->id)
-                )
-                ->orderBy('nome')
-                ->get(['id', 'nome', 'sigla', 'tipo']);
-        }
-
-        return view('proposicoes.show', compact('proposicao', 'tramitacaoPendente', 'unidadeAtual', 'unidadesDestino'));
+        return view('proposicoes.show', compact('proposicao'));
     }
 
     /**

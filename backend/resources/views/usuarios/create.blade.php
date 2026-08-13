@@ -39,11 +39,7 @@
                             <x-input id="name" name="name" type="text" class="mt-1 block w-full"
                                 :value="old('name')" required autofocus />
 
-                            @error('name')
-                                <p class="mt-2 text-sm text-red-600">
-                                    {{ $message }}
-                                </p>
-                            @enderror
+                            <x-input-error for="name" class="mt-2" />
                         </div>
 
                         <div>
@@ -52,11 +48,7 @@
                             <x-input id="email" name="email" type="email" class="mt-1 block w-full"
                                 :value="old('email')" required />
 
-                            @error('email')
-                                <p class="mt-2 text-sm text-red-600">
-                                    {{ $message }}
-                                </p>
-                            @enderror
+                            <x-input-error for="email" class="mt-2" />
                         </div>
 
                         <div>
@@ -65,11 +57,7 @@
                             <x-input id="password" name="password" type="password" class="mt-1 block w-full"
                                 required />
 
-                            @error('password')
-                                <p class="mt-2 text-sm text-red-600">
-                                    {{ $message }}
-                                </p>
-                            @enderror
+                            <x-input-error for="password" class="mt-2" />
                         </div>
 
                         <div>
@@ -88,15 +76,31 @@
                         </h3>
 
                         <p class="mt-1 text-sm text-gray-500">
-                            Defina a Câmara e o pacote inicial de permissões.
+                            Defina a Câmara, o papel e as unidades de atuação do usuário.
                         </p>
                     </div>
 
-                    <div class="grid gap-6 p-6 md:grid-cols-2">
+                    @php
+                        $unidadesSelecionadas = collect(old('unidades_tramitacao', []))
+                            ->map(fn($id) => (int) $id)
+                            ->values();
+                    @endphp
+
+                    <div class="grid gap-6 p-6 md:grid-cols-2" x-data="{
+                        camaraId: @js(old('camara_id', '')),
+                        unidades: @js($unidadesTramitacao->values()),
+                        unidadesSelecionadas: @js($unidadesSelecionadas),
+                        unidadesDisponiveis() {
+                            return this.unidades.filter(
+                                unidade => Number(unidade.camara_id) === Number(this.camaraId)
+                            );
+                        }
+                    }">
                         <div>
                             <x-label for="camara_id" value="Câmara" />
 
-                            <select id="camara_id" name="camara_id"
+                            <select id="camara_id" name="camara_id" x-model="camaraId"
+                                @change="unidadesSelecionadas = []"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 required>
                                 <option value="">
@@ -110,11 +114,7 @@
                                 @endforeach
                             </select>
 
-                            @error('camara_id')
-                                <p class="mt-2 text-sm text-red-600">
-                                    {{ $message }}
-                                </p>
-                            @enderror
+                            <x-input-error for="camara_id" class="mt-2" />
                         </div>
 
                         <div>
@@ -134,31 +134,50 @@
                                 @endforeach
                             </select>
 
-                            @error('role_id')
-                                <p class="mt-2 text-sm text-red-600">
-                                    {{ $message }}
-                                </p>
-                            @enderror
+                            <x-input-error for="role_id" class="mt-2" />
                         </div>
 
-                        <div class="md:col-span-2">
-                            <input type="hidden" name="ativo" value="0">
 
-                            <label class="inline-flex items-center gap-3">
-                                <input type="checkbox" name="ativo" value="1"
-                                    class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
-                                    @checked(old('ativo', '1') == '1')>
+                        <div class="border-t border-gray-200 pt-6 md:col-span-2">
+                            <div>
+                                <x-label value="Unidades de tramitação" />
 
-                                <span class="text-sm font-medium text-gray-700">
-                                    Usuário ativo
-                                </span>
-                            </label>
-
-                            @error('ativo')
-                                <p class="mt-2 text-sm text-red-600">
-                                    {{ $message }}
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Selecione as unidades em que o usuário poderá receber e encaminhar proposições.
                                 </p>
-                            @enderror
+                            </div>
+
+                            <p x-show="!camaraId" class="mt-4 text-sm text-gray-500">
+                                Selecione uma Câmara para visualizar suas unidades de tramitação.
+                            </p>
+
+                            <p x-show="camaraId && unidadesDisponiveis().length === 0"
+                                class="mt-4 text-sm text-gray-500">
+                                A Câmara selecionada não possui unidades de tramitação disponíveis.
+                            </p>
+
+                            <div x-show="camaraId && unidadesDisponiveis().length > 0"
+                                class="mt-4 grid gap-3 md:grid-cols-2">
+                                <template x-for="unidade in unidadesDisponiveis()" :key="unidade.id">
+                                    <label
+                                        class="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 p-4 transition hover:border-indigo-300 hover:bg-indigo-50/40">
+                                        <input type="checkbox" name="unidades_tramitacao[]" :value="unidade.id"
+                                            x-model="unidadesSelecionadas"
+                                            class="mt-0.5 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+
+                                        <span>
+                                            <span class="block text-sm font-medium text-gray-900"
+                                                x-text="unidade.nome"></span>
+
+                                            <span x-show="unidade.sigla" class="mt-1 block text-xs text-gray-500"
+                                                x-text="unidade.sigla"></span>
+                                        </span>
+                                    </label>
+                                </template>
+                            </div>
+
+                            <x-input-error for="unidades_tramitacao" class="mt-2" />
+                            <x-input-error for="unidades_tramitacao.*" class="mt-2" />
                         </div>
                     </div>
                 </div>
@@ -210,17 +229,8 @@
                             </section>
                         @endforeach
 
-                        @error('permissoes')
-                            <p class="mt-2 text-sm text-red-600">
-                                {{ $message }}
-                            </p>
-                        @enderror
-
-                        @error('permissoes.*')
-                            <p class="mt-2 text-sm text-red-600">
-                                {{ $message }}
-                            </p>
-                        @enderror
+                        <x-input-error for="permissoes" class="mt-2" />
+                        <x-input-error for="permissoes.*" class="mt-2" />
                     </div>
                 </div>
 

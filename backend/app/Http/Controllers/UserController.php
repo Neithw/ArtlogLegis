@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Models\Camara;
 use App\Models\Permissao;
 use App\Models\Role;
+use App\Models\UnidadeTramitacao;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -142,12 +143,18 @@ class UserController extends Controller
 
         $permissionIds = $dadosValidados['permissoes'] ?? [];
 
-        unset($dadosValidados['permissoes']);
+        $unidadesTramitacaoIds = $dadosValidados['unidades_tramitacao'] ?? [];
 
-        DB::transaction(function () use ($dadosValidados, $permissionIds): void {
+        unset(
+            $dadosValidados['permissoes'],
+            $dadosValidados['unidades_tramitacao']
+        );
+
+        DB::transaction(function () use ($dadosValidados, $permissionIds, $unidadesTramitacaoIds): void {
             $user = User::create($dadosValidados);
 
             $user->permissoes()->sync($permissionIds);
+            $user->unidadesTramitacao()->sync($unidadesTramitacaoIds);
         });
 
         return to_route('usuarios.index')
@@ -181,10 +188,17 @@ class UserController extends Controller
                 ->values();
         }
 
+        $unidadesTramitacaoSelecionadas = $user
+            ->unidadesTramitacao()
+            ->pluck('unidades_tramitacao.id')
+            ->map(fn($id) => (int) $id)
+            ->all();
+
         return view('usuarios.edit', [
             ...$this->dadosDoFormulario($usuarioAutenticado, $user),
             'user' => $user,
-            'permissoesSelecionadas' => $permissoesSelecionadas->all()
+            'permissoesSelecionadas' => $permissoesSelecionadas->all(),
+            'unidadesTramitacaoSelecionadas' => $unidadesTramitacaoSelecionadas
         ]);
     }
 
@@ -223,16 +237,22 @@ class UserController extends Controller
                 ->values();
         }
 
-        unset($dadosValidados['permissoes']);
+        $unidadesTramitacaoIds = $dadosValidados['unidades_tramitacao'] ?? [];
+
+        unset(
+            $dadosValidados['permissoes'],
+            $dadosValidados['unidades_tramitacao']
+        );
 
         if (empty($dadosValidados['password'])) {
             unset($dadosValidados['password']);
         }
 
-        DB::transaction(function () use ($user, $dadosValidados, $permissionIds): void {
+        DB::transaction(function () use ($user, $dadosValidados, $permissionIds, $unidadesTramitacaoIds): void {
             $user->update($dadosValidados);
 
             $user->permissoes()->sync($permissionIds->all());
+            $user->unidadesTramitacao()->sync($unidadesTramitacaoIds);
         });
 
         return to_route('usuarios.index')
@@ -321,6 +341,16 @@ class UserController extends Controller
                 'nome'
             ]);
 
+        $unidadesTramitacao = UnidadeTramitacao::query()
+            ->whereIn('camara_id', $camaras->pluck('id'))
+            ->orderBy('nome')
+            ->get([
+                'id',
+                'camara_id',
+                'nome',
+                'sigla'
+            ]);
+
         $roles = Role::query()
             ->where('codigo', '!=', 'root')
             ->orderBy('nome')
@@ -354,7 +384,8 @@ class UserController extends Controller
             'roles',
             'permissoesPorModulo',
             'pacotesPermissoes',
-            'usuarioIsRoot'
+            'usuarioIsRoot',
+            'unidadesTramitacao'
         );
     }
 }

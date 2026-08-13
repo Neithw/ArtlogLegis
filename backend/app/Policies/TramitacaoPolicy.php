@@ -28,7 +28,9 @@ class TramitacaoPolicy
     public function receber(User $user, Tramitacao $tramitacao): bool
     {
         return $this->pertenceAoEscopo($user, $tramitacao)
-            && $user->hasPermission('tramitacoes:receber');
+            && $user->hasPermission('tramitacoes:receber')
+            && $tramitacao->data_recebimento === null
+            && $this->atuaNaUnidade($user, $tramitacao->unidade_destino_id);
     }
 
     private function possuiCamara(User $user): bool
@@ -40,5 +42,13 @@ class TramitacaoPolicy
     {
         return $this->possuiCamara($user)
             && (int) $user->camara_id === (int) $tramitacao->proposicao->camara_id;
+    }
+
+    private function atuaNaUnidade(User $user, int $unidadeTramitacaoId): bool
+    {
+        return $user
+            ->unidadesTramitacao()
+            ->whereKey($unidadeTramitacaoId)
+            ->exists();
     }
 }

@@ -85,6 +85,22 @@ class UpdateUserRequest extends FormRequest
                 'integer',
                 'distinct',
                 'exists:permissoes,id'
+            ],
+
+            'unidades_tramitacao' => [
+                'nullable',
+                'array'
+            ],
+
+            'unidades_tramitacao.*' => [
+                'integer',
+                'distinct',
+                Rule::exists('unidades_tramitacao', 'id')
+                    ->where(
+                        fn($query) => $query
+                            ->where('camara_id', $this->input('camara_id'))
+                            ->whereNull('deleted_at')
+                    )
             ]
         ];
     }
@@ -151,6 +167,11 @@ class UpdateUserRequest extends FormRequest
             'permissoes.*.integer' => 'Uma das permissões selecionadas é inválida.',
             'permissoes.*.distinct' => 'Uma permissão foi enviada mais de uma vez.',
             'permissoes.*.exists' => 'Uma das permissões selecionadas não existe.',
+
+            'unidades_tramitacao.array' => 'As unidades de tramitação devem ser enviadas em uma lista.',
+            'unidades_tramitacao.*.integer' => 'Uma das unidades de tramitação selecionadas é inválida.',
+            'unidades_tramitacao.*.distinct' => 'Uma unidade de tramitação foi selecionada mais de uma vez.',
+            'unidades_tramitacao.*.exists' => 'Uma das unidades selecionadas não pertence à Câmara informada ou não está disponível.'
         ];
     }
 }

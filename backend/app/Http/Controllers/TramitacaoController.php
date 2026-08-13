@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreTramitacaoRequest;
 use App\Models\Proposicao;
 use App\Models\Tramitacao;
+use App\Models\UnidadeTramitacao;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +14,62 @@ use Illuminate\Validation\ValidationException;
 
 class TramitacaoController extends Controller
 {
+    public function show(Request $request, Proposicao $proposicao): View
+    {
+        $proposicao->load([
+            'camara',
+            'legislatura',
+            'tipoProposicao',
+            'autorMandato.vereador',
+            'criadoPor',
+
+            'tramitacoes' => fn($query) => $query
+                ->with([
+                    'unidadeOrigem',
+                    'unidadeDestino',
+                    'encaminhadoPor',
+                    'recebidoPor'
+                ])
+                ->orderByDesc('data_encaminhamento')
+                ->orderByDesc('id')
+        ]);
+
+        $tramitacaoPendente = $proposicao->tramitacoes
+            ->first(
+                fn($tramitacao) => $tramitacao->data_recebimento === null
+            );
+
+        $ultimaTramitacao = $proposicao->tramitacoes->first();
+
+        $unidadeAtual = null;
+
+        if ($ultimaTramitacao !== null) {
+            $unidadeAtual = $tramitacaoPendente
+                ? $tramitacaoPendente->unidadeOrigem
+                : $ultimaTramitacao->unidadeDestino;
+        }
+
+        $unidadesDestino = collect();
+
+        if (
+            $proposicao->situacao === 'protocolada'
+            && $tramitacaoPendente === null
+            && $request->user()->can('encaminhar', $proposicao)
+        ) {
+            $unidadesDestino = UnidadeTramitacao::query()
+                ->where('camara_id', $proposicao->camara_id)
+                ->when(
+                    $unidadeAtual !== null,
+                    fn($query) => $query
+                        ->whereKeyNot($unidadeAtual->id)
+                )
+                ->orderBy('nome')
+                ->get(['id', 'nome', 'sigla', 'tipo']);
+        }
+
+        return view('tramitacoes.show', compact('proposicao', 'tramitacaoPendente', 'unidadeAtual', 'unidadesDestino'));
+    }
+
     public function store(StoreTramitacaoRequest $request, Proposicao $proposicao): RedirectResponse
     {
         $dadosValidados = $request->validated();
@@ -64,7 +122,7 @@ class TramitacaoController extends Controller
             ]);
         });
 
-        return to_route('proposicoes.show', $proposicao)
+        return to_route('proposicoes.tramitacao.show', $proposicao)
             ->with('success', 'Proposição encaminhada com sucesso.');
     }
 
@@ -83,14 +141,14 @@ class TramitacaoController extends Controller
             }
 
             $tramitacaoBloqueada->update([
-                'recebido_por_id' => request()->user()->id,
+                'recebido_por_id' => $request()->user()->id,
                 'data_recebimento' => now()
             ]);
 
             return (int) $tramitacaoBloqueada->proposicao->id;
         });
 
-        return to_route('proposicoes.show', $proposicaoId)
+        return to_route('proposicoes.tramitacao.show', $proposicaoId)
             ->with('success', 'Recebimento da proposição confirmado com sucesso');
     }
 }

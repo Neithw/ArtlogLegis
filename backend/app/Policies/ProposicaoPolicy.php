@@ -84,10 +84,37 @@ class ProposicaoPolicy
 
     public function encaminhar(User $user, Proposicao $proposicao): bool
     {
-        return $this->pertenceAoEscopo($user, $proposicao)
-            && $user->hasPermission('tramitacoes:encaminhar')
-            && ! $proposicao->trashed()
-            && $proposicao->situacao === 'protocolada';
+        if (
+            ! $this->pertenceAoEscopo($user, $proposicao)
+            || ! $user->hasPermission('tramitacoes:encaminhar')
+            || $proposicao->trashed()
+            || $proposicao->situacao !== 'protocolada'
+        ) {
+            return false;
+        }
+
+        $ultimaTramitacao = $proposicao
+            ->tramitacoes()
+            ->orderByDesc('data_encaminhamento')
+            ->orderByDesc('id')
+            ->first([
+                'id',
+                'unidade_destino_id',
+                'data_recebimento'
+            ]);
+
+        if ($ultimaTramitacao === null) {
+            return true;
+        }
+
+        if ($ultimaTramitacao->data_recebimento === null) {
+            return false;
+        }
+
+        return $user
+            ->unidadesTramitacao()
+            ->whereKey($ultimaTramitacao->unidade_destino_id)
+            ->exists();
     }
 
     private function possuiCamara(User $user): bool

@@ -4,13 +4,14 @@
 
 O sistema possuirá um módulo interno para gerenciamento das unidades de tramitação.
 As unidades representarão os setores, órgãos ou estruturas pelos quais uma proposição poderá tramitar.
-Neste momento, o módulo manterá apenas o cadastro das unidades.
-O vínculo das unidades com as movimentações de uma proposição será implementado no fluxo de tramitação.
+Cada unidade poderá possuir usuários responsáveis pelo recebimento e encaminhamento de proposições.
 
 ## Estrutura
 
 - unidades_tramitacao
 - camaras
+- users
+- unidade_tramitacao_user
 
 A tabela `unidades_tramitacao` possuirá:
 
@@ -20,6 +21,11 @@ A tabela `unidades_tramitacao` possuirá:
 - `tipo`
 - `descricao`
 - `deleted_at`
+
+A tabela intermediária `unidade_tramitacao_user` possuirá:
+
+- `unidade_tramitacao_id`
+- `user_id`
 
 ## Tipos
 
@@ -40,8 +46,12 @@ Inicialmente, uma unidade poderá ser classificada como:
 - O nome da unidade será único dentro de cada Câmara.
 - Câmaras diferentes poderão possuir unidades com o mesmo nome.
 - A Câmara vinculada não poderá ser alterada após o cadastro.
+- Uma unidade poderá possuir vários usuários.
+- Um usuário poderá atuar em várias unidades.
+- Usuários somente poderão ser vinculados a unidades de sua própria Câmara.
+- O vínculo entre usuário e unidade não será obrigatório.
 - Usuários não-root poderão acessar somente unidades de sua própria Câmara.
-- O root possuirá acesso global às unidades.
+- O root possuirá acesso global e não dependerá de vínculo com unidades.
 - Apenas Câmaras ativas poderão receber novas unidades.
 - Unidades poderão ser arquivadas e posteriormente restauradas.
 - Unidades arquivadas continuarão reservando seu nome dentro da Câmara.
@@ -58,6 +68,8 @@ O módulo utilizará as seguintes permissões:
 - `unidades-tramitacao:excluir`
 - `unidades-tramitacao:restaurar`
 
-## Fluxo futuro
+## Integração com usuários
 
-Quando o fluxo de tramitação for implementado, as unidades poderão representar a origem e o destino de cada movimentação realizada em uma proposição.
+- As unidades de atuação serão selecionadas nos formulários de criação e edição de usuários.
+- Somente unidades pertencentes à Câmara selecionada serão apresentadas.
+- O vínculo com uma unidade definirá onde o usuário poderá receber e encaminhar proposições.

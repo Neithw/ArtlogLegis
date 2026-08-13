@@ -135,4 +135,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Tramitacao::class, 'recebido_por_id');
     }
+
+    public function unidadesTramitacao(): BelongsToMany
+    {
+        return $this->belongsToMany(UnidadeTramitacao::class, 'unidade_tramitacao_user', 'user_id', 'unidade_tramitacao_id')
+            ->withTimestamps();
+    }
 }

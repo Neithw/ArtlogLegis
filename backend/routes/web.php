@@ -19,6 +19,7 @@ use App\Models\Mandato;
 use App\Models\Partido;
 use App\Models\Proposicao;
 use App\Models\TipoProposicao;
+use App\Models\Tramitacao;
 use App\Models\UnidadeTramitacao;
 use App\Models\User;
 use App\Models\Vereador;
@@ -169,6 +170,13 @@ Route::middleware([
         ->middleware('can:protocolar,proposicao')
         ->name('proposicoes.protocolar');
 
+    Route::get('/proposicoes/{proposicao}/tramitacao', [TramitacaoController::class, 'show'])
+        ->middleware([
+            'can:view,proposicao',
+            'can:viewAny,' . Tramitacao::class
+        ])
+        ->name('proposicoes.tramitacao.show');
+
     Route::post('/proposicoes/{proposicao}/tramitacoes', [TramitacaoController::class, 'store'])
         ->middleware('can:encaminhar,proposicao')
         ->name('proposicoes.tramitacoes.store');
@@ -203,7 +211,7 @@ Route::middleware([
         ])
         ->except('show')
         ->middlewareFor('index', 'can:viewAny,' . UnidadeTramitacao::class)
-        ->middlewareFor(['create', 'store'], 'can:create' . UnidadeTramitacao::class)
+        ->middlewareFor(['create', 'store'], 'can:create,' . UnidadeTramitacao::class)
         ->middlewareFor(['edit', 'update'], 'can:update,unidadeTramitacao')
         ->middlewareFor('destroy', 'can:delete,unidadeTramitacao');
     // -----------------------------------------------------------------------------------------------
