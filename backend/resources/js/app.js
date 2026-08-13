@@ -1,6 +1,7 @@
-import Alpine from 'alpinejs';
-
-window.Alpine = Alpine;
+import {
+    Livewire,
+    Alpine,
+} from '../../vendor/livewire/livewire/dist/livewire.esm';
 
 Alpine.data('formularioUsuario', ({
     pacotes = {},
@@ -85,4 +86,59 @@ Alpine.data('formularioMandato', (configuracao = {}) => ({
     }
 }));
 
-Alpine.start();
+Alpine.store('layout', {
+    darkMode: document.documentElement.classList.contains('dark'),
+
+    sidebarOpen: false,
+
+    sidebarCollapsed:
+        localStorage.getItem('sidebar-collapsed') === 'true',
+
+    sidebarLabelsVisible:
+        localStorage.getItem('sidebar-collapsed') !== 'true',
+
+    sidebarLabelTimer: null,
+
+    toggleTheme() {
+        this.darkMode = !this.darkMode;
+
+        document.documentElement.classList.toggle(
+            'dark',
+            this.darkMode
+        );
+
+        localStorage.setItem(
+            'theme',
+            this.darkMode ? 'dark' : 'light'
+        );
+    },
+
+    toggleSidebar() {
+        if (window.innerWidth >= 1024) {
+            clearTimeout(this.sidebarLabelTimer);
+
+            if (this.sidebarCollapsed) {
+                this.sidebarCollapsed = false;
+
+                localStorage.setItem('sidebar-collapsed', 'false');
+
+                this.sidebarLabelTimer = setTimeout(() => {
+                    if (!this.sidebarCollapsed) {
+                        this.sidebarLabelsVisible = true;
+                    }
+                }, 100);
+            } else {
+                this.sidebarLabelsVisible = false;
+                this.sidebarCollapsed = true;
+
+                localStorage.setItem('sidebar-collapsed', 'true');
+            }
+
+            return;
+        }
+
+        this.sidebarOpen = !this.sidebarOpen;
+    },
+});
+
+Livewire.start();

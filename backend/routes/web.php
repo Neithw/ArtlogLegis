@@ -23,10 +23,13 @@ use App\Models\Tramitacao;
 use App\Models\UnidadeTramitacao;
 use App\Models\User;
 use App\Models\Vereador;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return Auth::check()
+        ? redirect()->route('dashboard')
+        : redirect()->route('login');
 });
 
 Route::middleware([

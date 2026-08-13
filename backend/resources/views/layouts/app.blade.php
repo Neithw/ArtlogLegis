@@ -6,43 +6,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'ArtLog Legis') }}</title>
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
 
-    <!-- Scripts -->
+    <script>
+        const temaSalvo = localStorage.getItem('theme');
+
+        const usarTemaEscuro =
+            temaSalvo === 'dark' ||
+            (
+                temaSalvo === null &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches
+            );
+
+        document.documentElement.classList.toggle('dark', usarTemaEscuro);
+    </script>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Styles -->
     @livewireStyles
 </head>
 
-<body class="font-sans antialiased">
+<body class="bg-slate-100 font-sans antialiased text-slate-900 dark:bg-neutral-950 dark:text-slate-100">
     <x-banner />
 
-    <div class="min-h-screen bg-gray-100">
-        @livewire('navigation-menu')
+    <div x-data @keydown.escape.window="$store.layout.sidebarOpen = false"
+        class="min-h-screen bg-slate-100 transition-colors dark:bg-neutral-950">
+        @persist('app-navigation')
+            @include('navigation-menu')
+        @endpersist
 
-        <!-- Page Heading -->
-        @if (isset($header))
-            <header class="bg-white shadow">
-                <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-                    {{ $header }}
-                </div>
-            </header>
-        @endif
+        <div class="min-h-screen pt-16 transition-[padding] duration-150 ease-out"
+            :class="$store.layout.sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'">
+            <div class="flex min-h-[calc(100vh-4rem)] flex-col">
+                @if (isset($header))
+                    <header
+                        class="shrink-0 border-b border-slate-200 bg-white
+                       dark:border-neutral-800 dark:bg-neutral-900">
+                        <div class="flex h-20 items-center px-4 sm:px-6 lg:px-8">
+                            <div class="w-full">
+                                {{ $header }}
+                            </div>
+                        </div>
+                    </header>
+                @endif
 
-        <!-- Page Content -->
-        <main>
-            {{ $slot }}
-        </main>
+                <main class="flex-1">
+                    {{ $slot }}
+                </main>
+
+                <footer
+                    class="shrink-0 border-t border-slate-200 bg-white
+                   dark:border-neutral-800 dark:bg-neutral-900">
+                    <div
+                        class="px-4 py-3 text-center text-xs
+                       text-slate-500 dark:text-neutral-500">
+                        © {{ now()->year }} ArtLog. Todos os direitos reservados.
+                    </div>
+                </footer>
+            </div>
+        </div>
     </div>
 
     @stack('modals')
 
-    @livewireScripts
+    @livewireScriptConfig
 </body>
 
 </html>
