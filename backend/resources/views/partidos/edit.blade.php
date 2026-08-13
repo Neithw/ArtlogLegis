@@ -1,76 +1,46 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <p class="text-sm font-medium text-indigo-600">
-                Administração legislativa
+            <p class="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                Estrutura parlamentar
             </p>
 
-            <h2 class="text-2xl font-semibold leading-tight text-gray-900">
+            <h2 class="text-2xl font-semibold tracking-tight text-slate-950 dark:text-neutral-100">
                 Editar partido
             </h2>
         </div>
     </x-slot>
 
-    <div class="py-4">
+    <div class="py-8 sm:py-10">
         <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-
             <form method="POST" action="{{ route('partidos.update', $partido) }}" class="space-y-6">
                 @csrf
                 @method('PUT')
 
-                <div class="overflow-hidden rounded-xl bg-white shadow">
-                    <div class="border-b border-gray-200 px-6 py-5">
-                        <h3 class="text-lg font-semibold text-gray-900">
+                <x-ui::card>
+                    <header class="border-b border-slate-200 px-4 py-5 sm:px-6 dark:border-neutral-800">
+                        <h3 class="text-lg font-semibold text-slate-950 dark:text-neutral-100">
                             Dados do partido
                         </h3>
 
-                        <p class="mt-1 text-sm text-gray-500">
+                        <p class="mt-1 text-sm text-slate-500 dark:text-neutral-400">
                             Atualize os dados públicos do partido.
                         </p>
-                    </div>
+                    </header>
 
-                    <div class="grid gap-6 p-6 md:grid-cols-2">
-                        <div>
-                            <x-label for="nome" value="Nome do partido" />
+                    @include('partidos._form', ['partido' => $partido])
+                </x-ui::card>
 
-                            <x-input id="nome" name="nome" type="text" class="mt-1 block w-full"
-                                :value="old('nome', $partido->nome)" required autofocus />
-
-                            <x-input-error for="nome" class="mt-2" />
-                        </div>
-
-                        <div>
-                            <x-label for="sigla" value="Sigla do partido" />
-
-                            <x-input id="sigla" name="sigla" type="text" class="mt-1 block w-full"
-                                :value="old('sigla', $partido->sigla)" required />
-
-                            <x-input-error for="sigla" class="mt-2" />
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <x-label for="numero_eleitoral" value="Número eleitoral do partido" />
-
-                            <x-input id="numero_eleitoral" name="numero_eleitoral" type="number" min="1"
-                                max="65535" class="mt-1 block w-full" :value="old('numero_eleitoral', $partido->numero_eleitoral)" />
-
-                            <p class="mt-1 text-xs text-gray-500">
-                                Informe apenas o número, por exemplo: 20.
-                            </p>
-
-                            <x-input-error for="numero_eleitoral" class="mt-2" />
-                        </div>
-                    </div>
-                </div>
-                <div class="flex items-center justify-end gap-3">
-                    <a href="{{ route('partidos.index') }}"
-                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-widest text-gray-700 shadow-sm transition hover:bg-gray-50">
+                <div class="flex flex-wrap items-center justify-end gap-3">
+                    <x-ui::button :href="route('partidos.index')" variant="secondary">
+                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                         Cancelar
-                    </a>
+                    </x-ui::button>
 
-                    <x-button>
+                    <x-ui::button type="submit">
+                        <i class="fa-solid fa-check" aria-hidden="true"></i>
                         Confirmar alterações
-                    </x-button>
+                    </x-ui::button>
                 </div>
             </form>
         </div>

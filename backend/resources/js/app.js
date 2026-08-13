@@ -99,13 +99,17 @@ Alpine.store('layout', {
 
     sidebarLabelTimer: null,
 
-    toggleTheme() {
-        this.darkMode = !this.darkMode;
-
+    applyTheme() {
         document.documentElement.classList.toggle(
             'dark',
             this.darkMode
         );
+    },
+
+    toggleTheme() {
+        this.darkMode = !this.darkMode;
+
+        this.applyTheme();
 
         localStorage.setItem(
             'theme',
@@ -139,6 +143,10 @@ Alpine.store('layout', {
 
         this.sidebarOpen = !this.sidebarOpen;
     },
+});
+
+document.addEventListener('livewire:navigated', () => {
+    Alpine.store('layout').applyTheme();
 });
 
 Livewire.start();

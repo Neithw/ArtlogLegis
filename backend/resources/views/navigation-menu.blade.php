@@ -186,10 +186,6 @@
                                    text-slate-700 dark:text-neutral-200">
                             {{ $user->name }}
                         </span>
-
-                        <span class="block text-xs text-slate-500 dark:text-neutral-400">
-                            Minha conta
-                        </span>
                     </span>
 
                     <i class="fa-solid fa-chevron-down fa-fw hidden text-xs
