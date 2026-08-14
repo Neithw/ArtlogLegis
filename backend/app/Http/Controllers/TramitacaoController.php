@@ -141,7 +141,7 @@ class TramitacaoController extends Controller
             }
 
             $tramitacaoBloqueada->update([
-                'recebido_por_id' => $request()->user()->id,
+                'recebido_por_id' => $request->user()->id,
                 'data_recebimento' => now()
             ]);
 

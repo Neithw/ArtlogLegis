@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Proposicao extends Model
@@ -74,5 +75,13 @@ class Proposicao extends Model
     public function tramitacoes(): HasMany
     {
         return $this->hasMany(Tramitacao::class);
+    }
+
+    public function ultimaTramitacao(): HasOne
+    {
+        return $this->hasOne(Tramitacao::class)->ofMany([
+            'data_encaminhamento' => 'max',
+            'id' => 'max'
+        ]);
     }
 }

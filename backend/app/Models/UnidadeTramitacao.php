@@ -24,13 +24,13 @@ class UnidadeTramitacao extends Model
     ];
 
     public const TIPOS = [
-        'secretaria',
-        'mesa_diretora',
-        'plenario',
-        'departamento',
-        'unidade_administrativa',
-        'orgao_externo',
-        'outro'
+        'secretaria' => 'Secretaria',
+        'mesa_diretora' => 'Mesa Diretora',
+        'plenario' => 'Plenário',
+        'departamento' => 'Departamento',
+        'unidade_administrativa' => 'Unidade Administrativa',
+        'orgao_externo' => 'Órgão Externo',
+        'outro' => 'Outro',
     ];
 
     public function camara(): BelongsTo

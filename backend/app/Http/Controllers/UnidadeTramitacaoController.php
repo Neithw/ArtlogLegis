@@ -5,23 +5,15 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreUnidadeTramitacaoRequest;
 use App\Http\Requests\UpdateUnidadeTramitacaoRequest;
 use App\Models\Camara;
+use App\Models\Proposicao;
 use App\Models\UnidadeTramitacao;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class UnidadeTramitacaoController extends Controller
 {
-    private const TIPOS_LABELS = [
-        'secretaria' => 'Secretaria',
-        'mesa_diretora' => 'Mesa Diretora',
-        'plenario' => 'Plenário',
-        'departamento' => 'Departamento',
-        'unidade_administrativa' => 'Unidade Administrativa',
-        'orgao_externo' => 'Órgão Externo',
-        'outro' => 'Outro',
-    ];
-
     /**
      * Display a listing of the resource.
      */
@@ -40,7 +32,7 @@ class UnidadeTramitacaoController extends Controller
             ->orderBy('nome')
             ->paginate(10);
 
-        $tiposLabels = self::TIPOS_LABELS;
+        $tiposLabels = UnidadeTramitacao::TIPOS;
 
         return view('unidades-tramitacao.index', compact('unidadesTramitacao', 'tiposLabels', 'usuarioIsRoot'));
     }
@@ -63,7 +55,7 @@ class UnidadeTramitacaoController extends Controller
             ->orderBy('nome')
             ->get(['id', 'nome']);
 
-        $tiposLabels = self::TIPOS_LABELS;
+        $tiposLabels = UnidadeTramitacao::TIPOS;
 
         return view('unidades-tramitacao.create', compact('camaras', 'tiposLabels', 'usuarioIsRoot'));
     }
@@ -86,7 +78,7 @@ class UnidadeTramitacaoController extends Controller
     {
         $unidadeTramitacao->load('camara');
 
-        $tiposLabels = self::TIPOS_LABELS;
+        $tiposLabels = UnidadeTramitacao::TIPOS;
 
         return view('unidades-tramitacao.edit', compact('unidadeTramitacao', 'tiposLabels'));
     }
@@ -107,6 +99,21 @@ class UnidadeTramitacaoController extends Controller
      */
     public function destroy(UnidadeTramitacao $unidadeTramitacao): RedirectResponse
     {
+        $possuiProposicaoAtiva = Proposicao::query()
+            ->where('situacao', 'protocolada')
+            ->whereHas(
+                'ultimaTramitacao',
+                fn($query) => $query
+                    ->where('unidade_destino_id', $unidadeTramitacao->id)
+            )
+            ->exists();
+
+        if ($possuiProposicaoAtiva) {
+            throw ValidationException::withMessages([
+                'unidadeTramitacao' => 'Esta unidade é o destino atual de uma ou mais proposições protocoladas e não pode ser arquivada.'
+            ]);
+        }
+
         $unidadeTramitacao->delete();
 
         return to_route('unidades-tramitacao.index')
@@ -128,13 +135,15 @@ class UnidadeTramitacaoController extends Controller
             ->latest('deleted_at')
             ->paginate(10);
 
-        $tiposLabels = self::TIPOS_LABELS;
+        $tiposLabels = UnidadeTramitacao::TIPOS;
 
         return view('unidades-tramitacao.arquivadas', compact('unidadesTramitacao', 'tiposLabels', 'usuarioIsRoot'));
     }
 
     public function restore(UnidadeTramitacao $unidadeTramitacao): RedirectResponse
     {
+        abort_unless($unidadeTramitacao->trashed(), 404);
+
         $unidadeTramitacao->restore();
 
         return to_route('unidades-tramitacao.arquivadas')
