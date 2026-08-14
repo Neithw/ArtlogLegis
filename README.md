@@ -49,10 +49,10 @@ O sistema adota uma estrutura multi-Câmara:
 
 A documentação está organizada por domínio:
 
-- [Arquitetura](docs/00-arquitetura) — RBAC, autorização e escopo de Câmara.
-- [Administração](docs/01-administracao) — Câmaras e usuários.
-- [Estrutura parlamentar](docs/02-estrutura-parlamentar) — Legislaturas, vereadores, partidos e mandatos.
-- [Proposições](docs/03-proposicoes) — Tipos de proposição, elaboração, protocolo e tramitação.
+- [Arquitetura](docs/00-arquitetura) – RBAC, autorização e escopo de Câmara.
+- [Administração](docs/01-administracao) – Câmaras e usuários.
+- [Estrutura parlamentar](docs/02-estrutura-parlamentar) – Legislaturas, vereadores, partidos e mandatos.
+- [Proposições](docs/03-proposicoes) – Tipos de proposição, elaboração, protocolo e tramitação.
 
 Cada módulo possui sua própria documentação, com decisões de modelagem, relacionamentos, regras de negócio e critérios de autorização.
 

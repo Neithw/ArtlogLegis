@@ -84,7 +84,7 @@
                                     <span class="sr-only">até</span>
 
                                     <span aria-hidden="true" class="mx-1 text-slate-400 dark:text-neutral-600">
-                                        —
+                                        –
                                     </span>
 
                                     <time datetime="{{ $legislatura->data_fim->format('Y-m-d') }}">

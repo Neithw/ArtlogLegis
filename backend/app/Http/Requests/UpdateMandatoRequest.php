@@ -139,4 +139,16 @@ class UpdateMandatoRequest extends FormRequest
             }
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'data_inicio.required' => 'Informe a data de início do mandato.',
+            'data_inicio.date' => 'Informe uma data de início válida.',
+
+            'data_fim.date' => 'Informe uma data de término válida.',
+            'data_fim.after_or_equal' =>
+            'A data de término deve ser igual ou posterior à data de início.',
+        ];
+    }
 }

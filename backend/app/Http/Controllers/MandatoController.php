@@ -27,7 +27,6 @@ class MandatoController extends Controller
             ->with([
                 'vereador',
                 'legislatura.camara',
-                'ultimaFiliacaoPartidaria.partido'
             ])
             ->when(! $usuarioIsRoot, function ($query) use ($usuarioAutenticado) {
                 $query->whereRelation('legislatura', 'camara_id', $usuarioAutenticado->camara_id);
@@ -77,6 +76,21 @@ class MandatoController extends Controller
             ]);
 
         return view('mandatos.create', compact('vereadores', 'legislaturas', 'partidos', 'usuarioIsRoot'));
+    }
+
+    public function show(Mandato $mandato): View
+    {
+        $mandato->load([
+            'vereador',
+            'legislatura.camara',
+
+            'filiacoesPartidarias' => fn($query) => $query
+                ->with('partido')
+                ->orderBy('data_inicio')
+                ->orderBy('id'),
+        ]);
+
+        return view('mandatos.show', compact('mandato'));
     }
 
     /**
@@ -148,7 +162,7 @@ class MandatoController extends Controller
         });
 
 
-        return to_route('mandatos.index')
+        return to_route('mandatos.show', $mandato)
             ->with('success', 'Mandato atualizado com sucesso.');
     }
 
@@ -180,11 +194,13 @@ class MandatoController extends Controller
             ->orderBy('data_inicio')
             ->paginate(10);
 
-        return view('mandatos.arquivados', compact('arquivados'));
+        return view('mandatos.arquivados', compact('arquivados', 'usuarioIsRoot'));
     }
 
     public function restore(Mandato $mandato): RedirectResponse
     {
+        abort_unless($mandato->trashed(), 404);
+
         $mandato->restore();
 
         return to_route('mandatos.arquivados')

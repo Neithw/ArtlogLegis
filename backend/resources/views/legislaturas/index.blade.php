@@ -105,8 +105,10 @@
                                 <td>
                                     {{ $legislatura->data_inicio->format('d/m/Y') }}
 
-                                    <span class="text-slate-400 dark:text-neutral-600">
-                                        -
+                                    <span class="sr-only">até</span>
+
+                                    <span aria-hidden="true" class="mx-1 text-slate-400 dark:text-neutral-600">
+                                        –
                                     </span>
 
                                     {{ $legislatura->data_fim->format('d/m/Y') }}

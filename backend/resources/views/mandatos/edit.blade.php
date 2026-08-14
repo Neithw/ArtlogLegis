@@ -1,99 +1,46 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <p class="text-sm font-medium text-indigo-600">
-                Administração
+            <p class="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                Estrutura parlamentar
             </p>
 
-            <h2 class="text-2xl font-semibold leading-tight text-gray-900">
+            <h2 class="text-2xl font-semibold tracking-tight text-slate-950 dark:text-neutral-100">
                 Editar mandato
             </h2>
         </div>
     </x-slot>
 
-    <div class="py-4">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-
-
+    <div class="py-8 sm:py-10">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
             <form action="{{ route('mandatos.update', $mandato) }}" method="POST" class="space-y-6">
                 @csrf
                 @method('PUT')
 
-                <div class="overflow-hidden rounded-xl bg-white shadow">
-                    <div class="border-b border-gray-200 px-6 py-5">
-                        <h3 class="text-lg font-semibold text-gray-900">
+                <x-ui::card>
+                    <header class="border-b border-slate-200 px-4 py-5 sm:px-6 dark:border-neutral-800">
+                        <h3 class="text-lg font-semibold text-slate-950 dark:text-neutral-100">
                             Dados do mandato
                         </h3>
 
-                        <p class="mt-1 text-sm text-gray-500">
-                            Edite os dados do mandato.
+                        <p class="mt-1 text-sm text-slate-500 dark:text-neutral-400">
+                            Atualize o período institucional do mandato.
                         </p>
-                    </div>
+                    </header>
 
-                    <div class="grid gap-6 p-6 md:grid-cols-2">
-                        <div>
-                            <x-label for="vereador_id" value="Vereador" />
-                            <p>
-                                {{ $mandato->vereador->nome_parlamentar ?? $mandato->vereador->nome }}
-                            </p>
-                        </div>
+                    @include('mandatos._form', ['mandato' => $mandato])
+                </x-ui::card>
 
-                        <div>
-                            <x-label for="legislatura_id" value="Legislatura" />
-
-                            <p>
-                                {{ $mandato->legislatura->numero }}ª Legislatura
-                            </p>
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <x-label value="Partido atual" />
-
-                            <div class="mt-1 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
-                                <p class="text-sm font-medium text-gray-900">
-                                    @if ($mandato->ultimaFiliacaoPartidaria?->partido)
-                                        {{ $mandato->ultimaFiliacaoPartidaria->partido->sigla }}
-                                        -
-                                        {{ $mandato->ultimaFiliacaoPartidaria->partido->nome }}
-                                    @else
-                                        Sem partido informado
-                                    @endif
-                                </p>
-
-                                <p class="mt-1 text-xs text-gray-500">
-                                    Alterações partidárias são registradas separadamente para preservar o histórico.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div>
-                            <x-label for="data_inicio" value="Data de início" />
-
-                            <x-input id="data_inicio" name="data_inicio" type="date" class="mt-1 block w-full"
-                                :value="old('data_inicio', $mandato->data_inicio?->format('Y-m-d'))" required />
-
-                            <x-input-error for="data_inicio" class="mt-2" />
-                        </div>
-
-                        <div>
-                            <x-label for="data_fim" value="Data de término" />
-
-                            <x-input id="data_fim" name="data_fim" type="date" class="mt-1 block w-full"
-                                :value="old('data_fim', $mandato->data_fim?->format('Y-m-d'))" />
-
-                            <x-input-error for="data_fim" class="mt-2" />
-                        </div>
-                    </div>
-                </div>
-                <div class="flex items-center justify-end gap-3">
-                    <a href="{{ route('mandatos.index') }}"
-                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-widest text-gray-700 shadow-sm transition hover:bg-gray-50">
+                <div class="flex flex-wrap items-center justify-end gap-3">
+                    <x-ui::button :href="route('mandatos.show', $mandato)" variant="secondary">
+                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                         Cancelar
-                    </a>
+                    </x-ui::button>
 
-                    <x-button>
+                    <x-ui::button type="submit">
+                        <i class="fa-solid fa-check" aria-hidden="true"></i>
                         Salvar alterações
-                    </x-button>
+                    </x-ui::button>
                 </div>
             </form>
         </div>

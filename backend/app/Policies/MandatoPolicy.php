@@ -15,9 +15,15 @@ class MandatoPolicy
         return $user->hasPermission('mandatos:visualizar');
     }
 
+    public function view(User $user, Mandato $mandato): bool
+    {
+        return $user->hasPermission('mandatos:visualizar')
+            && $this->pertenceAoEscopo($user, $mandato);
+    }
+
     public function viewArchived(User $user): bool
     {
-        return $user->hasPermission('mandatos:visualizar');
+        return $user->hasPermission('mandatos:restaurar');
     }
 
     /**

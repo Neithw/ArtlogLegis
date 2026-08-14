@@ -72,7 +72,7 @@
 
                                 <td>
                                     <span class="font-medium text-slate-950 dark:text-neutral-100">
-                                        {{ $partido->numero_eleitoral ?? '—' }}
+                                        {{ $partido->numero_eleitoral ?? '–' }}
                                     </span>
                                 </td>
 

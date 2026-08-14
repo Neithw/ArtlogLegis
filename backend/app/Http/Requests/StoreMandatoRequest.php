@@ -145,4 +145,25 @@ class StoreMandatoRequest extends FormRequest
             }
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'vereador_id.required' => 'Selecione um vereador.',
+            'vereador_id.exists' => 'O vereador selecionado é inválido.',
+
+            'legislatura_id.required' => 'Selecione uma legislatura.',
+            'legislatura_id.exists' => 'A legislatura selecionada é inválida.',
+
+            'partido_id.required' => 'Selecione um partido.',
+            'partido_id.exists' => 'O partido selecionado é inválido.',
+
+            'data_inicio.required' => 'Informe a data de início do mandato.',
+            'data_inicio.date' => 'Informe uma data de início válida.',
+
+            'data_fim.date' => 'Informe uma data de término válida.',
+            'data_fim.after_or_equal' =>
+            'A data de término deve ser igual ou posterior à data de início.',
+        ];
+    }
 }

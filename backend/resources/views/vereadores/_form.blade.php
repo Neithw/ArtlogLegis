@@ -56,7 +56,7 @@
 
                 @foreach ($usuariosDisponiveis as $usuario)
                     <option value="{{ $usuario->id }}" @selected((string) old('user_id', $vereador->user_id) === (string) $usuario->id)>
-                        {{ $usuario->name }} — {{ $usuario->email }}
+                        {{ $usuario->name }} – {{ $usuario->email }}
 
                         @if ($usuario->trashed())
                             (conta arquivada)
@@ -71,7 +71,7 @@
                 <option value="">Sem conta vinculada</option>
 
                 <template x-for="usuario in usuariosFiltrados" x-bind:key="usuario.id">
-                    <option x-bind:value="String(usuario.id)" x-text="`${usuario.name} — ${usuario.email}`"></option>
+                    <option x-bind:value="String(usuario.id)" x-text="`${usuario.name} – ${usuario.email}`"></option>
                 </template>
             </x-ui::select>
 
