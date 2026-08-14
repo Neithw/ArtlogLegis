@@ -96,12 +96,41 @@ class LegislaturaController extends Controller
     {
         if ($legislatura->mandatos()->withTrashed()->exists()) {
             return to_route('legislaturas.index')
-                ->with('error', 'Não é possível excluir uma legislatura que possui mandatos vinculados.');
+                ->with('error', 'Não é possível arquivar uma legislatura que possui mandatos vinculados.');
         }
 
         $legislatura->delete();
 
         return to_route('legislaturas.index')
-            ->with('success', 'Legislatura excluída com sucesso.');
+            ->with('success', 'Legislatura arquivada com sucesso.');
+    }
+
+    public function arquivadas(Request $request): View
+    {
+        $usuarioAutenticado = $request->user();
+        $usuarioIsRoot = $usuarioAutenticado->isRoot();
+
+        $legislaturas = Legislatura::onlyTrashed()
+            ->with(['camara:id,nome'])
+            ->when(! $usuarioIsRoot, function ($query) use ($usuarioAutenticado) {
+                $query->where(
+                    'camara_id',
+                    $usuarioAutenticado->camara_id
+                );
+            })
+            ->orderByDesc('data_inicio')
+            ->paginate(10);
+
+        return view('legislaturas.arquivadas', compact('legislaturas', 'usuarioIsRoot'));
+    }
+
+    public function restore(Legislatura $legislatura): RedirectResponse
+    {
+        abort_unless($legislatura->trashed(), 404);
+
+        $legislatura->restore();
+
+        return to_route('legislaturas.arquivadas')
+            ->with('success', 'Legislatura restaurada com sucesso.');
     }
 }

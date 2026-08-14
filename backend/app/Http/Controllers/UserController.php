@@ -29,11 +29,13 @@ class UserController extends Controller
             'vereadores:criar',
             'vereadores:editar',
             'vereadores:excluir',
+            'vereadores:restaurar',
 
             'legislaturas:visualizar',
             'legislaturas:criar',
             'legislaturas:editar',
             'legislaturas:excluir',
+            'legislaturas:restaurar',
 
             'partidos:visualizar',
 

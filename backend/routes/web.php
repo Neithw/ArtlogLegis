@@ -89,6 +89,15 @@ Route::middleware([
         ->middlewareFor('destroy', 'can:delete,vereador');
     // -----------------------------------------------------------------------------------------------
 
+    Route::get('/legislaturas/arquivadas', [LegislaturaController::class, 'arquivadas'])
+        ->middleware('can:viewArchived,' . Legislatura::class)
+        ->name('legislaturas.arquivadas');
+
+    Route::patch('/legislaturas/{legislatura}/restaurar', [LegislaturaController::class, 'restore'])
+        ->withTrashed()
+        ->middleware('can:restore,legislatura')
+        ->name('legislaturas.restore');
+
     Route::resource('legislaturas', LegislaturaController::class)
         ->except('show')
         ->middlewareFor('index', 'can:viewAny,' . Legislatura::class)

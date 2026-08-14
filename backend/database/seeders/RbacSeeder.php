@@ -47,7 +47,7 @@ class RbacSeeder extends Seeder
                 'codigo' => 'vereadores:visualizar'
             ],
             [
-                'nome' => 'Criar Vereadores',
+                'nome' => 'Cadastrar Vereadores',
                 'codigo' => 'vereadores:criar'
             ],
             [
@@ -57,6 +57,10 @@ class RbacSeeder extends Seeder
             [
                 'nome' => 'Excluir Vereadores',
                 'codigo' => 'vereadores:excluir'
+            ],
+            [
+                'nome' => 'Restaurar Vereadores',
+                'codigo' => 'vereadores:restaurar'
             ],
             [
                 'nome' => 'Visualizar Legislaturas',
@@ -73,6 +77,10 @@ class RbacSeeder extends Seeder
             [
                 'nome' => 'Excluir Legislaturas',
                 'codigo' => 'legislaturas:excluir'
+            ],
+            [
+                'nome' => 'Restaurar Legislaturas',
+                'codigo' => 'legislaturas:restaurar'
             ],
             [
                 'nome' => 'Visualizar Partidos',

@@ -25,6 +25,12 @@ class LegislaturaPolicy
             && $user->hasPermission('legislaturas:visualizar');
     }
 
+    public function viewArchived(User $user): bool
+    {
+        return $this->possuiCamara($user)
+            && $user->hasPermission('legislaturas:restaurar');
+    }
+
     /**
      * Determine whether the user can create models.
      */
@@ -50,6 +56,12 @@ class LegislaturaPolicy
     {
         return $this->pertenceAoEscopo($user, $legislatura)
             && $user->hasPermission('legislaturas:excluir');
+    }
+
+    public function restore(User $user, Legislatura $legislatura): bool
+    {
+        return $this->pertenceAoEscopo($user, $legislatura)
+            && $user->hasPermission('legislaturas:restaurar');
     }
 
     private function possuiCamara(User $user): bool
