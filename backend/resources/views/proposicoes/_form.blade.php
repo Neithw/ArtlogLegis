@@ -1,10 +1,10 @@
 @php
     $editando = isset($proposicao);
-    $usuarioIsRoot = $usuarioIsRoot ?? false;
+    $usuarioIsRoot = auth()->user()->isRoot();
 
     $camaraIdInicial = (string) old(
         'camara_id',
-        $editando ? $proposicao->camara_id : ($usuarioIsRoot ? '' : $camaras->first()?->id),
+        $editando ? $proposicao->camara_id : ($usuarioIsRoot ? '' : auth()->user()->camara_id),
     );
 
     $legislaturaIdInicial = (string) old('legislatura_id', $editando ? $proposicao->legislatura_id : '');
@@ -46,8 +46,6 @@
             ],
         )
         ->values();
-
-    $camaraExibida = $editando ? $proposicao->camara : $camaras->first();
 @endphp
 
 <div class="grid gap-6 p-4 sm:p-6 md:grid-cols-2" x-data="{
@@ -89,40 +87,38 @@
         this.autorMandatoId = '';
     },
 }">
-    @if (!$editando && $usuarioIsRoot)
-        <div class="md:col-span-2">
-            <x-ui::select name="camara_id" label="Câmara" x-model="camaraId" x-on:change="alterarCamara" required>
-                <option value="">Selecione uma Câmara</option>
+    @if ($usuarioIsRoot)
+        @if (!$editando)
+            <div class="md:col-span-2">
+                <x-ui::select name="camara_id" label="Câmara" x-model="camaraId" x-on:change="alterarCamara" required>
+                    <option value="">Selecione uma Câmara</option>
 
-                @foreach ($camaras as $camara)
-                    <option value="{{ $camara->id }}" @selected(old('camara_id') == $camara->id)>
-                        {{ $camara->nome }}
-                    </option>
-                @endforeach
-            </x-ui::select>
-        </div>
-    @else
-        <div class="md:col-span-2">
-            <p class="text-sm font-medium text-slate-700 dark:text-neutral-300">
-                Câmara
-            </p>
-
-            <div
-                class="mt-1 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3
-                       dark:border-neutral-800 dark:bg-neutral-950">
-                <p class="text-sm font-semibold text-slate-950 dark:text-neutral-100">
-                    {{ $camaraExibida?->nome ?? 'Câmara indisponível' }}
-                </p>
-
-                <p class="mt-1 text-xs text-slate-500 dark:text-neutral-500">
-                    {{ $editando
-                        ? 'A Câmara da proposição não pode ser alterada.'
-                        : 'A proposição será vinculada automaticamente à sua Câmara.' }}
-                </p>
+                    @foreach ($camaras as $camara)
+                        <option value="{{ $camara->id }}" @selected(old('camara_id') == $camara->id)>
+                            {{ $camara->nome }}
+                        </option>
+                    @endforeach
+                </x-ui::select>
             </div>
+        @else
+            <div class="md:col-span-2">
+                <p class="text-sm font-medium text-slate-700 dark:text-neutral-300">
+                    Câmara
+                </p>
 
-            <x-input-error for="camara_id" class="mt-1.5 dark:text-red-400" />
-        </div>
+                <div
+                    class="mt-1 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3
+                       dark:border-neutral-800 dark:bg-neutral-950">
+                    <p class="text-sm font-semibold text-slate-950 dark:text-neutral-100">
+                        {{ $proposicao->camara?->nome ?? 'Câmara indisponível' }}
+                    </p>
+
+                    <p class="mt-1 text-xs text-slate-500 dark:text-neutral-500">
+                        A Câmara da proposição não pode ser alterada.
+                    </p>
+                </div>
+            </div>
+        @endif
     @endif
 
     <x-ui::select name="legislatura_id" label="Legislatura" x-model="legislaturaId" x-on:change="alterarLegislatura"

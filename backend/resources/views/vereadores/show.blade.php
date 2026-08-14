@@ -89,7 +89,7 @@
                         </p>
 
                         <p class="mt-1 text-sm font-medium text-slate-950 dark:text-neutral-100">
-                            {{ $vereador->telefone_institucional ?? 'Não informado' }}
+                            {{ $vereador->telefone_institucional_formatado ?? 'Não informado' }}
                         </p>
                     </div>
 

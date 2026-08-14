@@ -52,7 +52,11 @@
                     <thead>
                         <tr>
                             <th scope="col">Usuário</th>
-                            <th scope="col">Câmara</th>
+
+                            @if ($usuarioIsRoot)
+                                <th scope="col">Câmara</th>
+                            @endif
+
                             <th scope="col">Papel</th>
                             <th scope="col">Situação</th>
                             <th scope="col" class="text-right">Ações</th>
@@ -96,15 +100,17 @@
                                     </div>
                                 </td>
 
-                                <td>
-                                    <span @class([
-                                        'text-sm',
-                                        'text-slate-700 dark:text-neutral-300' => $usuario->camara,
-                                        'text-slate-500 dark:text-neutral-500' => !$usuario->camara,
-                                    ])>
-                                        {{ $usuario->camara?->nome ?? 'Acesso global' }}
-                                    </span>
-                                </td>
+                                @if ($usuarioIsRoot)
+                                    <td>
+                                        <span @class([
+                                            'text-sm',
+                                            'text-slate-700 dark:text-neutral-300' => $usuario->camara,
+                                            'text-slate-500 dark:text-neutral-500' => !$usuario->camara,
+                                        ])>
+                                            {{ $usuario->camara?->nome ?? 'Acesso global' }}
+                                        </span>
+                                    </td>
+                                @endif
 
                                 <td>
                                     <span class="text-sm text-slate-700 dark:text-neutral-300">
@@ -191,7 +197,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5">
+                                <td colspan="{{ $usuarioIsRoot ? 5 : 4 }}">
                                     <x-ui::empty-state icon="fa-users">
                                         Nenhum usuário cadastrado.
                                     </x-ui::empty-state>

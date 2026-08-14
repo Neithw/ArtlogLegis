@@ -22,8 +22,6 @@
                     ? (string) old('camara_id', $user->camara_id)
                     : (string) auth()->user()->camara_id;
 
-                $camaraVinculada = $usuarioIsRoot ? null : $camaras->firstWhere('id', $camaraInicial);
-
                 $rotulosModulos = [
                     'usuarios' => 'Usuários',
                     'vereadores' => 'Vereadores',
@@ -136,11 +134,13 @@
 
                             <div>
                                 <h3 class="text-lg font-semibold text-slate-950 dark:text-neutral-100">
-                                    Vinculação e atuação
+                                    {{ $usuarioIsRoot ? 'Vinculação e atuação' : 'Unidades de atuação' }}
                                 </h3>
 
                                 <p class="mt-1 text-sm text-slate-500 dark:text-neutral-400">
-                                    Defina a Câmara e as unidades de atuação do usuário.
+                                    {{ $usuarioIsRoot
+                                        ? 'Defina a Câmara e as unidades de atuação do usuário.'
+                                        : 'Defina as unidades de atuação do usuário.' }}
                                 </p>
                             </div>
                         </div>
@@ -164,14 +164,14 @@
                             );
                         }
                     }">
-                        <div class="md:col-span-2">
-                            <label for="camara_id"
-                                class="block text-sm font-medium text-slate-700 dark:text-neutral-300">
-                                Câmara
-                                <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span>
-                            </label>
+                        @if ($usuarioIsRoot)
+                            <div class="md:col-span-2 border-b border-slate-200 pb-6 dark:border-neutral-800">
+                                <label for="camara_id"
+                                    class="block text-sm font-medium text-slate-700 dark:text-neutral-300">
+                                    Câmara
+                                    <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span>
+                                </label>
 
-                            @if ($usuarioIsRoot)
                                 <select id="camara_id" name="camara_id" x-model="camaraId"
                                     @change="unidadesSelecionadas = []" required
                                     class="mt-1 block w-full rounded-lg border-slate-300 bg-white text-slate-950 shadow-sm transition focus:border-indigo-500 focus:ring-indigo-500 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-100">
@@ -183,33 +183,12 @@
                                         </option>
                                     @endforeach
                                 </select>
-                            @else
-                                <input type="hidden" id="camara_id" name="camara_id" value="{{ $camaraInicial }}"
-                                    x-model="camaraId">
 
-                                <div
-                                    class="mt-1 flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 dark:border-neutral-800 dark:bg-neutral-950/50">
-                                    <div
-                                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-slate-500 shadow-sm dark:bg-neutral-900 dark:text-neutral-400">
-                                        <i class="fa-solid fa-building-columns" aria-hidden="true"></i>
-                                    </div>
+                                <x-input-error for="camara_id" class="mt-1.5 dark:text-red-400" />
+                            </div>
+                        @endif
 
-                                    <div>
-                                        <p class="text-sm font-semibold text-slate-950 dark:text-neutral-100">
-                                            {{ $camaraVinculada?->nome ?? 'Câmara indisponível' }}
-                                        </p>
-
-                                        <p class="text-xs text-slate-500 dark:text-neutral-500">
-                                            Vinculação definida pela sua conta.
-                                        </p>
-                                    </div>
-                                </div>
-                            @endif
-
-                            <x-input-error for="camara_id" class="mt-1.5 dark:text-red-400" />
-                        </div>
-
-                        <section class="border-t border-slate-200 pt-6 md:col-span-2 dark:border-neutral-800">
+                        <section class="md:col-span-2">
                             <div>
                                 <h4 class="text-sm font-semibold text-slate-950 dark:text-neutral-100">
                                     Unidades de tramitação
@@ -220,16 +199,22 @@
                                 </p>
                             </div>
 
-                            <div x-cloak x-show="!camaraId"
-                                class="mt-4 flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 dark:border-neutral-800 dark:bg-neutral-950/50 dark:text-neutral-400">
-                                <i class="fa-solid fa-circle-info mt-0.5" aria-hidden="true"></i>
-                                <span>Selecione uma Câmara para visualizar suas unidades de tramitação.</span>
-                            </div>
+                            @if ($usuarioIsRoot)
+                                <div x-cloak x-show="!camaraId"
+                                    class="mt-4 flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 dark:border-neutral-800 dark:bg-neutral-950/50 dark:text-neutral-400">
+                                    <i class="fa-solid fa-circle-info mt-0.5" aria-hidden="true"></i>
+                                    <span>Selecione uma Câmara para visualizar suas unidades de tramitação.</span>
+                                </div>
+                            @endif
 
                             <div x-cloak x-show="camaraId && unidadesDisponiveis().length === 0"
                                 class="mt-4 flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 dark:border-neutral-800 dark:bg-neutral-950/50 dark:text-neutral-400">
                                 <i class="fa-solid fa-circle-info mt-0.5" aria-hidden="true"></i>
-                                <span>A Câmara selecionada não possui unidades de tramitação disponíveis.</span>
+                                <span>
+                                    {{ $usuarioIsRoot
+                                        ? 'A Câmara selecionada não possui unidades de tramitação disponíveis.'
+                                        : 'Nenhuma unidade de tramitação está disponível.' }}
+                                </span>
                             </div>
 
                             <div x-cloak x-show="camaraId && unidadesDisponiveis().length > 0"
@@ -336,8 +321,9 @@
                                             'border-slate-200 hover:border-indigo-300 dark:border-neutral-800 dark:hover:border-indigo-800'">
                                         <label class="flex cursor-pointer items-start gap-4 p-4">
                                             <input type="radio" name="role_id" value="{{ $role->id }}"
-                                                x-model="papelId" x-on:change="selecionarPapel('{{ $role->id }}')"
-                                                class="sr-only" required>
+                                                x-model="papelId"
+                                                x-on:change="selecionarPapel('{{ $role->id }}')" class="sr-only"
+                                                required>
 
                                             <span
                                                 class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">

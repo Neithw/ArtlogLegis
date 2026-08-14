@@ -19,12 +19,21 @@ class StoreVereadorRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $user = $this->user();
+        $telefone = preg_replace(
+            '/\D+/',
+            '',
+            (string) $this->input('telefone_institucional')
+        );
 
-        if (! $user->isRoot()) {
-            $this->merge([
-                'camara_id' => $user->camara_id
-            ]);
-        }
+        $this->merge([
+            'camara_id' => $user->isRoot()
+                ? $this->input('camara_id')
+                : $user->camara_id,
+
+            'telefone_institucional' => $telefone !== ''
+                ? $telefone
+                : null,
+        ]);
     }
 
     /**
@@ -77,8 +86,7 @@ class StoreVereadorRequest extends FormRequest
 
             'telefone_institucional' => [
                 'nullable',
-                'string',
-                'max:255'
+                'digits_between:10,11'
             ],
 
             'biografia' => [

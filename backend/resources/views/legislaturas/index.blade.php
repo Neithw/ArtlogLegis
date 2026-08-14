@@ -36,7 +36,9 @@
                         </h3>
 
                         <p class="mt-1 text-sm text-slate-500 dark:text-neutral-400">
-                            Gerencie os períodos legislativos das Câmaras.
+                            {{ $usuarioIsRoot
+                                ? 'Gerencie os períodos legislativos das Câmaras.'
+                                : 'Gerencie os períodos da atividade parlamentar.' }}
                         </p>
                     </div>
 

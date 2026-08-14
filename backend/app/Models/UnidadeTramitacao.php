@@ -35,8 +35,7 @@ class UnidadeTramitacao extends Model
 
     public function camara(): BelongsTo
     {
-        return $this->belongsTo(Camara::class)
-            ->withTrashed();
+        return $this->belongsTo(Camara::class);
     }
 
     public function tramitacoesComoOrigem(): HasMany

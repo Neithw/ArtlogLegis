@@ -19,10 +19,13 @@ class CamaraController extends Controller
         $usuarioAutenticado = $request->user();
         $usuarioIsRoot = $usuarioAutenticado->isRoot();
 
+        if (! $usuarioIsRoot) {
+            $camara = Camara::findOrFail($usuarioAutenticado->camara_id);
+
+            return view('camaras.institucional', compact('camara'));
+        }
+
         $camaras = Camara::query()
-            ->when(! $usuarioIsRoot, function ($query) use ($usuarioAutenticado) {
-                $query->whereKey($usuarioAutenticado->camara_id);
-            })
             ->orderBy('nome')
             ->paginate(10);
 
@@ -68,7 +71,7 @@ class CamaraController extends Controller
         $camara->update($dadosValidados);
 
         return to_route('camaras.index')
-            ->with('success', 'Câmara atualizada com sucesso.');
+            ->with('success', 'Dados institucionais atualizados com sucesso.');
     }
 
     public function desativar(Camara $camara): RedirectResponse

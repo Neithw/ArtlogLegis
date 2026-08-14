@@ -16,6 +16,21 @@ class UpdateVereadorRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $telefone = preg_replace(
+            '/\D+/',
+            '',
+            (string) $this->input('telefone_institucional')
+        );
+
+        $this->merge([
+            'telefone_institucional' => $telefone !== ''
+                ? $telefone
+                : null
+        ]);
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -71,8 +86,7 @@ class UpdateVereadorRequest extends FormRequest
 
             'telefone_institucional' => [
                 'nullable',
-                'string',
-                'max:255'
+                'digits_between:10,11'
             ],
 
             'biografia' => [

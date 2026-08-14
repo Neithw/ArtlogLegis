@@ -10,7 +10,7 @@
                 array_filter([
                     $user->can('viewAny', \App\Models\Camara::class)
                         ? [
-                            'nome' => 'Câmaras',
+                            'nome' => $user->isRoot() ? 'Câmaras' : 'Dados institucionais',
                             'icone' => 'fa-building-columns',
                             'rota' => 'camaras.index',
                             'rotas' => ['camaras.*'],
@@ -136,7 +136,9 @@
         </div>
 
         {{-- Câmara centralizada --}}
-        <div class="pointer-events-none absolute left-1/2 hidden -translate-x-1/2 md:block">
+        <div class="pointer-events-none absolute inset-y-0 left-0 right-0 hidden
+           items-center justify-center transition-[left] duration-150 ease-out md:flex"
+            :class="$store.layout.sidebarCollapsed ? 'lg:left-20' : 'lg:left-64'">
             <div
                 class="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2
                        text-sm font-medium text-slate-600

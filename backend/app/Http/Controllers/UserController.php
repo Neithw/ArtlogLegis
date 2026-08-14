@@ -110,6 +110,7 @@ class UserController extends Controller
     public function index(): View
     {
         $usuarioAutenticado = request()->user();
+        $usuarioIsRoot = $usuarioAutenticado->isRoot();
 
         $usuarios = User::query()
             ->with([
@@ -125,7 +126,7 @@ class UserController extends Controller
             ->orderBy('name')
             ->paginate(10);
 
-        return view('usuarios.index', compact('usuarios'));
+        return view('usuarios.index', compact('usuarios', 'usuarioIsRoot'));
     }
 
     /**
