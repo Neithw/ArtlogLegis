@@ -1,172 +1,137 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <p class="text-sm font-medium text-indigo-600">
-                Administração legislativa
+            <p class="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                Processo legislativo
             </p>
 
-            <h2 class="text-2xl font-semibold tracking-tight text-gray-900">
-                Proposições Arquivadas
+            <h2 class="text-2xl font-semibold tracking-tight text-slate-950 dark:text-neutral-100">
+                Proposições arquivadas
             </h2>
         </div>
     </x-slot>
 
-    <div class="py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
+    <div class="py-8 sm:py-10">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             @if (session('success'))
-                <div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700"
-                    role="alert">
+                <x-ui::alert class="mb-6">
                     {{ session('success') }}
-                </div>
+                </x-ui::alert>
             @endif
 
             @if (session('error'))
-                <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
-                    role="alert">
+                <x-ui::alert type="error" class="mb-6">
                     {{ session('error') }}
-                </div>
+                </x-ui::alert>
             @endif
 
-            <section class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <x-ui::card>
                 <header
-                    class="flex flex-col gap-4 border-b border-gray-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+                    class="flex flex-col gap-4 border-b border-slate-200 px-4 py-5
+                           sm:flex-row sm:items-center sm:justify-between sm:px-6
+                           dark:border-neutral-800">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900">
+                        <h3 class="text-lg font-semibold text-slate-950 dark:text-neutral-100">
                             Proposições arquivadas
                         </h3>
 
-                        <p class="mt-1 text-sm text-gray-500">
-                            Gerencie as proposições arquivadas.
+                        <p class="mt-1 text-sm text-slate-500 dark:text-neutral-400">
+                            Consulte e restaure os rascunhos arquivados.
                         </p>
                     </div>
 
-                    <div>
-                        @can('viewAny', \App\Models\Proposicao::class)
-                            <a href="{{ route('proposicoes.index') }}"
-                                class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700">
-                                Voltar
-                            </a>
-                        @endcan
-                    </div>
+                    <x-ui::button :href="route('proposicoes.index')" variant="secondary">
+                        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                        Voltar
+                    </x-ui::button>
                 </header>
 
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-                                    Identificação
-                                </th>
+                <x-ui::table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Identificação</th>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Ementa</th>
+                            <th scope="col">Arquivada em</th>
 
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-                                    Tipo
-                                </th>
+                            @if ($usuarioIsRoot)
+                                <th scope="col">Câmara</th>
+                            @endif
 
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-                                    Ementa
-                                </th>
+                            <th scope="col" class="text-right">Ações</th>
+                        </tr>
+                    </thead>
 
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-                                    Legislatura
-                                </th>
+                    <tbody>
+                        @forelse ($arquivadas as $proposicao)
+                            <tr class="transition-colors hover:bg-slate-50 dark:hover:bg-neutral-800/50">
+                                <td>
+                                    <span class="font-semibold text-slate-950 dark:text-neutral-100">
+                                        Rascunho #{{ $proposicao->id }}
+                                    </span>
+                                </td>
 
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-                                    Situação
-                                </th>
+                                <td>
+                                    {{ $proposicao->tipoProposicao?->nome ?? 'Tipo indisponível' }}
+                                </td>
+
+                                <td class="max-w-md">
+                                    <p class="line-clamp-2">
+                                        {{ $proposicao->ementa ?: 'Não informada' }}
+                                    </p>
+                                </td>
+
+                                <td>
+                                    <time datetime="{{ $proposicao->deleted_at->toIso8601String() }}">
+                                        {{ $proposicao->deleted_at->format('d/m/Y H:i') }}
+                                    </time>
+                                </td>
 
                                 @if ($usuarioIsRoot)
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-                                        Câmara
-                                    </th>
+                                    <td>
+                                        {{ $proposicao->camara?->nome ?? 'Câmara indisponível' }}
+                                    </td>
                                 @endif
 
-                                <th scope="col"
-                                    class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">
-                                    Ações
-                                </th>
+                                <td class="text-right">
+                                    @can('restore', $proposicao)
+                                        <form action="{{ route('proposicoes.restore', $proposicao) }}" method="POST"
+                                            onsubmit="return confirm('Deseja realmente restaurar esta proposição?')"
+                                            class="flex justify-end">
+                                            @csrf
+                                            @method('PATCH')
+
+                                            <button type="submit"
+                                                class="inline-flex items-center gap-2 rounded-lg px-3 py-2
+                                                       text-sm font-semibold text-emerald-600 transition
+                                                       hover:bg-emerald-50 hover:text-emerald-700
+                                                       dark:text-emerald-400 dark:hover:bg-emerald-500/10
+                                                       dark:hover:text-emerald-300">
+                                                <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+                                                Restaurar
+                                            </button>
+                                        </form>
+                                    @endcan
+                                </td>
                             </tr>
-                        </thead>
-
-                        <tbody class="divide-y divide-gray-200 bg-white">
-                            @forelse ($arquivadas as $proposicao)
-                                <tr class="transition hover:bg-gray-50">
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        <div class="font-semibold text-gray-900">
-                                            Rascunho #{{ $proposicao->id }}
-                                        </div>
-                                    </td>
-
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                                        {{ $proposicao->tipoProposicao->nome }}
-                                    </td>
-
-                                    <td class="max-w-md px-6 py-4 text-sm text-gray-700">
-                                        <p class="line-clamp-3">
-                                            {{ $proposicao->ementa ?: 'Não informada' }}
-                                        </p>
-                                    </td>
-
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                                        {{ $proposicao->legislatura->numero }}ª Legislatura
-                                    </td>
-
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                                        <span
-                                            class="inline-flex rounded-full px-3 py-2 text-xs font-semibold bg-yellow-100 text-yellow-800">
-                                            {{ ucfirst(str_replace('_', ' ', $proposicao->situacao)) }}
-                                        </span>
-                                    </td>
-
-                                    @if ($usuarioIsRoot)
-                                        <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                                            {{ $proposicao->camara->nome }}
-                                        </td>
-                                    @endif
-
-                                    <td class="whitespace-nowrap px-6 py-4 text-right">
-                                        <div class="flex items-center justify-end gap-2">
-                                            @can('restore', $proposicao)
-                                                <form action="{{ route('proposicoes.restore', $proposicao) }}"
-                                                    method="POST"
-                                                    onsubmit="return confirm('Deseja realmente restaurar esta proposição?');">
-                                                    @csrf
-                                                    @method('PATCH')
-
-                                                    <button type="submit"
-                                                        class="rounded-lg p-2 text-sm font-semibold text-green-700 transition hover:bg-green-50">
-                                                        Restaurar
-                                                    </button>
-                                                </form>
-                                            @endcan
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="{{ $usuarioIsRoot ? 7 : 6 }}" class="px-6 py-12 text-center">
-                                        <p class="text-sm font-medium text-gray-700">
-                                            Nenhuma proposição arquivada.
-                                        </p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                        @empty
+                            <tr>
+                                <td colspan="{{ $usuarioIsRoot ? 6 : 5 }}">
+                                    <x-ui::empty-state icon="fa-box-archive">
+                                        Nenhuma proposição arquivada foi encontrada.
+                                    </x-ui::empty-state>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </x-ui::table>
 
                 @if ($arquivadas->hasPages())
-                    <div class="border-t border-gray-200 px-6 py-4">
-                        {{ $arquivadas->links() }}
+                    <div class="border-t border-slate-200 px-4 py-4 sm:px-6 dark:border-neutral-800">
+                        {{ $arquivadas->onEachSide(1)->links() }}
                     </div>
                 @endif
-            </section>
+            </x-ui::card>
         </div>
     </div>
 </x-app-layout>

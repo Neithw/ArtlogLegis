@@ -16,13 +16,23 @@ class UpdateProposicaoRequest extends FormRequest
         return true;
     }
 
-    public function prepareForValidation(): void
+    protected function prepareForValidation(): void
     {
         $proposicao = $this->route('proposicao');
 
+        $palavrasChave = $this->input('palavras_chave', []);
+
         $this->merge([
             'camara_id' => $proposicao->camara_id,
-            'palavras_chave' => $this->input('palavras_chave', [])
+
+            'palavras_chave' => is_array($palavrasChave)
+                ? collect($palavrasChave)
+                ->filter(fn($valor) => is_string($valor))
+                ->map(fn($valor) => trim($valor))
+                ->filter(fn($valor) => $valor !== '')
+                ->values()
+                ->all()
+                : $palavrasChave,
         ]);
     }
 
@@ -128,6 +138,34 @@ class UpdateProposicaoRequest extends FormRequest
                 'string',
                 'max:100'
             ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'legislatura_id.required' => 'Selecione uma legislatura.',
+            'legislatura_id.exists' => 'A legislatura selecionada não está disponível.',
+
+            'tipo_proposicao_id.required' => 'Selecione um tipo de proposição.',
+            'tipo_proposicao_id.exists' => 'O tipo de proposição selecionado não está disponível.',
+
+            'autor_mandato_id.required' => 'Selecione o autor principal.',
+            'autor_mandato_id.exists' => 'O mandato selecionado não está disponível.',
+
+            'ementa.string' => 'A ementa deve ser um texto válido.',
+            'texto_integral.string' => 'O texto integral deve ser um texto válido.',
+
+            'assunto.string' => 'O assunto deve ser um texto válido.',
+            'assunto.max' => 'O assunto não pode ter mais de :max caracteres.',
+
+            'area_tematica.string' => 'A área temática deve ser um texto válido.',
+            'area_tematica.max' => 'A área temática não pode ter mais de :max caracteres.',
+
+            'palavras_chave.array' => 'As palavras-chave possuem um formato inválido.',
+            'palavras_chave.*.distinct' => 'As palavras-chave não podem ser repetidas.',
+            'palavras_chave.*.string' => 'Cada palavra-chave deve ser um texto válido.',
+            'palavras_chave.*.max' => 'Cada palavra-chave pode ter no máximo :max caracteres.',
         ];
     }
 }

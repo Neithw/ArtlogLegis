@@ -142,8 +142,8 @@ Route::middleware([
         ->name('mandatos.restore');
 
     Route::resource('mandatos', MandatoController::class)
-        ->except('show')
         ->middlewareFor('index', 'can:viewAny,' . Mandato::class)
+        ->middlewareFor('show', 'can:view,mandato')
         ->middlewareFor(['create', 'store'], 'can:create,' . Mandato::class)
         ->middlewareFor(['edit', 'update'], 'can:update,mandato')
         ->middlewareFor('destroy', 'can:delete,mandato');

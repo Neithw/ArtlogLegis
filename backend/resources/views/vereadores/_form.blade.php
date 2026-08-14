@@ -41,11 +41,7 @@
                 </p>
             </div>
 
-            @error('camara_id')
-                <p class="mt-1.5 text-sm text-red-600 dark:text-red-400">
-                    {{ $message }}
-                </p>
-            @enderror
+            <x-input-error for="camara_id" class="mt-1.5 dark:text-red-400" />
         </div>
     @endif
 

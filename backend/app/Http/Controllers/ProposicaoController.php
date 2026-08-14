@@ -26,7 +26,7 @@ class ProposicaoController extends Controller
         $usuarioIsRoot = $usuarioAutenticado->isRoot();
 
         $proposicoes = Proposicao::query()
-            ->with(['camara', 'legislatura', 'tipoProposicao'])
+            ->with(['camara', 'tipoProposicao'])
             ->when(
                 ! $usuarioIsRoot,
                 fn($query) => $query
@@ -217,7 +217,7 @@ class ProposicaoController extends Controller
         $usuarioIsRoot = $usuarioAutenticado->isRoot();
 
         $arquivadas = Proposicao::onlyTrashed()
-            ->with(['camara', 'legislatura', 'tipoProposicao', 'criadoPor'])
+            ->with(['camara', 'tipoProposicao'])
             ->when(
                 ! $usuarioIsRoot,
                 fn($query) => $query
@@ -231,6 +231,8 @@ class ProposicaoController extends Controller
 
     public function restore(Proposicao $proposicao): RedirectResponse
     {
+        abort_unless($proposicao->trashed(), 404);
+
         $proposicao->restore();
 
         return to_route('proposicoes.arquivadas')

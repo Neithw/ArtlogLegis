@@ -1,213 +1,162 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <p class="text-sm font-medium text-indigo-600">
-                Administração legislativa
+            <p class="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                Processo legislativo
             </p>
 
-            <h2 class="text-2xl font-semibold tracking-tight text-gray-900">
+            <h2 class="text-2xl font-semibold tracking-tight text-slate-950 dark:text-neutral-100">
                 Proposições
             </h2>
         </div>
     </x-slot>
 
-    <div class="py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
+    <div class="py-8 sm:py-10">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             @if (session('success'))
-                <div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700"
-                    role="alert">
+                <x-ui::alert class="mb-6">
                     {{ session('success') }}
-                </div>
+                </x-ui::alert>
             @endif
 
             @if (session('error'))
-                <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
-                    role="alert">
+                <x-ui::alert type="error" class="mb-6">
                     {{ session('error') }}
-                </div>
+                </x-ui::alert>
             @endif
 
-            <section class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <x-ui::card>
                 <header
-                    class="flex flex-col gap-4 border-b border-gray-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+                    class="flex flex-col gap-4 border-b border-slate-200 px-4 py-5
+                           sm:flex-row sm:items-center sm:justify-between sm:px-6
+                           dark:border-neutral-800">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900">
-                            Proposições
+                        <h3 class="text-lg font-semibold text-slate-950 dark:text-neutral-100">
+                            Proposições cadastradas
                         </h3>
 
-                        <p class="mt-1 text-sm text-gray-500">
-                            Gerencie as proposições.
+                        <p class="mt-1 text-sm text-slate-500 dark:text-neutral-400">
+                            Consulte os rascunhos e as proposições protocoladas.
                         </p>
                     </div>
 
-                    <div>
+                    <div class="flex flex-wrap items-center gap-2">
                         @can('viewArchived', \App\Models\Proposicao::class)
-                            <a href="{{ route('proposicoes.arquivadas') }}"
-                                class="inline-flex items-center justify-center rounded-lg bg-yellow-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-yellow-700">
+                            <x-ui::button :href="route('proposicoes.arquivadas')" variant="secondary">
+                                <i class="fa-solid fa-box-archive" aria-hidden="true"></i>
                                 Arquivadas
-                            </a>
+                            </x-ui::button>
                         @endcan
 
                         @can('create', \App\Models\Proposicao::class)
-                            <a href="{{ route('proposicoes.create') }}"
-                                class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700">
-                                Nova Proposição
-                            </a>
+                            <x-ui::button :href="route('proposicoes.create')">
+                                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                                Nova proposição
+                            </x-ui::button>
                         @endcan
                     </div>
                 </header>
 
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-                                    Identificação
-                                </th>
+                <x-ui::table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Identificação</th>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Ementa</th>
+                            <th scope="col">Situação</th>
 
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-                                    Tipo
-                                </th>
+                            @if ($usuarioIsRoot)
+                                <th scope="col">Câmara</th>
+                            @endif
 
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-                                    Ementa
-                                </th>
+                            <th scope="col" class="text-right">Ações</th>
+                        </tr>
+                    </thead>
 
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-                                    Legislatura
-                                </th>
+                    <tbody>
+                        @forelse ($proposicoes as $proposicao)
+                            @php
+                                [$situacao, $variante] = match ($proposicao->situacao) {
+                                    'rascunho' => ['Rascunho', 'warning'],
+                                    'protocolada' => ['Protocolada', 'success'],
+                                    default => [ucfirst(str_replace('_', ' ', $proposicao->situacao)), 'info'],
+                                };
+                            @endphp
 
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-                                    Situação
-                                </th>
+                            <tr class="transition-colors hover:bg-slate-50 dark:hover:bg-neutral-800/50">
+                                <td>
+                                    <p class="font-semibold text-slate-950 dark:text-neutral-100">
+                                        @if ($proposicao->numero !== null && $proposicao->ano !== null)
+                                            Nº {{ $proposicao->numero }}/{{ $proposicao->ano }}
+                                        @else
+                                            Rascunho #{{ $proposicao->id }}
+                                        @endif
+                                    </p>
+
+                                    @if ($proposicao->data_protocolo)
+                                        <p class="mt-1 text-xs text-slate-500 dark:text-neutral-500">
+                                            Protocolada em
+                                            <time datetime="{{ $proposicao->data_protocolo->toIso8601String() }}">
+                                                {{ $proposicao->data_protocolo->format('d/m/Y H:i') }}
+                                            </time>
+                                        </p>
+                                    @endif
+                                </td>
+
+                                <td>
+                                    {{ $proposicao->tipoProposicao?->nome ?? 'Tipo indisponível' }}
+                                </td>
+
+                                <td class="max-w-md">
+                                    <p class="line-clamp-2">
+                                        {{ $proposicao->ementa ?: 'Não informada' }}
+                                    </p>
+                                </td>
+
+                                <td>
+                                    <x-ui::badge :variant="$variante">
+                                        {{ $situacao }}
+                                    </x-ui::badge>
+                                </td>
 
                                 @if ($usuarioIsRoot)
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-                                        Câmara
-                                    </th>
+                                    <td>
+                                        {{ $proposicao->camara?->nome ?? 'Câmara indisponível' }}
+                                    </td>
                                 @endif
 
-                                <th scope="col"
-                                    class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">
-                                    Ações
-                                </th>
+                                <td class="text-right">
+                                    @can('view', $proposicao)
+                                        <a href="{{ route('proposicoes.show', $proposicao) }}" wire:navigate.hover
+                                            class="inline-flex items-center gap-2 rounded-lg px-3 py-2
+                                                   text-sm font-semibold text-indigo-600 transition
+                                                   hover:bg-indigo-50 hover:text-indigo-700
+                                                   dark:text-indigo-400 dark:hover:bg-indigo-500/10
+                                                   dark:hover:text-indigo-300">
+                                            <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                                            Visualizar
+                                        </a>
+                                    @endcan
+                                </td>
                             </tr>
-                        </thead>
-
-                        <tbody class="divide-y divide-gray-200 bg-white">
-                            @forelse ($proposicoes as $proposicao)
-                                <tr class="transition hover:bg-gray-50">
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        <div class="font-semibold text-gray-900">
-                                            @if ($proposicao->situacao === 'protocolada')
-                                                Nº {{ $proposicao->numero }}/{{ $proposicao->ano }}
-                                            @else
-                                                Rascunho #{{ $proposicao->id }}
-                                            @endif
-                                        </div>
-
-                                        @if ($proposicao->data_protocolo)
-                                            <div class="mt-1 text-xs text-gray-500">
-                                                Protocolada em
-                                                {{ $proposicao->data_protocolo->format('d/m/Y H:i') }}
-                                            </div>
-                                        @endif
-                                    </td>
-
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                                        {{ $proposicao->tipoProposicao->nome }}
-                                    </td>
-
-                                    <td class="max-w-md px-6 py-4 text-sm text-gray-700">
-                                        <p class="line-clamp-3">
-                                            {{ $proposicao->ementa ?: 'Não informada' }}
-                                        </p>
-                                    </td>
-
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                                        {{ $proposicao->legislatura->numero }}ª Legislatura
-                                    </td>
-
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        <span @class([
-                                            'inline-flex rounded-full px-3 py-2 text-xs font-semibold',
-                                            'bg-yellow-100 text-yellow-800' => $proposicao->situacao === 'rascunho',
-                                            'bg-green-100 text-green-800' => $proposicao->situacao === 'protocolada',
-                                        ])>
-                                            {{ ucfirst(str_replace('_', ' ', $proposicao->situacao)) }}
-                                        </span>
-                                    </td>
-
-                                    @if ($usuarioIsRoot)
-                                        <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                                            {{ $proposicao->camara->nome }}
-                                        </td>
-                                    @endif
-
-                                    <td class="whitespace-nowrap px-6 py-4 text-right">
-                                        <div class="flex items-center justify-end gap-2">
-                                            @can('view', $proposicao)
-                                                <a href="{{ route('proposicoes.show', $proposicao) }}"
-                                                    class="rounded-lg p-2 text-sm font-semibold text-green-700 transition hover:bg-green-50">
-                                                    Visualizar
-                                                </a>
-                                            @endcan
-
-                                            @if ($proposicao->situacao === 'rascunho')
-                                                @can('update', $proposicao)
-                                                    <a href="{{ route('proposicoes.edit', $proposicao) }}"
-                                                        class="rounded-lg p-2 text-sm font-semibold text-yellow-700 transition hover:bg-yellow-50">
-                                                        Editar
-                                                    </a>
-                                                @endcan
-
-                                                @can('delete', $proposicao)
-                                                    <form action="{{ route('proposicoes.destroy', $proposicao) }}"
-                                                        method="POST"
-                                                        onsubmit="return confirm('Deseja realmente arquivar esta proposição?');">
-                                                        @csrf
-                                                        @method('DELETE')
-
-                                                        <button type="submit"
-                                                            class="rounded-lg p-2 text-sm font-semibold text-red-700 transition hover:bg-red-50">
-                                                            Arquivar
-                                                        </button>
-                                                    </form>
-                                                @endcan
-                                            @endif
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="{{ $usuarioIsRoot ? 7 : 6 }}" class="px-6 py-12 text-center">
-                                        <p class="text-sm font-medium text-gray-700">
-                                            Nenhuma proposição cadastrada.
-                                        </p>
-
-                                        <p class="mt-1 text-sm text-gray-500">
-                                            Cadastre uma proposição para iniciar.
-                                        </p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                        @empty
+                            <tr>
+                                <td colspan="{{ $usuarioIsRoot ? 6 : 5 }}">
+                                    <x-ui::empty-state icon="fa-file-lines">
+                                        Nenhuma proposição foi encontrada.
+                                    </x-ui::empty-state>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </x-ui::table>
 
                 @if ($proposicoes->hasPages())
-                    <div class="border-t border-gray-200 px-6 py-4">
-                        {{ $proposicoes->links() }}
+                    <div class="border-t border-slate-200 px-4 py-4 sm:px-6 dark:border-neutral-800">
+                        {{ $proposicoes->onEachSide(1)->links() }}
                     </div>
                 @endif
-            </section>
+            </x-ui::card>
         </div>
     </div>
 </x-app-layout>
