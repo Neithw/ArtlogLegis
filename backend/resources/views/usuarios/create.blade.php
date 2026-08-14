@@ -1,84 +1,143 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <p class="text-sm font-medium text-indigo-600">
+            <p class="text-sm font-medium text-indigo-600 dark:text-indigo-400">
                 Administração
             </p>
 
-            <h2 class="text-2xl font-semibold leading-tight text-gray-900">
-                Novo usuário
+            <h2 class="text-2xl font-semibold tracking-tight text-slate-950 dark:text-neutral-100">
+                Cadastrar usuário
             </h2>
         </div>
     </x-slot>
 
-    <div class="py-4">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="py-8 sm:py-10">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+            @php
+                $permissoesDisponiveis = $permissoesPorModulo->flatten(1)->keyBy('id');
+
+                $idsPermissoesDisponiveis = $permissoesDisponiveis->keys()->map(fn($id) => (int) $id)->values();
+
+                $camaraInicial = $usuarioIsRoot ? (string) old('camara_id', '') : (string) auth()->user()->camara_id;
+
+                $camaraVinculada = $usuarioIsRoot ? null : $camaras->firstWhere('id', auth()->user()->camara_id);
+
+                $rotulosModulos = [
+                    'usuarios' => 'Usuários',
+                    'vereadores' => 'Vereadores',
+                    'legislaturas' => 'Legislaturas',
+                    'partidos' => 'Partidos',
+                    'mandatos' => 'Mandatos',
+                    'tipos-proposicao' => 'Tipos de proposição',
+                    'proposicoes' => 'Proposições',
+                    'unidades-tramitacao' => 'Unidades de tramitação',
+                    'tramitacoes' => 'Tramitações',
+                ];
+            @endphp
 
             <form method="POST" action="{{ route('usuarios.store') }}" class="space-y-6" x-data="formularioUsuario({
                 pacotes: @js($pacotesPermissoes),
                 papelInicial: @js(old('role_id', '')),
                 permissoesIniciais: @js(old('permissoes', [])),
+                permissoesDisponiveis: @js($idsPermissoesDisponiveis),
             })">
                 @csrf
 
-                <div class="overflow-hidden rounded-xl bg-white shadow">
-                    <div class="border-b border-gray-200 px-6 py-5">
-                        <h3 class="text-lg font-semibold text-gray-900">
-                            Dados de acesso
-                        </h3>
+                <x-ui::card>
+                    <header class="border-b border-slate-200 px-4 py-5 sm:px-6 dark:border-neutral-800">
+                        <div class="flex items-start gap-3">
+                            <div
+                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 dark:bg-neutral-800 dark:text-neutral-400">
+                                <i class="fa-solid fa-key" aria-hidden="true"></i>
+                            </div>
 
-                        <p class="mt-1 text-sm text-gray-500">
-                            Informe os dados utilizados pelo usuário para acessar o sistema.
-                        </p>
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-950 dark:text-neutral-100">
+                                    Dados de acesso
+                                </h3>
+
+                                <p class="mt-1 text-sm text-slate-500 dark:text-neutral-400">
+                                    Informe os dados utilizados pelo usuário para acessar o sistema.
+                                </p>
+                            </div>
+                        </div>
+                    </header>
+
+                    <div class="grid gap-6 p-4 sm:p-6 md:grid-cols-2">
+                        <div>
+                            <label for="name"
+                                class="block text-sm font-medium text-slate-700 dark:text-neutral-300">
+                                Nome
+                                <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span>
+                            </label>
+
+                            <input id="name" name="name" type="text" value="{{ old('name') }}" required
+                                autofocus autocomplete="name" placeholder="Nome completo"
+                                class="mt-1 block w-full rounded-lg border-slate-300 bg-white text-slate-950 shadow-sm transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-indigo-500 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-100 dark:placeholder:text-neutral-600">
+
+                            <x-input-error for="name" class="mt-1.5 dark:text-red-400" />
+                        </div>
+
+                        <div>
+                            <label for="email"
+                                class="block text-sm font-medium text-slate-700 dark:text-neutral-300">
+                                E-mail
+                                <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span>
+                            </label>
+
+                            <input id="email" name="email" type="email" value="{{ old('email') }}" required
+                                autocomplete="email" placeholder="usuario@exemplo.com"
+                                class="mt-1 block w-full rounded-lg border-slate-300 bg-white text-slate-950 shadow-sm transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-indigo-500 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-100 dark:placeholder:text-neutral-600">
+
+                            <x-input-error for="email" class="mt-1.5 dark:text-red-400" />
+                        </div>
+
+                        <div>
+                            <label for="password"
+                                class="block text-sm font-medium text-slate-700 dark:text-neutral-300">
+                                Senha inicial
+                                <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span>
+                            </label>
+
+                            <input id="password" name="password" type="password" required autocomplete="new-password"
+                                class="mt-1 block w-full rounded-lg border-slate-300 bg-white text-slate-950 shadow-sm transition focus:border-indigo-500 focus:ring-indigo-500 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-100">
+
+                            <x-input-error for="password" class="mt-1.5 dark:text-red-400" />
+                        </div>
+
+                        <div>
+                            <label for="password_confirmation"
+                                class="block text-sm font-medium text-slate-700 dark:text-neutral-300">
+                                Confirmação da senha
+                                <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span>
+                            </label>
+
+                            <input id="password_confirmation" name="password_confirmation" type="password" required
+                                autocomplete="new-password"
+                                class="mt-1 block w-full rounded-lg border-slate-300 bg-white text-slate-950 shadow-sm transition focus:border-indigo-500 focus:ring-indigo-500 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-100">
+                        </div>
                     </div>
+                </x-ui::card>
 
-                    <div class="grid gap-6 p-6 md:grid-cols-2">
-                        <div>
-                            <x-label for="name" value="Nome" />
+                <x-ui::card>
+                    <header class="border-b border-slate-200 px-4 py-5 sm:px-6 dark:border-neutral-800">
+                        <div class="flex items-start gap-3">
+                            <div
+                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 dark:bg-neutral-800 dark:text-neutral-400">
+                                <i class="fa-solid fa-sitemap" aria-hidden="true"></i>
+                            </div>
 
-                            <x-input id="name" name="name" type="text" class="mt-1 block w-full"
-                                :value="old('name')" required autofocus />
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-950 dark:text-neutral-100">
+                                    Vinculação e atuação
+                                </h3>
 
-                            <x-input-error for="name" class="mt-2" />
+                                <p class="mt-1 text-sm text-slate-500 dark:text-neutral-400">
+                                    Defina a Câmara e as unidades de atuação do usuário.
+                                </p>
+                            </div>
                         </div>
-
-                        <div>
-                            <x-label for="email" value="E-mail" />
-
-                            <x-input id="email" name="email" type="email" class="mt-1 block w-full"
-                                :value="old('email')" required />
-
-                            <x-input-error for="email" class="mt-2" />
-                        </div>
-
-                        <div>
-                            <x-label for="password" value="Senha inicial" />
-
-                            <x-input id="password" name="password" type="password" class="mt-1 block w-full"
-                                required />
-
-                            <x-input-error for="password" class="mt-2" />
-                        </div>
-
-                        <div>
-                            <x-label for="password_confirmation" value="Confirmação da senha" />
-
-                            <x-input id="password_confirmation" name="password_confirmation" type="password"
-                                class="mt-1 block w-full" required />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="overflow-hidden rounded-lg bg-white shadow">
-                    <div class="border-b border-gray-200 px-6 py-5">
-                        <h3 class="text-lg font-semibold text-gray-900">
-                            Vinculação e papel
-                        </h3>
-
-                        <p class="mt-1 text-sm text-gray-500">
-                            Defina a Câmara, o papel e as unidades de atuação do usuário.
-                        </p>
-                    </div>
+                    </header>
 
                     @php
                         $unidadesSelecionadas = collect(old('unidades_tramitacao', []))
@@ -86,8 +145,8 @@
                             ->values();
                     @endphp
 
-                    <div class="grid gap-6 p-6 md:grid-cols-2" x-data="{
-                        camaraId: @js(old('camara_id', '')),
+                    <div class="grid gap-6 p-4 sm:p-6 md:grid-cols-2" x-data="{
+                        camaraId: @js($camaraInicial),
                         unidades: @js($unidadesTramitacao->values()),
                         unidadesSelecionadas: @js($unidadesSelecionadas),
                         unidadesDisponiveis() {
@@ -96,153 +155,307 @@
                             );
                         }
                     }">
-                        <div>
-                            <x-label for="camara_id" value="Câmara" />
+                        <div class="md:col-span-2">
+                            <label for="camara_id"
+                                class="block text-sm font-medium text-slate-700 dark:text-neutral-300">
+                                Câmara
+                                <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span>
+                            </label>
 
-                            <select id="camara_id" name="camara_id" x-model="camaraId"
-                                @change="unidadesSelecionadas = []"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                required>
-                                <option value="">
-                                    Selecione uma Câmara
-                                </option>
+                            @if ($usuarioIsRoot)
+                                <select id="camara_id" name="camara_id" x-model="camaraId"
+                                    @change="unidadesSelecionadas = []" required
+                                    class="mt-1 block w-full rounded-lg border-slate-300 bg-white text-slate-950 shadow-sm transition focus:border-indigo-500 focus:ring-indigo-500 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-100">
+                                    <option value="">Selecione uma Câmara</option>
 
-                                @foreach ($camaras as $camara)
-                                    <option value="{{ $camara->id }}" @selected(old('camara_id') == $camara->id)>
-                                        {{ $camara->nome }}
-                                    </option>
-                                @endforeach
-                            </select>
+                                    @foreach ($camaras as $camara)
+                                        <option value="{{ $camara->id }}" @selected(old('camara_id') == $camara->id)>
+                                            {{ $camara->nome }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            @else
+                                <input type="hidden" id="camara_id" name="camara_id" value="{{ $camaraInicial }}"
+                                    x-model="camaraId">
 
-                            <x-input-error for="camara_id" class="mt-2" />
+                                <div
+                                    class="mt-1 flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 dark:border-neutral-800 dark:bg-neutral-950/50">
+                                    <div
+                                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-slate-500 shadow-sm dark:bg-neutral-900 dark:text-neutral-400">
+                                        <i class="fa-solid fa-building-columns" aria-hidden="true"></i>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-sm font-semibold text-slate-950 dark:text-neutral-100">
+                                            {{ $camaraVinculada?->nome ?? 'Câmara indisponível' }}
+                                        </p>
+
+                                        <p class="text-xs text-slate-500 dark:text-neutral-500">
+                                            Vinculação definida pela sua conta.
+                                        </p>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <x-input-error for="camara_id" class="mt-1.5 dark:text-red-400" />
                         </div>
 
-                        <div>
-                            <x-label for="role_id" value="Papel" />
-
-                            <select id="role_id" name="role_id"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                x-model="papelId" x-on:change="aplicarPacote($event.target.value)" required>
-                                <option value="">
-                                    Selecione um papel
-                                </option>
-
-                                @foreach ($roles as $role)
-                                    <option value="{{ $role->id }}">
-                                        {{ $role->nome }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <x-input-error for="role_id" class="mt-2" />
-                        </div>
-
-
-                        <div class="border-t border-gray-200 pt-6 md:col-span-2">
+                        <section class="border-t border-slate-200 pt-6 md:col-span-2 dark:border-neutral-800">
                             <div>
-                                <x-label value="Unidades de tramitação" />
+                                <h4 class="text-sm font-semibold text-slate-950 dark:text-neutral-100">
+                                    Unidades de tramitação
+                                </h4>
 
-                                <p class="mt-1 text-sm text-gray-500">
+                                <p class="mt-1 text-sm text-slate-500 dark:text-neutral-400">
                                     Selecione as unidades em que o usuário poderá receber e encaminhar proposições.
                                 </p>
                             </div>
 
-                            <p x-show="!camaraId" class="mt-4 text-sm text-gray-500">
-                                Selecione uma Câmara para visualizar suas unidades de tramitação.
-                            </p>
+                            <div x-cloak x-show="!camaraId"
+                                class="mt-4 flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 dark:border-neutral-800 dark:bg-neutral-950/50 dark:text-neutral-400">
+                                <i class="fa-solid fa-circle-info mt-0.5" aria-hidden="true"></i>
+                                <span>Selecione uma Câmara para visualizar suas unidades de tramitação.</span>
+                            </div>
 
-                            <p x-show="camaraId && unidadesDisponiveis().length === 0"
-                                class="mt-4 text-sm text-gray-500">
-                                A Câmara selecionada não possui unidades de tramitação disponíveis.
-                            </p>
+                            <div x-cloak x-show="camaraId && unidadesDisponiveis().length === 0"
+                                class="mt-4 flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 dark:border-neutral-800 dark:bg-neutral-950/50 dark:text-neutral-400">
+                                <i class="fa-solid fa-circle-info mt-0.5" aria-hidden="true"></i>
+                                <span>A Câmara selecionada não possui unidades de tramitação disponíveis.</span>
+                            </div>
 
-                            <div x-show="camaraId && unidadesDisponiveis().length > 0"
+                            <div x-cloak x-show="camaraId && unidadesDisponiveis().length > 0"
                                 class="mt-4 grid gap-3 md:grid-cols-2">
                                 <template x-for="unidade in unidadesDisponiveis()" :key="unidade.id">
                                     <label
-                                        class="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 p-4 transition hover:border-indigo-300 hover:bg-indigo-50/40">
+                                        class="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 p-4 transition hover:border-indigo-300 hover:bg-indigo-50/40 dark:border-neutral-800 dark:hover:border-indigo-800 dark:hover:bg-indigo-950/20">
                                         <input type="checkbox" name="unidades_tramitacao[]" :value="unidade.id"
                                             x-model="unidadesSelecionadas"
-                                            class="mt-0.5 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                            class="mt-0.5 rounded border-slate-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-neutral-700 dark:bg-neutral-950 dark:checked:bg-indigo-600">
 
-                                        <span>
-                                            <span class="block text-sm font-medium text-gray-900"
+                                        <span class="min-w-0">
+                                            <span
+                                                class="block text-sm font-medium text-slate-950 dark:text-neutral-100"
                                                 x-text="unidade.nome"></span>
 
-                                            <span x-show="unidade.sigla" class="mt-1 block text-xs text-gray-500"
+                                            <span x-show="unidade.sigla"
+                                                class="mt-1 block text-xs text-slate-500 dark:text-neutral-500"
                                                 x-text="unidade.sigla"></span>
                                         </span>
                                     </label>
                                 </template>
                             </div>
 
-                            <x-input-error for="unidades_tramitacao" class="mt-2" />
-                            <x-input-error for="unidades_tramitacao.*" class="mt-2" />
-                        </div>
+                            <x-input-error for="unidades_tramitacao" class="mt-1.5 dark:text-red-400" />
+                            <x-input-error for="unidades_tramitacao.*" class="mt-1.5 dark:text-red-400" />
+                        </section>
                     </div>
-                </div>
+                </x-ui::card>
 
-                <div class="overflow-hidden rounded-lg bg-white shadow">
-                    <div class="border-b border-gray-200 px-6 py-5">
-                        <div class="flex items-start justify-between gap-4">
+                <x-ui::card>
+                    <header
+                        class="flex flex-col gap-4 border-b border-slate-200 px-4 py-5 sm:flex-row sm:items-start sm:justify-between sm:px-6 dark:border-neutral-800">
+                        <div class="flex items-start gap-3">
+                            <div
+                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 dark:bg-neutral-800 dark:text-neutral-400">
+                                <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                            </div>
+
                             <div>
-                                <h3 class="text-lg font-semibold text-gray-900">
-                                    Permissões
+                                <h3 class="text-lg font-semibold text-slate-950 dark:text-neutral-100">
+                                    Controle de acesso
                                 </h3>
 
-                                <p class="mt-1 text-sm text-gray-500">
-                                    Selecione as ações que o usuário poderá executar.
+                                <p class="mt-1 text-sm text-slate-500 dark:text-neutral-400">
+                                    Escolha um pacote de acesso e, se necessário, personalize suas permissões.
                                 </p>
                             </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span x-cloak x-show="possuiPersonalizacao"
+                                class="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-950/50 dark:text-amber-300">
+                                Personalizado
+                            </span>
+
                             <span
-                                class="whitespace-nowrap rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600"
+                                class="inline-flex w-fit items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 dark:bg-neutral-800 dark:text-neutral-300"
                                 x-text="`${permissoesSelecionadas.length} selecionada(s)`"></span>
                         </div>
-                    </div>
+                    </header>
 
-                    <div class="space-y-6 p-6">
-                        @foreach ($permissoesPorModulo as $modulo => $permissoesDoModulo)
-                            <section>
-                                <h4 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-500">
-                                    {{ ucfirst($modulo) }}
+                    <div class="space-y-6 p-4 sm:p-6">
+                        <section>
+                            <div>
+                                <h4 class="text-sm font-semibold text-slate-950 dark:text-neutral-100">
+                                    Pacote de acesso
+                                    <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span>
                                 </h4>
 
-                                <div class="grid gap-3 md:grid-cols-2">
-                                    @foreach ($permissoesDoModulo as $permissao)
-                                        <label class="flex items-start gap-3 rounded-lg border border-gray-200 p-4">
-                                            <input type="checkbox" name="permissoes[]" :value="{{ $permissao->id }}"
-                                                class="mt-0.5 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
-                                                x-model="permissoesSelecionadas">
+                                <p class="mt-1 text-sm text-slate-500 dark:text-neutral-400">
+                                    O pacote define o papel do usuário e aplica uma seleção inicial de permissões.
+                                </p>
+                            </div>
 
-                                            <span>
-                                                <span class="block text-sm font-medium text-gray-900">
-                                                    {{ $permissao->nome }}
+                            <div class="mt-4 grid items-start gap-4 md:grid-cols-2">
+                                @foreach ($roles as $role)
+                                    @php
+                                        $descricaoPapel = match ($role->codigo) {
+                                            'gerente' => 'Administração dos usuários e dos módulos da Câmara.',
+                                            'usuario_comum' => 'Acesso às rotinas operacionais e de consulta.',
+                                            default => 'Conjunto de acessos definido para este papel.',
+                                        };
+
+                                        $iconePapel = match ($role->codigo) {
+                                            'gerente' => 'fa-user-gear',
+                                            'usuario_comum' => 'fa-user',
+                                            default => 'fa-shield-halved',
+                                        };
+
+                                        $idsDoPacote = collect($pacotesPermissoes[$role->id] ?? [])->map(
+                                            fn($id) => (int) $id,
+                                        );
+
+                                        $permissoesDoPacote = $idsDoPacote
+                                            ->map(fn($id) => $permissoesDisponiveis->get($id))
+                                            ->filter();
+                                    @endphp
+
+                                    <div class="overflow-hidden rounded-xl border transition"
+                                        :class="papelId === '{{ $role->id }}'
+                                            ?
+                                            'border-indigo-500 ring-2 ring-indigo-500/20 dark:border-indigo-400' :
+                                            'border-slate-200 hover:border-indigo-300 dark:border-neutral-800 dark:hover:border-indigo-800'">
+                                        <label class="flex cursor-pointer items-start gap-4 p-4">
+                                            <input type="radio" name="role_id" value="{{ $role->id }}"
+                                                x-model="papelId" x-on:change="selecionarPapel('{{ $role->id }}')"
+                                                class="sr-only" required>
+
+                                            <span
+                                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
+                                                <i class="fa-solid {{ $iconePapel }}" aria-hidden="true"></i>
+                                            </span>
+
+                                            <span class="min-w-0 flex-1">
+                                                <span class="flex items-start justify-between gap-3">
+                                                    <span class="font-semibold text-slate-950 dark:text-neutral-100">
+                                                        {{ $role->nome }}
+                                                    </span>
+
+                                                    <i x-cloak x-show="papelId === '{{ $role->id }}'"
+                                                        class="fa-solid fa-circle-check text-indigo-600 dark:text-indigo-400"
+                                                        aria-hidden="true"></i>
                                                 </span>
 
-                                                <span class="mt-1 block text-xs text-gray-500">
-                                                    {{ $permissao->codigo }}
+                                                <span class="mt-1 block text-sm text-slate-500 dark:text-neutral-400">
+                                                    {{ $descricaoPapel }}
+                                                </span>
+
+                                                <span
+                                                    class="mt-3 block text-xs font-medium text-slate-500 dark:text-neutral-500">
+                                                    {{ $permissoesDoPacote->count() }} permissões incluídas
                                                 </span>
                                             </span>
                                         </label>
-                                    @endforeach
+
+                                        <details class="border-t border-slate-200 dark:border-neutral-800">
+                                            <summary
+                                                class="cursor-pointer px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 dark:text-neutral-300 dark:hover:bg-neutral-800/50">
+                                                Ver permissões do pacote
+                                            </summary>
+
+                                            <ul
+                                                class="max-h-56 space-y-2 overflow-y-auto border-t border-slate-200 px-4 py-3 text-sm text-slate-600 dark:border-neutral-800 dark:text-neutral-400">
+                                                @forelse ($permissoesDoPacote as $permissao)
+                                                    <li class="flex items-start gap-2">
+                                                        <i class="fa-solid fa-check mt-1 text-emerald-600 dark:text-emerald-400"
+                                                            aria-hidden="true"></i>
+                                                        <span>{{ $permissao->nome }}</span>
+                                                    </li>
+                                                @empty
+                                                    <li>Nenhuma permissão disponível neste pacote.</li>
+                                                @endforelse
+                                            </ul>
+                                        </details>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <x-input-error for="role_id" class="mt-1.5 dark:text-red-400" />
+                        </section>
+
+                        <section class="border-t border-slate-200 pt-6 dark:border-neutral-800">
+                            <button type="button" x-on:click="personalizacaoAberta = !personalizacaoAberta"
+                                class="flex w-full items-center justify-between gap-4 rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-4 dark:focus:ring-offset-neutral-900"
+                                :aria-expanded="personalizacaoAberta">
+                                <span>
+                                    <span class="block text-sm font-semibold text-slate-950 dark:text-neutral-100">
+                                        Personalizar permissões
+                                    </span>
+
+                                    <span class="mt-1 block text-sm text-slate-500 dark:text-neutral-400">
+                                        Ajuste individualmente os acessos aplicados pelo pacote selecionado.
+                                    </span>
+                                </span>
+
+                                <i class="fa-solid fa-chevron-down text-slate-400 transition-transform dark:text-neutral-500"
+                                    :class="personalizacaoAberta && 'rotate-180'" aria-hidden="true"></i>
+                            </button>
+
+                            <div x-cloak x-show="personalizacaoAberta" class="mt-6 space-y-8">
+                                <div class="flex flex-wrap items-center justify-end gap-2">
+                                    <button type="button" x-on:click="limparPermissoes()"
+                                        class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-neutral-100">
+                                        Limpar tudo
+                                    </button>
+
+                                    <button type="button" x-on:click="selecionarTodasPermissoes()"
+                                        class="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900">
+                                        Selecionar tudo
+                                    </button>
                                 </div>
-                            </section>
-                        @endforeach
 
-                        <x-input-error for="permissoes" class="mt-2" />
-                        <x-input-error for="permissoes.*" class="mt-2" />
+                                @foreach ($permissoesPorModulo as $modulo => $permissoesDoModulo)
+                                    <section>
+                                        <h5
+                                            class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-neutral-500">
+                                            {{ $rotulosModulos[$modulo] ?? ucfirst(str_replace(['-', '_'], ' ', $modulo)) }}
+                                        </h5>
+
+                                        <div class="grid gap-3 md:grid-cols-2">
+                                            @foreach ($permissoesDoModulo as $permissao)
+                                                <label
+                                                    class="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 p-4 transition hover:border-indigo-300 hover:bg-indigo-50/40 dark:border-neutral-800 dark:hover:border-indigo-800 dark:hover:bg-indigo-950/20">
+                                                    <input type="checkbox" name="permissoes[]"
+                                                        :value="{{ $permissao->id }}" x-model="permissoesSelecionadas"
+                                                        class="mt-0.5 rounded border-slate-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-neutral-700 dark:bg-neutral-950 dark:checked:bg-indigo-600">
+
+                                                    <span
+                                                        class="text-sm font-medium text-slate-950 dark:text-neutral-100">
+                                                        {{ $permissao->nome }}
+                                                    </span>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </section>
+                                @endforeach
+                            </div>
+
+                            <x-input-error for="permissoes" class="mt-1.5 dark:text-red-400" />
+                            <x-input-error for="permissoes.*" class="mt-1.5 dark:text-red-400" />
+                        </section>
                     </div>
-                </div>
+                </x-ui::card>
 
-                <div class="flex items-center justify-end gap-3">
-                    <a href="{{ route('usuarios.index') }}"
-                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-widest text-gray-700 shadow-sm transition hover:bg-gray-50">
+                <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+                    <x-ui::button :href="route('usuarios.index')" variant="secondary">
+                        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
                         Cancelar
-                    </a>
+                    </x-ui::button>
 
-                    <x-button>
+                    <x-ui::button type="submit">
+                        <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
                         Cadastrar usuário
-                    </x-button>
+                    </x-ui::button>
                 </div>
             </form>
         </div>

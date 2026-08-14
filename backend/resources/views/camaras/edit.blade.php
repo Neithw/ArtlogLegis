@@ -50,11 +50,7 @@
                                 placeholder="Ex.: Câmara Municipal de Uberlândia"
                                 class="mt-1 block w-full rounded-lg border-slate-300 bg-white text-slate-950 shadow-sm transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-indigo-500 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-100 dark:placeholder:text-neutral-600">
 
-                            @error('nome')
-                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">
-                                    {{ $message }}
-                                </p>
-                            @enderror
+                            <x-input-error for="nome" class="mt-2 dark:text-red-400" />
                         </div>
 
                         <div>
@@ -78,11 +74,7 @@
                                 Informe o CNPJ da instituição, quando disponível.
                             </p>
 
-                            @error('cnpj')
-                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">
-                                    {{ $message }}
-                                </p>
-                            @enderror
+                            <x-input-error for="cnpj" class="mt-2 dark:text-red-400" />
                         </div>
                     </div>
 

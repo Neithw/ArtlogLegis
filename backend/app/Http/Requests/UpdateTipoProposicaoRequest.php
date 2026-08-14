@@ -40,7 +40,6 @@ class UpdateTipoProposicaoRequest extends FormRequest
                 'integer',
                 Rule::exists('camaras', 'id')
                     ->where('ativo', true)
-                    ->whereNull('deleted_at'),
             ],
 
             'nome' => [

@@ -52,7 +52,6 @@ class StoreProposicaoRequest extends FormRequest
                 'required',
                 'integer',
                 Rule::exists('camaras', 'id')
-                    ->whereNull('deleted_at')
                     ->where('ativo', true)
             ],
 

@@ -56,7 +56,9 @@ class UserPolicy
      */
     public function delete(User $user, User $targetUser): bool
     {
-        return $user->isRoot();
+        return $user->isRoot()
+            && ! $targetUser->isRoot()
+            && ! $user->is($targetUser);
     }
 
     private function possuiCamara(User $user): bool

@@ -53,13 +53,8 @@ class StoreVereadorRequest extends FormRequest
             'camara_id' => [
                 'required',
                 'integer',
-
                 Rule::exists('camaras', 'id')
-                    ->where(function ($query) {
-                        $query
-                            ->where('ativo', true)
-                            ->whereNull('deleted_at');
-                    })
+                    ->where('ativo', true)
             ],
 
             'nome' => [

@@ -1,190 +1,212 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <p class="text-sm font-medium text-indigo-600">
+            <p class="text-sm font-medium text-indigo-600 dark:text-indigo-400">
                 Administração
             </p>
 
-            <h2 class="text-2xl font-semibold tracking-tight text-gray-900">
+            <h2 class="text-2xl font-semibold tracking-tight text-slate-950 dark:text-neutral-100">
                 Usuários
             </h2>
         </div>
     </x-slot>
 
-    <div class="py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
+    <div class="py-8 sm:py-10">
+        <div class="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
             @if (session('success'))
-                <div
-                    class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-800">
+                <x-ui::alert>
                     {{ session('success') }}
-                </div>
+                </x-ui::alert>
             @endif
 
-            <section class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+            @if (session('error'))
+                <x-ui::alert type="error">
+                    {{ session('error') }}
+                </x-ui::alert>
+            @endif
+
+            <x-ui::card>
                 <header
-                    class="flex flex-col gap-4 border-b border-gray-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+                    class="flex flex-col gap-4 border-b border-slate-200 px-4 py-5
+                           sm:flex-row sm:items-center sm:justify-between sm:px-6
+                           dark:border-neutral-800">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900">
+                        <h3 class="text-lg font-semibold text-slate-950 dark:text-neutral-100">
                             Usuários cadastrados
                         </h3>
 
-                        <p class="mt-1 text-sm text-gray-500">
-                            Gerencie os usuários, seus papéis e seus acessos ao sistema.
+                        <p class="mt-1 text-sm text-slate-500 dark:text-neutral-400">
+                            Gerencie os usuários, seus papéis, permissões e acessos ao sistema.
                         </p>
                     </div>
 
                     @can('create', App\Models\User::class)
-                        <a href="{{ route('usuarios.create') }}"
-                            class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700">
+                        <x-ui::button :href="route('usuarios.create')">
+                            <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
                             Cadastrar Usuário
-                        </a>
+                        </x-ui::button>
                     @endcan
                 </header>
 
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                    Usuário
-                                </th>
+                <x-ui::table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Usuário</th>
+                            <th scope="col">Câmara</th>
+                            <th scope="col">Papel</th>
+                            <th scope="col">Situação</th>
+                            <th scope="col" class="text-right">Ações</th>
+                        </tr>
+                    </thead>
 
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                    Câmara
-                                </th>
+                    <tbody>
+                        @forelse ($usuarios as $usuario)
+                            <tr class="transition-colors hover:bg-slate-50 dark:hover:bg-neutral-800/50">
+                                <td>
+                                    <div class="flex items-center gap-3">
+                                        <div @class([
+                                            'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg',
+                                            'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400' => $usuario->isRoot(),
+                                            'bg-slate-100 text-slate-500 dark:bg-neutral-800 dark:text-neutral-400' => !$usuario->isRoot(),
+                                        ])>
+                                            <i @class([
+                                                'fa-solid',
+                                                'fa-user-shield' => $usuario->isRoot(),
+                                                'fa-user' => !$usuario->isRoot(),
+                                            ]) aria-hidden="true"></i>
+                                        </div>
 
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                    Papel
-                                </th>
+                                        <div class="min-w-0">
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <p class="font-semibold text-slate-950 dark:text-neutral-100">
+                                                    {{ $usuario->name }}
+                                                </p>
 
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                    Status
-                                </th>
+                                                @if ($usuario->isRoot())
+                                                    <x-ui::badge variant="info">
+                                                        Root
+                                                    </x-ui::badge>
+                                                @endif
+                                            </div>
 
-                                <th scope="col"
-                                    class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                    Ações
-                                </th>
-                            </tr>
-                        </thead>
-
-                        <tbody class="divide-y divide-gray-200 bg-white">
-                            @forelse ($usuarios as $usuario)
-                                <tr>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-900">
-                                                {{ $usuario->name }}
-                                            </p>
-
-                                            <p class="text-sm text-gray-500">
+                                            <p class="truncate text-xs text-slate-500 dark:text-neutral-500">
                                                 {{ $usuario->email }}
                                             </p>
                                         </div>
-                                    </td>
+                                    </div>
+                                </td>
 
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
+                                <td>
+                                    <span @class([
+                                        'text-sm',
+                                        'text-slate-700 dark:text-neutral-300' => $usuario->camara,
+                                        'text-slate-500 dark:text-neutral-500' => !$usuario->camara,
+                                    ])>
                                         {{ $usuario->camara?->nome ?? 'Acesso global' }}
-                                    </td>
+                                    </span>
+                                </td>
 
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
+                                <td>
+                                    <span class="text-sm text-slate-700 dark:text-neutral-300">
                                         {{ $usuario->role?->nome ?? 'Sem papel definido' }}
-                                    </td>
+                                    </span>
+                                </td>
 
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        @if ($usuario->ativo)
-                                            <span
-                                                class="inline-flex rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
-                                                Ativo
-                                            </span>
-                                        @else
-                                            <span
-                                                class="inline-flex rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700">
-                                                Inativo
-                                            </span>
-                                        @endif
-                                    </td>
+                                <td>
+                                    <x-ui::badge :variant="$usuario->ativo ? 'success' : 'neutral'">
+                                        {{ $usuario->ativo ? 'Ativo' : 'Inativo' }}
+                                    </x-ui::badge>
+                                </td>
 
-                                    <td class="whitespace-nowrap px-4 py-4 text-right">
-                                        @if (!$usuario->isRoot())
-                                            <div class="flex items-center justify-end gap-2">
-                                                @can('update', $usuario)
-                                                    <a href="{{ route('usuarios.edit', $usuario) }}"
-                                                        class="rounded-lg p-2 text-sm font-semibold text-yellow-700 transition hover:bg-yellow-50">
-                                                        Editar
-                                                    </a>
-                                                @endcan
+                                <td>
+                                    @if ($usuario->isRoot())
+                                        <div
+                                            class="flex items-center justify-end gap-2 text-xs font-medium text-slate-500 dark:text-neutral-500">
+                                            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                                            <span>Conta protegida</span>
+                                        </div>
+                                    @else
+                                        <div class="flex items-center justify-end gap-1">
+                                            @can('update', $usuario)
+                                                <a href="{{ route('usuarios.edit', $usuario) }}"
+                                                    class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
+                                                    aria-label="Editar {{ $usuario->name }}">
+                                                    <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                                                    <span class="hidden sm:inline">Editar</span>
+                                                </a>
+                                            @endcan
 
-                                                @if ($usuario->ativo)
-                                                    @can('desativar', $usuario)
-                                                        @if (!auth()->user()->is($usuario))
-                                                            <form action="{{ route('usuarios.desativar', $usuario) }}"
-                                                                onsubmit="return confirm('Deseja realmente desativar este usuário?');"
-                                                                method="POST">
-                                                                @csrf
-                                                                @method('PATCH')
-
-                                                                <button type="submit"
-                                                                    class="rounded-lg p-2 text-sm font-semibold text-red-700 transition hover:bg-red-50">
-                                                                    Desativar
-                                                                </button>
-                                                            </form>
-                                                        @endif
-                                                    @endcan
-                                                @else
-                                                    @can('reativar', $usuario)
-                                                        <form action="{{ route('usuarios.reativar', $usuario) }}"
-                                                            method="POST">
+                                            @if ($usuario->ativo)
+                                                @can('desativar', $usuario)
+                                                    @if (!auth()->user()->is($usuario))
+                                                        <form action="{{ route('usuarios.desativar', $usuario) }}"
+                                                            method="POST"
+                                                            onsubmit="return confirm('Deseja realmente desativar este usuário? O acesso ao sistema será bloqueado.');">
                                                             @csrf
                                                             @method('PATCH')
 
                                                             <button type="submit"
-                                                                class="rounded-lg p-2 text-sm font-semibold text-green-700 transition hover:bg-green-50">
-                                                                Reativar
+                                                                class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 dark:text-red-400 dark:hover:bg-red-950/40"
+                                                                aria-label="Desativar {{ $usuario->name }}">
+                                                                <i class="fa-solid fa-ban" aria-hidden="true"></i>
+                                                                <span class="hidden sm:inline">Desativar</span>
                                                             </button>
                                                         </form>
-                                                    @endcan
-                                                @endif
-
-                                                @can('delete', $usuario)
-                                                    <form action="{{ route('usuarios.destroy', $usuario) }}"
-                                                        onsubmit="return confirm('Deseja realmente excluir este usuário?')"
+                                                    @endif
+                                                @endcan
+                                            @else
+                                                @can('reativar', $usuario)
+                                                    <form action="{{ route('usuarios.reativar', $usuario) }}"
                                                         method="POST">
                                                         @csrf
-                                                        @method('DELETE')
+                                                        @method('PATCH')
 
                                                         <button type="submit"
-                                                            class="rounded-lg p-2 text-sm font-semibold text-red-800 transition hover:bg-red-100">
-                                                            Excluir
+                                                            class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:text-emerald-400 dark:hover:bg-emerald-950/40"
+                                                            aria-label="Reativar {{ $usuario->name }}">
+                                                            <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+                                                            <span class="hidden sm:inline">Reativar</span>
                                                         </button>
                                                     </form>
                                                 @endcan
-                                            </div>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="px-6 py-12 text-center text-sm text-gray-500">
-                                        Nenhum usuário foi encontrado.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                                            @endif
+
+                                            @can('delete', $usuario)
+                                                <form action="{{ route('usuarios.destroy', $usuario) }}" method="POST"
+                                                    onsubmit="return confirm('Deseja realmente excluir este usuário? O registro será arquivado e o acesso permanecerá bloqueado.');">
+                                                    @csrf
+                                                    @method('DELETE')
+
+                                                    <button type="submit"
+                                                        class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 dark:text-red-400 dark:hover:bg-red-950/40"
+                                                        aria-label="Excluir {{ $usuario->name }}">
+                                                        <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                                                        <span class="hidden sm:inline">Excluir</span>
+                                                    </button>
+                                                </form>
+                                            @endcan
+                                        </div>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5">
+                                    <x-ui::empty-state icon="fa-users">
+                                        Nenhum usuário cadastrado.
+                                    </x-ui::empty-state>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </x-ui::table>
 
                 @if ($usuarios->hasPages())
-                    <div class="border-t border-gray-200 px-6 py-4">
+                    <footer class="border-t border-slate-200 px-4 py-4 sm:px-6 dark:border-neutral-800">
                         {{ $usuarios->links() }}
-                    </div>
+                    </footer>
                 @endif
-            </section>
+            </x-ui::card>
         </div>
     </div>
 </x-app-layout>

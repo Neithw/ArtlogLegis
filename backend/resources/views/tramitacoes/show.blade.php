@@ -14,35 +14,27 @@
     <div class="py-10">
         <div class="mx-auto max-w-5xl space-y-6 px-4 sm:px-6 lg:px-8">
             @if (session('success'))
-                <div class="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300"
-                    role="alert">
-                    <i class="fa-solid fa-circle-check mt-0.5" aria-hidden="true"></i>
-                    <span>{{ session('success') }}</span>
-                </div>
+                <x-ui::alert>
+                    {{ session('success') }}
+                </x-ui::alert>
             @endif
 
             @if (session('error'))
-                <div class="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300"
-                    role="alert">
-                    <i class="fa-solid fa-circle-exclamation mt-0.5" aria-hidden="true"></i>
-                    <span>{{ session('error') }}</span>
-                </div>
+                <x-ui::alert type="error">
+                    {{ session('error') }}
+                </x-ui::alert>
             @endif
 
             @error('proposicao')
-                <div class="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300"
-                    role="alert">
-                    <i class="fa-solid fa-circle-exclamation mt-0.5" aria-hidden="true"></i>
-                    <span>{{ $message }}</span>
-                </div>
+                <x-ui::alert type="error">
+                    {{ $message }}
+                </x-ui::alert>
             @enderror
 
             @error('tramitacao')
-                <div class="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300"
-                    role="alert">
-                    <i class="fa-solid fa-circle-exclamation mt-0.5" aria-hidden="true"></i>
-                    <span>{{ $message }}</span>
-                </div>
+                <x-ui::alert type="error">
+                    {{ $message }}
+                </x-ui::alert>
             @enderror
 
             <section
@@ -278,8 +270,8 @@
                                         <p>Não há outra unidade disponível para encaminhamento.</p>
                                     </div>
                                 @else
-                                    <form action="{{ route('proposicoes.tramitacoes.store', $proposicao) }}"
-                                        method="POST" class="space-y-5">
+                                    <form action="{{ route('proposicoes.tramitacoes.store', $proposicao) }}" method="POST"
+                                        class="space-y-5">
                                         @csrf
 
                                         <div>
@@ -302,11 +294,7 @@
                                                 @endforeach
                                             </select>
 
-                                            @error('unidade_destino_id')
-                                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">
-                                                    {{ $message }}
-                                                </p>
-                                            @enderror
+                                            <x-input-error for="unidade_destino_id" class="mt-2 dark:text-red-400" />
                                         </div>
 
                                         <div>
@@ -322,11 +310,7 @@
                                                 placeholder="Informe uma orientação ou observação para a unidade de destino."
                                                 class="mt-1 block w-full rounded-lg border-slate-300 bg-white text-slate-950 shadow-sm placeholder:text-slate-400 focus:border-indigo-500 focus:ring-indigo-500 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-100 dark:placeholder:text-neutral-600">{{ old('despacho') }}</textarea>
 
-                                            @error('despacho')
-                                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">
-                                                    {{ $message }}
-                                                </p>
-                                            @enderror
+                                            <x-input-error for="despacho" class="mt-2 dark:text-red-400" />
                                         </div>
 
                                         <div class="flex justify-end">

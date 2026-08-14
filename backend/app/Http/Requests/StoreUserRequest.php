@@ -18,6 +18,15 @@ class StoreUserRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if (! $this->user()->isRoot()) {
+            $this->merge([
+                'camara_id' => $this->user()->camara_id
+            ]);
+        }
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -50,11 +59,7 @@ class StoreUserRequest extends FormRequest
                 'required',
                 'integer',
                 Rule::exists('camaras', 'id')
-                    ->where(function ($query) {
-                        $query
-                            ->where('ativo', true)
-                            ->whereNull('deleted_at');
-                    })
+                    ->where('ativo', true)
             ],
 
             'role_id' => [
@@ -142,6 +147,7 @@ class StoreUserRequest extends FormRequest
             'email.unique' => 'Este e-mail já está cadastrado.',
 
             'password.required' => 'Informe uma senha inicial.',
+            'password.min' => 'A senha deve possuir pelo menos :min caracteres.',
             'password.confirmed' => 'A confirmação da senha não corresponde.',
 
             'camara_id.required' => 'Selecione uma câmara',

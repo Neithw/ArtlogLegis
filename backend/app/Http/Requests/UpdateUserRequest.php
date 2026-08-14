@@ -18,6 +18,15 @@ class UpdateUserRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if (! $this->user()->isRoot()) {
+            $this->merge([
+                'camara_id' => $this->user()->camara_id
+            ]);
+        }
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -54,15 +63,11 @@ class UpdateUserRequest extends FormRequest
                 'integer',
                 Rule::exists('camaras', 'id')
                     ->where(function ($query) use ($usuarioAutenticado, $user) {
-                        $query
-                            ->whereNull('deleted_at')
-                            ->where(function ($query) use ($usuarioAutenticado, $user) {
-                                $query->where('ativo', true);
+                        $query->where('ativo', true);
 
-                                if ($usuarioAutenticado->isRoot() && $user->camara_id !== null) {
-                                    $query->orWhere('id', $user->camara_id);
-                                }
-                            });
+                        if ($usuarioAutenticado->isRoot() && $user->camara_id !== null) {
+                            $query->orWhere('id', $user->camara_id);
+                        }
                     })
             ],
 
@@ -153,6 +158,7 @@ class UpdateUserRequest extends FormRequest
             'email.max' => 'O e-mail não pode possuir mais de 255 caracteres.',
             'email.unique' => 'Este e-mail já está cadastrado.',
 
+            'password.min' => 'A senha deve possuir pelo menos :min caracteres.',
             'password.confirmed' => 'A confirmação da senha não corresponde.',
 
             'camara_id.required' => 'Selecione uma Câmara.',

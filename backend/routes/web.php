@@ -48,6 +48,7 @@ Route::middleware([
         ->name('camaras.desativar');
 
     Route::patch('/camaras/{camara}/reativar', [CamaraController::class, 'reativar'])
+        ->middleware('can:reativar,camara')
         ->name('camaras.reativar');
 
     Route::resource('/camaras', CamaraController::class)
@@ -58,12 +59,12 @@ Route::middleware([
     // -----------------------------------------------------------------------------------------------
 
     Route::patch('/usuarios/{user}/desativar', [UserController::class, 'desativar'])
-        ->name('usuarios.desativar')
-        ->middleware('can:desativar,user');
+        ->middleware('can:desativar,user')
+        ->name('usuarios.desativar');
 
     Route::patch('/usuarios/{user}/reativar', [UserController::class, 'reativar'])
-        ->name('usuarios.reativar')
-        ->middleware('can:reativar,user');
+        ->middleware('can:reativar,user')
+        ->name('usuarios.reativar');
 
     Route::resource('usuarios', UserController::class)
         ->parameters([

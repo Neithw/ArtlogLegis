@@ -310,7 +310,10 @@ class UserController extends Controller
             abort(403);
         }
 
-        $user->delete();
+        DB::transaction(function () use ($user): void {
+            $user->update(['ativo' => false]);
+            $user->delete();
+        });
 
         return to_route('usuarios.index')
             ->with('success', 'Usuário excluído com sucesso.');
