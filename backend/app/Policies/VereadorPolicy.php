@@ -25,6 +25,12 @@ class VereadorPolicy
             && $user->hasPermission('vereadores:visualizar');
     }
 
+    public function viewArchived(User $user): bool
+    {
+        return $this->possuiCamara($user)
+            && $user->hasPermission('vereadores:restaurar');
+    }
+
     /**
      * Determine whether the user can create models.
      */
@@ -50,6 +56,12 @@ class VereadorPolicy
     {
         return $this->pertenceAoEscopo($user, $vereador)
             && $user->hasPermission('vereadores:excluir');
+    }
+
+    public function restore(User $user, Vereador $vereador): bool
+    {
+        return $this->pertenceAoEscopo($user, $vereador)
+            && $user->hasPermission('vereadores:restaurar');
     }
 
     private function possuiCamara(User $user): bool

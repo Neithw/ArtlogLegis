@@ -78,6 +78,15 @@ Route::middleware([
         ->middlewareFor(['destroy'], 'can:delete,user');
     // -----------------------------------------------------------------------------------------------
 
+    Route::get('/vereadores/arquivados', [VereadorController::class, 'arquivados'])
+        ->middleware('can:viewArchived,' . Vereador::class)
+        ->name('vereadores.arquivados');
+
+    Route::patch('/vereadores/{vereador}/restaurar', [VereadorController::class, 'restore'])
+        ->withTrashed()
+        ->middleware('can:restore,vereador')
+        ->name('vereadores.restore');
+
     Route::resource('vereadores', VereadorController::class)
         ->parameters([
             'vereadores' => 'vereador'

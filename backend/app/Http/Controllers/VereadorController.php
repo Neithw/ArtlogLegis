@@ -24,7 +24,7 @@ class VereadorController extends Controller
         $vereadores = Vereador::query()
             ->with([
                 'camara:id,nome',
-                'user:id,name,email'
+                'user:id,name,email,ativo,deleted_at'
             ])
             ->when(! $usuarioIsRoot, function ($query) use ($usuarioAutenticado) {
                 $query->where(
@@ -86,7 +86,7 @@ class VereadorController extends Controller
     {
         $vereador->load([
             'camara:id,nome',
-            'user:id,name,email'
+            'user:id,name,email,ativo,deleted_at'
         ]);
 
         return view('vereadores.show', compact('vereador'));
@@ -148,12 +148,44 @@ class VereadorController extends Controller
     {
         if ($vereador->mandatos()->withTrashed()->exists()) {
             return to_route('vereadores.index')
-                ->with('error', 'Não é possível excluir um vereador que possui mandatos vinculados.');
+                ->with('error', 'Não é possível arquivar um vereador que possui mandatos vinculados.');
         }
 
         $vereador->delete();
 
         return to_route('vereadores.index')
-            ->with('success', 'Vereador excluído com sucesso.');
+            ->with('success', 'Vereador arquivado com sucesso.');
+    }
+
+    public function arquivados(Request $request): View
+    {
+        $usuarioAutenticado = $request->user();
+        $usuarioIsRoot = $usuarioAutenticado->isRoot();
+
+        $vereadores = Vereador::onlyTrashed()
+            ->with([
+                'camara:id,nome',
+                'user:id,name,email,ativo,deleted_at'
+            ])
+            ->when(! $usuarioIsRoot, function ($query) use ($usuarioAutenticado) {
+                $query->where(
+                    'camara_id',
+                    $usuarioAutenticado->camara_id
+                );
+            })
+            ->orderBy('nome')
+            ->paginate(10);
+
+        return view('vereadores.arquivados', compact('vereadores', 'usuarioIsRoot'));
+    }
+
+    public function restore(Vereador $vereador): RedirectResponse
+    {
+        abort_unless($vereador->trashed(), 404);
+
+        $vereador->restore();
+
+        return to_route('vereadores.arquivados')
+            ->with('success', 'Vereador restaurado com sucesso.');
     }
 }
