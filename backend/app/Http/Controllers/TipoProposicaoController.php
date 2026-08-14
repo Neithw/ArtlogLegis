@@ -40,6 +40,7 @@ class TipoProposicaoController extends Controller
         $usuarioIsRoot = $request->user()->isRoot();
 
         $camaras = Camara::query()
+            ->where('ativo', true)
             ->when(! $usuarioIsRoot, function ($query) use ($usuarioAutenticado) {
                 $query->whereKey($usuarioAutenticado->camara_id);
             })
@@ -108,9 +109,11 @@ class TipoProposicaoController extends Controller
 
     public function restore(TipoProposicao $tipoProposicao): RedirectResponse
     {
+        abort_unless($tipoProposicao->trashed(), 404);
+
         $tipoProposicao->restore();
 
-        return to_route('tipos-proposicao.index')
+        return to_route('tipos-proposicao.arquivados')
             ->with('success', 'Tipo de proposição restaurado com sucesso.');
     }
 }

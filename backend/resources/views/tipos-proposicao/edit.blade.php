@@ -1,81 +1,46 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <p class="text-sm font-medium text-indigo-600">
-                Administração
+            <p class="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                Processo legislativo
             </p>
 
-            <h2 class="text-2xl font-semibold leading-tight text-gray-900">
+            <h2 class="text-2xl font-semibold tracking-tight text-slate-950 dark:text-neutral-100">
                 Editar tipo de proposição
             </h2>
         </div>
     </x-slot>
 
-    <div class="py-4">
+    <div class="py-8 sm:py-10">
         <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-
-            <form method="POST" action="{{ route('tipos-proposicao.update', $tipoProposicao) }}" class="space-y-6">
+            <form action="{{ route('tipos-proposicao.update', $tipoProposicao) }}" method="POST" class="space-y-6">
                 @csrf
                 @method('PUT')
 
-                <div class="overflow-hidden rounded-xl bg-white shadow">
-                    <div class="border-b border-gray-200 px-6 py-5">
-                        <h3 class="text-lg font-semibold text-gray-900">
+                <x-ui::card>
+                    <header class="border-b border-slate-200 px-4 py-5 sm:px-6 dark:border-neutral-800">
+                        <h3 class="text-lg font-semibold text-slate-950 dark:text-neutral-100">
                             Dados do tipo
                         </h3>
 
-                        <p class="mt-1 text-sm text-gray-500">
-                            Atualize os dados do tipo.
+                        <p class="mt-1 text-sm text-slate-500 dark:text-neutral-400">
+                            Atualize as informações do tipo de proposição.
                         </p>
-                    </div>
+                    </header>
 
-                    <div class="grid gap-6 p-6 md:grid-cols-2">
-                        <div class="md:col-span-2">
-                            <p class="text-sm font-medium text-gray-700">
-                                Câmara
-                            </p>
+                    @include('tipos-proposicao._form')
+                </x-ui::card>
 
-                            <div class="mt-1 rounded-md border border-gray-200 bg-gray-50 px-4 py-3">
-                                <p class="text-sm font-semibold text-gray-900">
-                                    {{ $tipoProposicao->camara->nome }}
-                                </p>
-
-                                <p class="mt-1 text-xs text-gray-500">
-                                    A Câmara vinculada não pode ser alterada após o cadastro do tipo.
-                                </p>
-                            </div>
-
-                            @error('camara_id')
-                                <p class="mt-2 text-sm text-red-600">
-                                    {{ $message }}
-                                </p>
-                            @enderror
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <x-label for="nome" value="Nome do tipo" />
-
-                            <x-input id="nome" name="nome" type="text" class="mt-1 block w-full"
-                                :value="old('nome', $tipoProposicao->nome)" required autofocus />
-
-                            @error('nome')
-                                <p class="mt-2 text-sm text-red-600">
-                                    {{ $message }}
-                                </p>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-end gap-3">
-                    <a href="{{ route('tipos-proposicao.index') }}"
-                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-widest text-gray-700 shadow-sm transition hover:bg-gray-50">
+                <div class="flex flex-wrap items-center justify-end gap-3">
+                    <x-ui::button :href="route('tipos-proposicao.index')" variant="secondary">
+                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                         Cancelar
-                    </a>
+                    </x-ui::button>
 
-                    <x-button>
+                    <x-ui::button type="submit">
+                        <i class="fa-solid fa-check" aria-hidden="true"></i>
                         Atualizar tipo
-                    </x-button>
+                    </x-ui::button>
                 </div>
             </form>
         </div>
