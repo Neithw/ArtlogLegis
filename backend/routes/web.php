@@ -44,19 +44,17 @@ Route::middleware([
     })->name('dashboard');
 
     Route::patch('/camaras/{camara}/desativar', [CamaraController::class, 'desativar'])
-        ->name('camaras.desativar')
-        ->middleware('can:desativar,camara');
+        ->middleware('can:desativar,camara')
+        ->name('camaras.desativar');
 
     Route::patch('/camaras/{camara}/reativar', [CamaraController::class, 'reativar'])
-        ->name('camaras.reativar')
-        ->middleware('can:reativar,camara');
+        ->name('camaras.reativar');
 
     Route::resource('/camaras', CamaraController::class)
         ->except(['show', 'destroy'])
         ->middlewareFor('index', 'can:viewAny,' . Camara::class)
         ->middlewareFor(['create', 'store'], 'can:create,' . Camara::class)
         ->middlewareFor(['edit', 'update'], 'can:update,camara');
-    // ->middlewareFor('destroy', 'can:delete,camara');
     // -----------------------------------------------------------------------------------------------
 
     Route::patch('/usuarios/{user}/desativar', [UserController::class, 'desativar'])

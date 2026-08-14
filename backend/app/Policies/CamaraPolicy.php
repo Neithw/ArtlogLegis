@@ -42,12 +42,4 @@ class CamaraPolicy
     {
         return false;
     }
-
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Camara $camara): bool
-    {
-        return false;
-    }
 }

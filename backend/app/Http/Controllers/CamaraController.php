@@ -90,15 +90,4 @@ class CamaraController extends Controller
         return to_route('camaras.index')
             ->with('success', 'Câmara reativada com sucesso.');
     }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    // public function destroy(Camara $camara): RedirectResponse
-    // {
-    //     $camara->delete();
-
-    //     return to_route('camaras.index')
-    //         ->with('success', 'Câmara excluída com sucesso.');
-    // }
 }

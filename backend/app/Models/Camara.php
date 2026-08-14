@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Camara extends Model
 {
-    use SoftDeletes;
-
     protected $fillable = [
         'nome',
         'cnpj',
@@ -21,6 +19,25 @@ class Camara extends Model
         return [
             'ativo' => 'boolean',
         ];
+    }
+
+    protected function cnpjFormatado(): Attribute
+    {
+        return Attribute::make(
+            get: function (mixed $value, array $attributes): ?string {
+                $cnpj = $attributes['cnpj'] ?? null;
+
+                if ($cnpj === null) {
+                    return null;
+                }
+
+                return preg_replace(
+                    '/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/',
+                    '$1.$2.$3/$4-$5',
+                    $cnpj,
+                );
+            },
+        );
     }
 
     public function users(): HasMany

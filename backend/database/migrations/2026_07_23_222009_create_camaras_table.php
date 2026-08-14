@@ -16,7 +16,6 @@ return new class extends Migration {
             $table->char('cnpj', 14)->nullable()->unique();
             $table->boolean('ativo')->default(true);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
