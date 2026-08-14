@@ -87,14 +87,14 @@
                             Voltar
                         </x-ui::button>
 
-                        @can('update', $proposicao)
-                            <x-ui::button :href="route('proposicoes.edit', $proposicao)" variant="secondary">
-                                <i class="fa-solid fa-pen" aria-hidden="true"></i>
-                                Editar
-                            </x-ui::button>
-                        @endcan
-
                         @if ($proposicao->situacao === 'rascunho')
+                            @can('update', $proposicao)
+                                <x-ui::button :href="route('proposicoes.edit', $proposicao)" variant="secondary">
+                                    <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                                    Editar
+                                </x-ui::button>
+                            @endcan
+
                             @can('protocolar', $proposicao)
                                 <form action="{{ route('proposicoes.protocolar', $proposicao) }}" method="POST"
                                     onsubmit="return confirm('Deseja realmente protocolar esta proposição? Esta ação não poderá ser desfeita.')">
@@ -315,20 +315,22 @@
                 </footer>
             </x-ui::card>
 
-            @can('delete', $proposicao)
-                <div class="flex justify-end">
-                    <form action="{{ route('proposicoes.destroy', $proposicao) }}" method="POST"
-                        onsubmit="return confirm('Deseja realmente arquivar esta proposição?')">
-                        @csrf
-                        @method('DELETE')
+            @if ($proposicao->situacao === 'rascunho')
+                @can('delete', $proposicao)
+                    <div class="flex justify-end">
+                        <form action="{{ route('proposicoes.destroy', $proposicao) }}" method="POST"
+                            onsubmit="return confirm('Deseja realmente arquivar esta proposição?')">
+                            @csrf
+                            @method('DELETE')
 
-                        <x-ui::button type="submit" variant="danger">
-                            <i class="fa-solid fa-box-archive" aria-hidden="true"></i>
-                            Arquivar proposição
-                        </x-ui::button>
-                    </form>
-                </div>
-            @endcan
+                            <x-ui::button type="submit" variant="danger">
+                                <i class="fa-solid fa-box-archive" aria-hidden="true"></i>
+                                Arquivar proposição
+                            </x-ui::button>
+                        </form>
+                    </div>
+                @endcan
+            @endif
         </div>
     </div>
 </x-app-layout>
