@@ -136,9 +136,9 @@
         </div>
 
         {{-- Câmara centralizada --}}
-        <div class="pointer-events-none absolute inset-y-0 left-0 right-0 hidden
-           items-center justify-center transition-[left] duration-150 ease-out md:flex"
-            :class="$store.layout.sidebarCollapsed ? 'lg:left-20' : 'lg:left-64'">
+        <div
+            class="app-context pointer-events-none absolute inset-y-0 left-0 right-0 hidden
+           items-center justify-center md:flex">
             <div
                 class="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2
                        text-sm font-medium text-slate-600
@@ -244,22 +244,18 @@
         style="display: none" class="fixed inset-0 top-16 z-30 bg-slate-950/50 lg:hidden"></div>
 
     {{-- Sidebar --}}
-    <aside
-        :class="[
-            $store.layout.sidebarOpen ? 'translate-x-0' : '-translate-x-full',
-            $store.layout.sidebarCollapsed ? 'lg:w-20' : 'lg:w-64'
-        ]"
-        class="fixed bottom-0 left-0 top-16 z-40 flex w-64 flex-col
-               border-r border-slate-200 bg-white shadow-xl
-               overflow-hidden transition-[width,transform] duration-150 ease-out
-               dark:border-neutral-800 dark:bg-neutral-900
-               lg:translate-x-0 lg:shadow-none">
+    <aside :class="$store.layout.sidebarOpen ? '!translate-x-0' : '-translate-x-full'"
+        class="app-sidebar fixed bottom-0 left-0 top-16 z-40 flex w-64
+           -translate-x-full flex-col overflow-hidden
+           border-r border-slate-200 bg-white shadow-xl
+           dark:border-neutral-800 dark:bg-neutral-900
+           lg:translate-x-0 lg:shadow-none">
         {{-- Cabeçalho da sidebar --}}
         <div class="flex h-20 shrink-0 items-center justify-between
                    border-b border-slate-200 px-4
                    dark:border-neutral-800"
             :class="$store.layout.sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''">
-            <div class="min-w-0" :class="$store.layout.sidebarLabelsVisible ? '' : 'lg:hidden'">
+            <div data-sidebar-label class="min-w-0" :class="$store.layout.sidebarLabelsVisible ? '' : 'lg:hidden'">
                 <p class="font-semibold text-slate-800 dark:text-neutral-100">
                     Menu
                 </p>
@@ -288,11 +284,12 @@
                     <i class="fa-solid fa-xmark fa-fw"></i>
                 </span>
 
-                <span class="hidden lg:inline-flex">
-                    <i class="fa-solid fa-fw"
-                        :class="$store.layout.sidebarCollapsed ?
-                            'fa-angles-right' :
-                            'fa-angles-left'"></i>
+                <span data-sidebar-expand-icon class="hidden lg:inline-flex">
+                    <i class="fa-solid fa-angles-right fa-fw"></i>
+                </span>
+
+                <span data-sidebar-collapse-icon class="hidden lg:inline-flex">
+                    <i class="fa-solid fa-angles-left fa-fw"></i>
                 </span>
             </button>
         </div>
@@ -310,7 +307,8 @@
            dark:hover:text-white">
                 <i class="fa-solid fa-table-cells-large fa-fw shrink-0 text-base"></i>
 
-                <span class="whitespace-nowrap" :class="$store.layout.sidebarLabelsVisible ? '' : 'lg:hidden'">
+                <span data-sidebar-label class="whitespace-nowrap"
+                    :class="$store.layout.sidebarLabelsVisible ? '' : 'lg:hidden'">
                     Visão geral
                 </span>
             </a>
@@ -342,7 +340,7 @@
                                 class="fa-solid {{ $grupo['icone'] }}
                                        fa-fw shrink-0 text-base"></i>
 
-                            <span class="flex min-w-0 flex-1 items-center justify-between gap-2"
+                            <span data-sidebar-label class="flex min-w-0 flex-1 items-center justify-between gap-2"
                                 :class="$store.layout.sidebarLabelsVisible ? '' : 'lg:hidden'">
                                 <span class="truncate">
                                     {{ $grupo['nome'] }}
@@ -354,8 +352,9 @@
                             </span>
                         </button>
 
-                        <div x-cloak x-show="open" :class="$store.layout.sidebarLabelsVisible ? '' : 'lg:hidden'"
-                            class="mt-1 space-y-1 ps-4">
+                        <div x-show="open" data-sidebar-label
+                            @if (!request()->routeIs(...$grupo['rotas'])) style="display: none" @endif
+                            :class="$store.layout.sidebarLabelsVisible ? '' : 'lg:hidden'" class="mt-1 space-y-1 ps-4">
                             @foreach ($grupo['itens'] as $item)
                                 <a href="{{ route($item['rota']) }}" wire:navigate.hover
                                     wire:current="!bg-indigo-50 !text-indigo-700 font-medium dark:!bg-neutral-800 dark:!text-white"

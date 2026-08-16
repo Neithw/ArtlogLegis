@@ -22,6 +22,11 @@
             );
 
         document.documentElement.classList.toggle('dark', usarTemaEscuro);
+
+        document.documentElement.classList.toggle(
+            'sidebar-collapsed',
+            localStorage.getItem('sidebar-collapsed') === 'true'
+        );
     </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -38,8 +43,7 @@
             @include('navigation-menu')
         @endpersist
 
-        <div class="min-h-screen pt-16 transition-[padding] duration-150 ease-out"
-            :class="$store.layout.sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'">
+        <div class="app-content min-h-screen pt-16">
             <div class="flex min-h-[calc(100vh-4rem)] flex-col">
                 @if (isset($header))
                     <header

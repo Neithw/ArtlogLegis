@@ -7,3 +7,55 @@
 [x-cloak] {
     display: none !important;
 }
+
+:root {
+    --app-sidebar-width: 16rem;
+}
+
+:root.sidebar-collapsed {
+    --app-sidebar-width: 5rem;
+}
+
+@media (min-width: 1024px) {
+    .app-sidebar {
+        width: var(--app-sidebar-width);
+    }
+
+    .app-content {
+        padding-left: var(--app-sidebar-width);
+    }
+
+    .app-context {
+        left: var(--app-sidebar-width);
+    }
+
+    html.sidebar-collapsed [data-sidebar-label] {
+        display: none !important;
+    }
+
+    html.sidebar-collapsed [data-sidebar-collapse-icon] {
+        display: none !important;
+    }
+
+    html:not(.sidebar-collapsed) [data-sidebar-expand-icon] {
+        display: none !important;
+    }
+
+    html.layout-ready .app-sidebar {
+        transition: width 150ms ease-out;
+    }
+
+    html.layout-ready .app-content {
+        transition: padding-left 150ms ease-out;
+    }
+
+    html.layout-ready .app-context {
+        transition: left 150ms ease-out;
+    }
+}
+
+@media (max-width: 1023px) {
+    html.layout-ready .app-sidebar {
+        transition: transform 150ms ease-out;
+    }
+}

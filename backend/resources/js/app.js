@@ -160,6 +160,13 @@ Alpine.store('layout', {
         );
     },
 
+    applySidebar() {
+        document.documentElement.classList.toggle(
+            'sidebar-collapsed',
+            this.sidebarCollapsed
+        );
+    },
+
     toggleTheme() {
         this.darkMode = !this.darkMode;
 
@@ -177,6 +184,7 @@ Alpine.store('layout', {
 
             if (this.sidebarCollapsed) {
                 this.sidebarCollapsed = false;
+                this.applySidebar();
 
                 localStorage.setItem('sidebar-collapsed', 'false');
 
@@ -188,6 +196,7 @@ Alpine.store('layout', {
             } else {
                 this.sidebarLabelsVisible = false;
                 this.sidebarCollapsed = true;
+                this.applySidebar();
 
                 localStorage.setItem('sidebar-collapsed', 'true');
             }
@@ -200,7 +209,14 @@ Alpine.store('layout', {
 });
 
 document.addEventListener('livewire:navigated', () => {
-    Alpine.store('layout').applyTheme();
+    const layout = Alpine.store('layout')
+
+    layout.applyTheme();
+    layout.applySidebar();
 });
 
 Livewire.start();
+
+requestAnimationFrame(() => {
+    document.documentElement.classList.add('layout-ready');
+});
