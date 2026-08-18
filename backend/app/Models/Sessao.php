@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Sessao extends Model
 {
@@ -62,5 +63,10 @@ class Sessao extends Model
     {
         return $this->belongsTo(User::class, 'criado_por_id')
             ->withTrashed();
+    }
+
+    public function eventos(): HasMany
+    {
+        return $this->hasMany(SessaoEvento::class);
     }
 }

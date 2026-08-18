@@ -44,6 +44,52 @@ class SessaoPolicy
             && $sessao->situacao === 'em_preparacao';
     }
 
+    public function convocar(User $user, Sessao $sessao): bool
+    {
+        return $this->pertenceAoEscopo($user, $sessao)
+            && $user->hasPermission('sessoes:convocar')
+            && $sessao->situacao === 'em_preparacao';
+    }
+
+    public function abrir(User $user, Sessao $sessao): bool
+    {
+        return $this->pertenceAoEscopo($user, $sessao)
+            && $user->hasPermission('sessoes:abrir')
+            && $sessao->situacao === 'convocada';
+    }
+
+    public function suspender(User $user, Sessao $sessao): bool
+    {
+        return $this->pertenceAoEscopo($user, $sessao)
+            && $user->hasPermission('sessoes:suspender')
+            && $sessao->situacao === 'aberta';
+    }
+
+    public function retomar(User $user, Sessao $sessao): bool
+    {
+        return $this->pertenceAoEscopo($user, $sessao)
+            && $user->hasPermission('sessoes:retomar')
+            && $sessao->situacao === 'suspensa';
+    }
+
+    public function encerrar(User $user, Sessao $sessao): bool
+    {
+        return $this->pertenceAoEscopo($user, $sessao)
+            && $user->hasPermission('sessoes:encerrar')
+            && $sessao->situacao === 'aberta';
+    }
+
+    public function cancelar(User $user, Sessao $sessao): bool
+    {
+        return $this->pertenceAoEscopo($user, $sessao)
+            && $user->hasPermission('sessoes:cancelar')
+            && in_array(
+                $sessao->situacao,
+                ['em_preparacao', 'convocada'],
+                true
+            );
+    }
+
     private function possuiCamara(User $user): bool
     {
         return $user->camara_id !== null;

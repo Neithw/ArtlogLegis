@@ -238,6 +238,30 @@ Route::middleware([
         ->middlewareFor('destroy', 'can:delete,unidadeTramitacao');
     // -----------------------------------------------------------------------------------------------
 
+    Route::patch('/sessoes/{sessao}/convocar', [SessaoController::class, 'convocar'])
+        ->middleware('can:convocar,sessao')
+        ->name('sessoes.convocar');
+
+    Route::patch('/sessoes/{sessao}/abrir', [SessaoController::class, 'abrir'])
+        ->middleware('can:abrir,sessao')
+        ->name('sessoes.abrir');
+
+    Route::patch('/sessoes/{sessao}/suspender', [SessaoController::class, 'suspender'])
+        ->middleware('can:suspender,sessao')
+        ->name('sessoes.suspender');
+
+    Route::patch('/sessoes/{sessao}/retomar', [SessaoController::class, 'retomar'])
+        ->middleware('can:retomar,sessao')
+        ->name('sessoes.retomar');
+
+    Route::patch('/sessoes/{sessao}/encerrar', [SessaoController::class, 'encerrar'])
+        ->middleware('can:encerrar,sessao')
+        ->name('sessoes.encerrar');
+
+    Route::patch('/sessoes/{sessao}/cancelar', [SessaoController::class, 'cancelar'])
+        ->middleware('can:cancelar,sessao')
+        ->name('sessoes.cancelar');
+
     Route::resource('sessoes', SessaoController::class)
         ->parameters([
             'sessoes' => 'sessao'

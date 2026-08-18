@@ -75,9 +75,18 @@
         [
             'nome' => 'Processo legislativo',
             'icone' => 'fa-file-lines',
-            'rotas' => ['tipos-proposicao.*', 'proposicoes.*', 'tramitacoes.*', 'unidades-tramitacao.*'],
+            'rotas' => ['tipos-proposicao.*', 'proposicoes.*', 'tramitacoes.*', 'unidades-tramitacao.*', 'sessoes.*'],
             'itens' => array_values(
                 array_filter([
+                    $user->can('viewAny', \App\Models\UnidadeTramitacao::class)
+                        ? [
+                            'nome' => 'Unidades de tramitação',
+                            'icone' => 'fa-sitemap',
+                            'rota' => 'unidades-tramitacao.index',
+                            'rotas' => ['unidades-tramitacao.*'],
+                        ]
+                        : null,
+
                     $user->can('viewAny', \App\Models\TipoProposicao::class)
                         ? [
                             'nome' => 'Tipos de proposição',
@@ -96,12 +105,12 @@
                         ]
                         : null,
 
-                    $user->can('viewAny', \App\Models\UnidadeTramitacao::class)
+                    $user->can('viewAny', \App\Models\Sessao::class)
                         ? [
-                            'nome' => 'Unidades de tramitação',
-                            'icone' => 'fa-sitemap',
-                            'rota' => 'unidades-tramitacao.index',
-                            'rotas' => ['unidades-tramitacao.*'],
+                            'nome' => 'Sessões',
+                            'icone' => 'fa-scale-balanced',
+                            'rota' => 'sessoes.index',
+                            'rotas' => ['sessoes.*'],
                         ]
                         : null,
                 ]),

@@ -194,6 +194,30 @@ class RbacSeeder extends Seeder
                 'nome' => 'Editar Sessões',
                 'codigo' => 'sessoes:editar'
             ],
+            [
+                'nome' => 'Convocar Sessões',
+                'codigo' => 'sessoes:convocar'
+            ],
+            [
+                'nome' => 'Abrir Sessões',
+                'codigo' => 'sessoes:abrir'
+            ],
+            [
+                'nome' => 'Suspender Sessões',
+                'codigo' => 'sessoes:suspender'
+            ],
+            [
+                'nome' => 'Retomar Sessões',
+                'codigo' => 'sessoes:retomar'
+            ],
+            [
+                'nome' => 'Encerrar Sessões',
+                'codigo' => 'sessoes:encerrar'
+            ],
+            [
+                'nome' => 'Cancelar Sessões',
+                'codigo' => 'sessoes:cancelar'
+            ],
         ])->each(function (array $permission): void {
             Permissao::updateOrCreate(
                 [

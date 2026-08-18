@@ -14,7 +14,7 @@
 
 <span
     {{ $attributes->class([
-        'inline-flex items-center rounded-full px-2.5 py-2',
+        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-2',
         'text-xs font-semibold leading-none',
         ...$classes,
     ]) }}>

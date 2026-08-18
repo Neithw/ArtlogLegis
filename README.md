@@ -22,7 +22,9 @@ A aplicação está sendo construída de forma modular, acompanhando o fluxo rea
 - elaboração e protocolo de proposições legislativas;
 - tramitação interna entre unidades administrativas;
 - arquivamento lógico e restauração de registros;
-- aplicação de regras de autorização por meio de Policies.
+- aplicação de regras de autorização por meio de Policies;
+- gerenciamento do ciclo de vida das sessões legislativas;
+- registro auditável das mudanças de situação das sessões;
 
 ## Arquitetura
 
@@ -53,6 +55,7 @@ A documentação está organizada por domínio:
 - [Administração](docs/01-administracao) – Câmaras e usuários.
 - [Estrutura parlamentar](docs/02-estrutura-parlamentar) – Legislaturas, vereadores, partidos e mandatos.
 - [Proposições](docs/03-proposicoes) – Tipos de proposição, elaboração, protocolo e tramitação.
+- [Sessões](docs/04-sessoes) – Cadastro, ciclo de vida e histórico das sessões legislativas.
 
 Cada módulo possui sua própria documentação, com decisões de modelagem, relacionamentos, regras de negócio e critérios de autorização.
 
@@ -60,7 +63,7 @@ Cada módulo possui sua própria documentação, com decisões de modelagem, rel
 
 O projeto está em desenvolvimento.
 
-A base administrativa e parlamentar está consolidada. O desenvolvimento atual está concentrado no fluxo legislativo, incluindo elaboração, protocolo e tramitação de proposições.
+A base administrativa e parlamentar está consolidada. Os fluxos de elaboração, protocolo e tramitação de proposições estão implementados, assim como o ciclo inicial das sessões legislativas, incluindo convocação, abertura, suspensão, retomada, encerramento, cancelamento e histórico de eventos.
 
 ## Objetivo
 

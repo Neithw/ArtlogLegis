@@ -146,4 +146,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Sessao::class, 'criado_por_id');
     }
+
+    public function eventosSessaoExecutados(): HasMany
+    {
+        return $this->hasMany(SessaoEvento::class, 'executado_por_id');
+    }
 }
