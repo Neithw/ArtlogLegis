@@ -6,6 +6,7 @@ use App\Http\Controllers\LegislaturaController;
 use App\Http\Controllers\MandatoController;
 use App\Http\Controllers\PartidoController;
 use App\Http\Controllers\ProposicaoController;
+use App\Http\Controllers\SessaoController;
 use App\Http\Controllers\TipoProposicaoController;
 use App\Http\Controllers\TramitacaoController;
 use App\Http\Controllers\UnidadeTramitacaoController;
@@ -18,6 +19,7 @@ use App\Models\Legislatura;
 use App\Models\Mandato;
 use App\Models\Partido;
 use App\Models\Proposicao;
+use App\Models\Sessao;
 use App\Models\TipoProposicao;
 use App\Models\Tramitacao;
 use App\Models\UnidadeTramitacao;
@@ -234,5 +236,16 @@ Route::middleware([
         ->middlewareFor(['create', 'store'], 'can:create,' . UnidadeTramitacao::class)
         ->middlewareFor(['edit', 'update'], 'can:update,unidadeTramitacao')
         ->middlewareFor('destroy', 'can:delete,unidadeTramitacao');
+    // -----------------------------------------------------------------------------------------------
+
+    Route::resource('sessoes', SessaoController::class)
+        ->parameters([
+            'sessoes' => 'sessao'
+        ])
+        ->except('destroy')
+        ->middlewareFor('index', 'can:viewAny,' . Sessao::class)
+        ->middlewareFor('show', 'can:view,sessao')
+        ->middlewareFor(['create', 'store'], 'can:create,' . Sessao::class)
+        ->middlewareFor(['edit', 'update'], 'can:update,sessao');
     // -----------------------------------------------------------------------------------------------
 });

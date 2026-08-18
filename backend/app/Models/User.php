@@ -141,4 +141,9 @@ class User extends Authenticatable
         return $this->belongsToMany(UnidadeTramitacao::class, 'unidade_tramitacao_user', 'user_id', 'unidade_tramitacao_id')
             ->withTimestamps();
     }
+
+    public function sessoesCriadas(): HasMany
+    {
+        return $this->hasMany(Sessao::class, 'criado_por_id');
+    }
 }

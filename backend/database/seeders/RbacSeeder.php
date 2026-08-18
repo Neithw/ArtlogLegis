@@ -182,6 +182,18 @@ class RbacSeeder extends Seeder
                 'nome' => 'Receber Tramitações',
                 'codigo' => 'tramitacoes:receber'
             ],
+            [
+                'nome' => 'Visualizar Sessões',
+                'codigo' => 'sessoes:visualizar'
+            ],
+            [
+                'nome' => 'Cadastrar Sessões',
+                'codigo' => 'sessoes:criar'
+            ],
+            [
+                'nome' => 'Editar Sessões',
+                'codigo' => 'sessoes:editar'
+            ],
         ])->each(function (array $permission): void {
             Permissao::updateOrCreate(
                 [

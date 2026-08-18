@@ -69,4 +69,9 @@ class Camara extends Model
     {
         return $this->hasMany(UnidadeTramitacao::class);
     }
+
+    public function sessoes(): HasMany
+    {
+        return $this->hasMany(Sessao::class);
+    }
 }

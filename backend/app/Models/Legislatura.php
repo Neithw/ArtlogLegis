@@ -43,4 +43,9 @@ class Legislatura extends Model
     {
         return $this->hasMany(Proposicao::class);
     }
+
+    public function sessoes(): HasMany
+    {
+        return $this->hasMany(Sessao::class);
+    }
 }
