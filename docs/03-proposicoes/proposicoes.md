@@ -51,6 +51,11 @@ A tabela `proposicoes` possuirá inicialmente:
 - Somente proposições em rascunho poderão ser editadas ou arquivadas.
 - A protocolação e sua numeração serão tratadas em fluxo próprio.
 - Tramitação, documentos, assinaturas e votações serão tratados futuramente.
+- O mandato do autor deverá estar vigente na data da criação, atualização e protocolação da proposição.
+- Um mandato será considerado vigente quando sua data de início for anterior ou igual à data de referência e sua data de término for nula ou posterior ou igual à data de referência.
+- Mandatos futuros, encerrados ou arquivados não poderão ser atribuídos a novas proposições.
+- Rascunhos vinculados a mandatos que deixaram de estar vigentes deverão receber um autor elegível antes de serem atualizados ou protocolados.
+- Proposições já protocoladas preservarão sua autoria histórica mesmo após o encerramento ou arquivamento do mandato.
 
 ## Permissões
 

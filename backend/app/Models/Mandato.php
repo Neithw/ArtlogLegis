@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -27,6 +29,34 @@ class Mandato extends Model
             'data_inicio' => 'date',
             'data_fim' => 'date',
         ];
+    }
+
+    public function scopeVigenteEm(
+        Builder $query,
+        CarbonInterface $data
+    ): Builder {
+        $dataReferencia = $data->toDateString();
+
+        return $query
+            ->whereNull(
+                $query->getModel()->getQualifiedDeletedAtColumn()
+            )
+            ->whereDate('data_inicio', '<=', $dataReferencia)
+            ->where(
+                fn(Builder $query) => $query
+                    ->whereNull('data_fim')
+                    ->orWhereDate('data_fim', '>=', $dataReferencia)
+            );
+    }
+
+    public function estaVigenteEm(CarbonInterface $data): bool
+    {
+        return ! $this->trashed()
+            && $this->data_inicio->lte($data)
+            && (
+                $this->data_fim === null
+                || $this->data_fim->gte($data)
+            );
     }
 
     public function vereador(): BelongsTo

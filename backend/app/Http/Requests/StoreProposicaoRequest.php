@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Mandato;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class StoreProposicaoRequest extends FormRequest
 {
@@ -129,6 +131,44 @@ class StoreProposicaoRequest extends FormRequest
                 'string',
                 'max:100'
             ],
+        ];
+    }
+
+    public function after(): array
+    {
+        return [
+            function (Validator $validator) {
+                if (
+                    $validator->errors()->has('camara_id')
+                    || $validator->errors()->has('legislatura_id')
+                    || $validator->errors()->has('autor_mandato_id')
+                ) {
+                    return;
+                }
+
+                $mandatoValido = Mandato::query()
+                    ->whereKey($this->integer('autor_mandato_id'))
+                    ->where(
+                        'legislatura_id',
+                        $this->integer('legislatura_id')
+                    )
+                    ->vigenteEm(today())
+                    ->whereHas(
+                        'vereador',
+                        fn($query) => $query->where(
+                            'camara_id',
+                            $this->integer('camara_id')
+                        )
+                    )
+                    ->exists();
+
+                if (! $mandatoValido) {
+                    $validator->errors()->add(
+                        'autor_mandato_id',
+                        'O autor principal deve possuir mandato vigente na legislatura selecionada.'
+                    );
+                }
+            },
         ];
     }
 

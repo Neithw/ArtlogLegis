@@ -34,6 +34,15 @@
             'rotas' => ['legislaturas.*', 'vereadores.*', 'partidos.*', 'mandatos.*'],
             'itens' => array_values(
                 array_filter([
+                    $user->can('viewAny', \App\Models\Partido::class)
+                        ? [
+                            'nome' => 'Partidos',
+                            'icone' => 'fa-flag',
+                            'rota' => 'partidos.index',
+                            'rotas' => ['partidos.*'],
+                        ]
+                        : null,
+
                     $user->can('viewAny', \App\Models\Legislatura::class)
                         ? [
                             'nome' => 'Legislaturas',
@@ -49,15 +58,6 @@
                             'icone' => 'fa-user-tie',
                             'rota' => 'vereadores.index',
                             'rotas' => ['vereadores.*'],
-                        ]
-                        : null,
-
-                    $user->can('viewAny', \App\Models\Partido::class)
-                        ? [
-                            'nome' => 'Partidos',
-                            'icone' => 'fa-flag',
-                            'rota' => 'partidos.index',
-                            'rotas' => ['partidos.*'],
                         ]
                         : null,
 

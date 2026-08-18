@@ -13,6 +13,7 @@
             'dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300',
             'dark:hover:bg-neutral-800 dark:hover:text-white',
         ],
+        'edit' => ['bg-amber-500 text-white hover:bg-amber-600', 'dark:bg-amber-600 dark:hover:bg-amber-500'],
         'danger' => ['bg-red-600 text-white hover:bg-red-700', 'dark:bg-red-600 dark:hover:bg-red-500'],
         'warning' => ['bg-amber-500 text-white hover:bg-amber-600', 'dark:bg-amber-600 dark:hover:bg-amber-500'],
         default => ['bg-indigo-600 text-white hover:bg-indigo-700', 'dark:bg-indigo-600 dark:hover:bg-indigo-500'],

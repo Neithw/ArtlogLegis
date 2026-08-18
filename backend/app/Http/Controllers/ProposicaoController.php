@@ -75,6 +75,7 @@ class ProposicaoController extends Controller
             ->get(['id', 'nome', 'camara_id']);
 
         $mandatos = Mandato::query()
+            ->vigenteEm(today())
             ->with('vereador:id,camara_id,nome,nome_parlamentar')
             ->whereHas(
                 'vereador',
@@ -83,7 +84,13 @@ class ProposicaoController extends Controller
                         ->where('camara_id', $usuarioAutenticado->camara_id))
             )
             ->orderBy('legislatura_id')
-            ->get(['id', 'vereador_id', 'legislatura_id']);
+            ->get([
+                'id',
+                'vereador_id',
+                'legislatura_id',
+                'data_inicio',
+                'data_fim'
+            ]);
 
 
         return view('proposicoes.create', compact('camaras', 'legislaturas', 'tiposProposicao', 'mandatos', 'usuarioIsRoot'));
@@ -115,7 +122,14 @@ class ProposicaoController extends Controller
             'protocoladoPor'
         ]);
 
-        return view('proposicoes.show', compact('proposicao'));
+        $autorMandato = $proposicao->autorMandato;
+
+        $autorMandatoVigente = $autorMandato !== null
+            && (int) $autorMandato->legislatura_id === (int) $proposicao->legislatura_id
+            && (int) $autorMandato->vereador?->camara_id === (int) $proposicao->camara_id
+            && $autorMandato->estaVigenteEm(today());
+
+        return view('proposicoes.show', compact('proposicao', 'autorMandatoVigente'));
     }
 
     /**
@@ -158,11 +172,18 @@ class ProposicaoController extends Controller
             )
             ->where(
                 fn($query) => $query
-                    ->whereNull('deleted_at')
+                    ->where(fn($query) => $query->vigenteEm(today()))
                     ->orWhere('id', $proposicao->autor_mandato_id)
             )
             ->orderBy('legislatura_id')
-            ->get(['id', 'vereador_id', 'legislatura_id', 'deleted_at']);
+            ->get([
+                'id',
+                'vereador_id',
+                'legislatura_id',
+                'deleted_at',
+                'data_inicio',
+                'data_fim'
+            ]);
 
         return view('proposicoes.edit', compact('proposicao', 'legislaturas', 'mandatos', 'tiposProposicao'));
     }
@@ -312,9 +333,12 @@ class ProposicaoController extends Controller
                 ]);
             }
 
+            $dataProtocolo = now();
+
             $mandatoValido = Mandato::query()
                 ->whereKey($proposicao->autor_mandato_id)
                 ->where('legislatura_id', $proposicao->legislatura_id)
+                ->vigenteEm($dataProtocolo)
                 ->whereHas(
                     'vereador',
                     fn($query) => $query
@@ -324,11 +348,10 @@ class ProposicaoController extends Controller
 
             if (! $mandatoValido) {
                 throw ValidationException::withMessages([
-                    'protocolo' => 'O mandato do autor não está disponível para protocolo.'
+                    'protocolo' => 'A proposição não pode ser protocolada porque o autor principal não possui mandato vigente.'
                 ]);
             }
 
-            $dataProtocolo = now();
             $ano = (int) $dataProtocolo->format('Y');
 
             $ultimoNumero = Proposicao::withTrashed()

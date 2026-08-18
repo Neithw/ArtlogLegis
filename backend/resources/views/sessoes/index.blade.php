@@ -148,20 +148,6 @@
                                                 Visualizar
                                             </a>
                                         @endcan
-
-                                        @if ($sessao->situacao === 'em_preparacao')
-                                            @can('update', $sessao)
-                                                <a href="{{ route('sessoes.edit', $sessao) }}" wire:navigate.hover
-                                                    class="inline-flex items-center gap-2 rounded-lg px-3 py-2
-                                                       text-sm font-semibold text-slate-600 transition
-                                                       hover:bg-slate-100 hover:text-slate-950
-                                                       dark:text-neutral-300 dark:hover:bg-neutral-800
-                                                       dark:hover:text-white">
-                                                    <i class="fa-solid fa-pen" aria-hidden="true"></i>
-                                                    Editar
-                                                </a>
-                                            @endcan
-                                        @endif
                                     </div>
                                 </td>
                             </tr>

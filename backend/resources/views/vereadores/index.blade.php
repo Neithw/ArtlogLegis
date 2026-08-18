@@ -134,36 +134,6 @@
                                                 Visualizar
                                             </a>
                                         @endcan
-
-                                        @can('update', $vereador)
-                                            <a href="{{ route('vereadores.edit', $vereador) }}" wire:navigate.hover
-                                                class="inline-flex items-center gap-2 rounded-lg px-3 py-2
-                                                       text-sm font-semibold text-slate-600 transition
-                                                       hover:bg-slate-100 hover:text-slate-950
-                                                       dark:text-neutral-300 dark:hover:bg-neutral-800
-                                                       dark:hover:text-white">
-                                                <i class="fa-solid fa-pen" aria-hidden="true"></i>
-                                                Editar
-                                            </a>
-                                        @endcan
-
-                                        @can('delete', $vereador)
-                                            <form action="{{ route('vereadores.destroy', $vereador) }}" method="POST"
-                                                onsubmit="return confirm('Deseja realmente arquivar este vereador?')">
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <button type="submit"
-                                                    class="inline-flex items-center gap-2 rounded-lg px-3 py-2
-                                                           text-sm font-semibold text-red-600 transition
-                                                           hover:bg-red-50 hover:text-red-700
-                                                           dark:text-red-400 dark:hover:bg-red-500/10
-                                                           dark:hover:text-red-300">
-                                                    <i class="fa-solid fa-box-archive" aria-hidden="true"></i>
-                                                    Arquivar
-                                                </button>
-                                            </form>
-                                        @endcan
                                     </div>
                                 </td>
                             </tr>

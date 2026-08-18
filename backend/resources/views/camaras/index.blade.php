@@ -99,7 +99,7 @@
                                     <div class="flex items-center justify-end gap-1">
                                         @can('update', $camara)
                                             <a href="{{ route('camaras.edit', $camara) }}"
-                                                class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
+                                                class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-amber-600 transition hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:text-amber-400 dark:hover:bg-amber-950/40"
                                                 aria-label="Editar {{ $camara->nome }}">
                                                 <i class="fa-solid fa-pen" aria-hidden="true"></i>
                                                 <span class="hidden sm:inline">Editar</span>
@@ -114,7 +114,7 @@
                                                     @method('PATCH')
 
                                                     <button type="submit"
-                                                        class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 dark:text-red-400 dark:hover:bg-red-950/40"
+                                                        class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 dark:text-red-400 dark:hover:bg-red-950/40"
                                                         aria-label="Desativar {{ $camara->nome }}">
                                                         <i class="fa-solid fa-ban" aria-hidden="true"></i>
                                                         <span class="hidden sm:inline">Desativar</span>

@@ -61,13 +61,14 @@
                     <thead>
                         <tr>
                             <th scope="col">Identificação</th>
-                            <th scope="col">Tipo</th>
-                            <th scope="col">Ementa</th>
-                            <th scope="col">Situação</th>
 
                             @if ($usuarioIsRoot)
                                 <th scope="col">Câmara</th>
                             @endif
+
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Ementa</th>
+                            <th scope="col">Situação</th>
 
                             <th scope="col" class="text-right">Ações</th>
                         </tr>
@@ -103,6 +104,12 @@
                                     @endif
                                 </td>
 
+                                @if ($usuarioIsRoot)
+                                    <td>
+                                        {{ $proposicao->camara?->nome ?? 'Câmara indisponível' }}
+                                    </td>
+                                @endif
+
                                 <td>
                                     {{ $proposicao->tipoProposicao?->nome ?? 'Tipo indisponível' }}
                                 </td>
@@ -118,12 +125,6 @@
                                         {{ $situacao }}
                                     </x-ui::badge>
                                 </td>
-
-                                @if ($usuarioIsRoot)
-                                    <td>
-                                        {{ $proposicao->camara?->nome ?? 'Câmara indisponível' }}
-                                    </td>
-                                @endif
 
                                 <td class="text-right">
                                     @can('view', $proposicao)

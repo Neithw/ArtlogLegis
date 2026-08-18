@@ -2,6 +2,8 @@
     $editando = isset($proposicao);
     $usuarioIsRoot = auth()->user()->isRoot();
 
+    $hoje = today();
+
     $camaraIdInicial = (string) old(
         'camara_id',
         $editando ? $proposicao->camara_id : ($usuarioIsRoot ? '' : auth()->user()->camara_id),
@@ -42,7 +44,17 @@
                 'camara_id' => $mandato->vereador->camara_id,
                 'legislatura_id' => $mandato->legislatura_id,
                 'nome' => $mandato->vereador->nome_parlamentar ?: $mandato->vereador->nome,
-                'arquivado' => $mandato->trashed(),
+
+                'elegivel' => $mandato->estaVigenteEm($hoje),
+
+                'situacao' => match (true) {
+                    $mandato->trashed() => 'mandato arquivado',
+                    $mandato->data_inicio->gt($hoje) => 'mandato futuro',
+
+                    $mandato->data_fim && $mandato->data_fim->lt($hoje) => 'mandato encerrado',
+
+                    default => null,
+                },
             ],
         )
         ->values();
@@ -73,8 +85,24 @@
         return this.mandatos.filter(
             mandato =>
             String(mandato.camara_id) === String(this.camaraId) &&
-            String(mandato.legislatura_id) === String(this.legislaturaId)
+            String(mandato.legislatura_id) === String(this.legislaturaId) &&
+            (
+                mandato.elegivel ||
+                String(mandato.id) === String(this.autorMandatoId)
+            )
         );
+    },
+
+    get autorMandatoSelecionado() {
+        return this.mandatos.find(
+            mandato =>
+            String(mandato.id) === String(this.autorMandatoId)
+        );
+    },
+
+    get autorMandatoIndisponivel() {
+        return this.autorMandatoSelecionado &&
+            !this.autorMandatoSelecionado.elegivel;
     },
 
     alterarCamara() {
@@ -150,14 +178,20 @@
 
             <template x-for="mandato in mandatosFiltrados" :key="mandato.id">
                 <option :value="String(mandato.id)" :selected="String(mandato.id) === String(autorMandatoId)"
-                    x-text="`${mandato.nome}${mandato.arquivado ? ' (arquivado)' : ''}`">
+                    x-text="mandato.nome + (mandato.situacao ? ` (${mandato.situacao})` : '')">
                 </option>
             </template>
         </x-ui::select>
 
+        <p x-cloak x-show="autorMandatoIndisponivel" class="mt-1.5 text-sm text-amber-700 dark:text-amber-300">
+
+            O mandato atualmente vinculado não está vigente.
+            Selecione outro autor para salvar ou protocolar a proposição.
+        </p>
+
         <p x-cloak x-show="legislaturaId && mandatosFiltrados.length === 0"
             class="mt-1.5 text-sm text-slate-500 dark:text-neutral-500">
-            Nenhum mandato disponível para esta legislatura.
+            Nenhum mandato vigente disponível para esta legislatura.
         </p>
     </div>
 

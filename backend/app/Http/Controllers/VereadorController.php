@@ -85,8 +85,9 @@ class VereadorController extends Controller
     public function show(Vereador $vereador): View
     {
         $vereador->load([
-            'camara:id,nome',
-            'user:id,name,email,ativo,deleted_at'
+            'camara',
+            'user',
+            'mandatos.legislatura'
         ]);
 
         return view('vereadores.show', compact('vereador'));
