@@ -218,6 +218,10 @@ class RbacSeeder extends Seeder
                 'nome' => 'Cancelar Sessões',
                 'codigo' => 'sessoes:cancelar'
             ],
+            [
+                'nome' => 'Gerenciar Pauta das Sessões',
+                'codigo' => 'sessoes:gerenciar-pauta',
+            ],
         ])->each(function (array $permission): void {
             Permissao::updateOrCreate(
                 [

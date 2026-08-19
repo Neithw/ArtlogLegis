@@ -151,4 +151,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(SessaoEvento::class, 'executado_por_id');
     }
+
+    public function itensPautaIncluidos(): HasMany
+    {
+        return $this->hasMany(ItemPauta::class, 'incluido_por_id');
+    }
 }

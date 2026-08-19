@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CamaraController;
 use App\Http\Controllers\FiliacaoPartidariaController;
+use App\Http\Controllers\ItemPautaController;
 use App\Http\Controllers\LegislaturaController;
 use App\Http\Controllers\MandatoController;
 use App\Http\Controllers\PartidoController;
@@ -261,6 +262,18 @@ Route::middleware([
     Route::patch('/sessoes/{sessao}/cancelar', [SessaoController::class, 'cancelar'])
         ->middleware('can:cancelar,sessao')
         ->name('sessoes.cancelar');
+
+    Route::post('/sessoes/{sessao}/pauta', [ItemPautaController::class, 'store'])
+        ->middleware('can:gerenciarPauta,sessao')
+        ->name('sessoes.pauta.store');
+
+    Route::delete('/sessoes/{sessao}/pauta/{itemPauta}', [ItemPautaController::class, 'destroy'])
+        ->middleware('can:gerenciarPauta,sessao')
+        ->name('sessoes.pauta.destroy');
+
+    Route::patch('/sessoes/{sessao}/pauta/{itemPauta}/mover', [ItemPautaController::class, 'mover'])
+        ->middleware('can:gerenciarPauta,sessao')
+        ->name('sessoes.pauta.mover');
 
     Route::resource('sessoes', SessaoController::class)
         ->parameters([

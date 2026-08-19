@@ -9,7 +9,8 @@ Toda sessão será cadastrada inicialmente em preparação, sem número e ano of
 A numeração e o ano oficiais serão atribuídos durante o fluxo de convocação.
 Sessões não poderão ser arquivadas ou excluídas, preservando seu valor histórico.
 O ciclo inicial da sessão contempla convocação, abertura, suspensão, retomada, encerramento e cancelamento.
-Pauta, presença e votações serão implementadas em etapas próprias.
+Pauta, presença e votações são tratadas como etapas próprias do domínio.
+O gerenciamento da pauta está documentado separadamente em `pauta.md`.
 
 ## Estrutura
 
@@ -102,7 +103,7 @@ As mudanças de situação são realizadas exclusivamente por ações específic
 - sessões encerradas ou canceladas são estados finais;
 - a situação não pode ser alterada diretamente pelos formulários de cadastro e edição.
 
-A convocação atribui o número e o ano oficiais da sessão, respeitando a sequência definida para a Câmara.
+A convocação atribui o número e o ano oficiais da sessão, utilizando uma sequência independente por legislatura, tipo de sessão e ano.
 
 Cada mudança de situação gera um evento contendo:
 
@@ -128,5 +129,6 @@ O módulo utiliza permissões específicas para consulta, manutenção e mudanç
 - `sessoes:retomar`
 - `sessoes:encerrar`
 - `sessoes:cancelar`
+- `sessoes:gerenciar-pauta`
 
 As Policies combinam a permissão do usuário com o escopo da Câmara e a situação atual da sessão.

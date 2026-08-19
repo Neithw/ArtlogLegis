@@ -413,9 +413,9 @@
                                                 class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-neutral-400">
                                                 Despacho
                                             </p>
-                                            <p
-                                                class="mt-1 whitespace-pre-line text-sm leading-6 text-slate-700 dark:text-neutral-300">
-                                                {{ $tramitacao->despacho }}</p>
+
+                                            {{-- blade-formatter-disable-next-line --}}
+                                            <p class="mt-1 whitespace-pre-line text-sm leading-6 text-slate-700 dark:text-neutral-300">{{ $tramitacao->despacho }}</p>
                                         </div>
                                     @endif
 

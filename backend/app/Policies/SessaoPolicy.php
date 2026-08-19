@@ -90,6 +90,13 @@ class SessaoPolicy
             );
     }
 
+    public function gerenciarPauta(User $user, Sessao $sessao): bool
+    {
+        return $this->pertenceAoEscopo($user, $sessao)
+            && $user->hasPermission('sessoes:gerenciar-pauta')
+            && $sessao->situacao === 'em_preparacao';
+    }
+
     private function possuiCamara(User $user): bool
     {
         return $user->camara_id !== null;

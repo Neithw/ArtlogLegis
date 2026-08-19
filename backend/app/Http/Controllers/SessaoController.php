@@ -8,6 +8,7 @@ use App\Http\Requests\SuspenderSessaoRequest;
 use App\Http\Requests\UpdateSessaoRequest;
 use App\Models\Camara;
 use App\Models\Legislatura;
+use App\Models\Proposicao;
 use App\Models\Sessao;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -75,18 +76,51 @@ class SessaoController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Sessao $sessao): View
+    public function show(Request $request, Sessao $sessao): View
     {
         $sessao->load([
             'camara:id,nome',
             'legislatura:id,numero,data_inicio,data_fim',
             'criadoPor:id,name',
+
+            'itensPauta.proposicao:id,tipo_proposicao_id,numero,ano,ementa',
+            'itensPauta.proposicao.tipoProposicao:id,nome',
+            'itensPauta.incluidoPor:id,name',
+
             'eventos' => fn($query) => $query
                 ->with('executadoPor:id,name')
                 ->orderByDesc('created_at')
         ]);
 
-        return view('sessoes.show', compact('sessao'));
+        $podeGerenciarPauta =
+            $sessao->situacao === 'em_preparacao'
+            && $request->user()->can('gerenciarPauta', $sessao);
+
+        $proposicoesDisponiveis = collect();
+
+        if ($podeGerenciarPauta) {
+            $proposicoesDisponiveis = Proposicao::query()
+                ->with('tipoProposicao:id,nome')
+                ->where('camara_id', $sessao->camara_id)
+                ->where('legislatura_id', $sessao->legislatura_id)
+                ->where('situacao', 'protocolada')
+                ->whereDoesntHave(
+                    'itensPauta',
+                    fn($query) => $query
+                        ->where('sessao_id', $sessao->id)
+                )
+                ->orderByDesc('ano')
+                ->orderBy('numero')
+                ->get([
+                    'id',
+                    'tipo_proposicao_id',
+                    'numero',
+                    'ano',
+                    'ementa'
+                ]);
+        }
+
+        return view('sessoes.show', compact('sessao', 'podeGerenciarPauta', 'proposicoesDisponiveis'));
     }
 
     /**

@@ -69,4 +69,10 @@ class Sessao extends Model
     {
         return $this->hasMany(SessaoEvento::class);
     }
+
+    public function itensPauta(): HasMany
+    {
+        return $this->hasMany(ItemPauta::class)
+            ->orderBy('ordem');
+    }
 }

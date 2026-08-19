@@ -83,4 +83,9 @@ class Proposicao extends Model
             'id' => 'max'
         ]);
     }
+
+    public function itensPauta(): HasMany
+    {
+        return $this->hasMany(ItemPauta::class);
+    }
 }
