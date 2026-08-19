@@ -69,3 +69,39 @@ A base administrativa e parlamentar está consolidada. Os fluxos de elaboração
 ## Objetivo
 
 Construir uma plataforma capaz de acompanhar o ciclo legislativo municipal de forma organizada, segura e rastreável, servindo tanto à gestão interna quanto à futura transparência pública.
+
+## Instalação e execução
+
+1. Clonar o repositório
+    - `git clone https://github.com/Neithw/ArtlogLegis.git`
+    - `cd ArtlogLegis`
+
+2. Criar os arquivos de ambiente
+    - `cp .env.example .env`
+    - `cp backend/.env.example backend/.env`
+
+3. Construir as imagens
+    - `docker compose build`
+
+4. Instalar as dependências PHP
+    - `docker compose run --rm --no-deps app composer install`
+
+5. Instalar as dependências JavaScript
+    - `docker compose run --rm --no-deps vite npm ci`
+
+6. Gerar a chave da aplicação
+    - `docker compose run --rm --no-deps app php artisan key:generate`
+
+7. Iniciar os containers
+    - `docker compose up -d`
+
+8. Preparar o banco de dados (migrations e seeders)
+    - `docker compose exec app php artisan migrate --seed`
+
+9. A aplicação estará disponível em:
+    - `http://localhost:8001`
+
+Os seeders criam um usuário root para o ambiente de desenvolvimento:
+
+- E-mail: `root@sistema.test`
+- Senha: `password`
