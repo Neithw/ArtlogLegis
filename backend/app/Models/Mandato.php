@@ -92,4 +92,9 @@ class Mandato extends Model
         return $this->hasMany(Proposicao::class, 'autor_mandato_id')
             ->withTrashed();
     }
+
+    public function presencas(): HasMany
+    {
+        return $this->hasMany(SessaoPresenca::class);
+    }
 }

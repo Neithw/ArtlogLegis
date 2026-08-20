@@ -8,6 +8,7 @@ use App\Http\Requests\SuspenderSessaoRequest;
 use App\Http\Requests\UpdateSessaoRequest;
 use App\Models\Camara;
 use App\Models\Legislatura;
+use App\Models\Mandato;
 use App\Models\Proposicao;
 use App\Models\Sessao;
 use Illuminate\Contracts\View\View;
@@ -87,6 +88,9 @@ class SessaoController extends Controller
             'itensPauta.proposicao.tipoProposicao:id,nome',
             'itensPauta.incluidoPor:id,name',
 
+            'presencas.registradoPor:id,name',
+            'presencas.atualizadoPor:id,name',
+
             'eventos' => fn($query) => $query
                 ->with('executadoPor:id,name')
                 ->orderByDesc('created_at')
@@ -120,7 +124,56 @@ class SessaoController extends Controller
                 ]);
         }
 
-        return view('sessoes.show', compact('sessao', 'podeGerenciarPauta', 'proposicoesDisponiveis'));
+        $presencasPorMandato = $sessao->presencas
+            ->keyBy('mandato_id');
+
+        $deveExibirPresencas =
+            in_array(
+                $sessao->situacao,
+                ['convocada', 'aberta', 'suspensa', 'encerrada'],
+                true
+            )
+            || (
+                $sessao->situacao === 'cancelada'
+                && $presencasPorMandato->isNotEmpty()
+            );
+
+        $podeGerenciarPresencas =
+            in_array(
+                $sessao->situacao,
+                ['convocada', 'aberta', 'suspensa'],
+                true
+            )
+            && $request->user()->can('gerenciarPresencas', $sessao);
+
+        $mandatos = collect();
+
+        if ($deveExibirPresencas) {
+            $mandatos = Mandato::query()
+                ->with('vereador:id,nome,nome_parlamentar')
+                ->where('legislatura_id', $sessao->legislatura_id)
+                ->whereHas(
+                    'vereador',
+                    fn($query) => $query
+                        ->where('camara_id', $sessao->camara_id)
+                )
+                ->vigenteEm($sessao->data_hora_inicio_previsto)
+                ->get()
+                ->sortBy(
+                    fn(Mandato $mandato) => $mandato->vereador->nome_parlamentar ?: $mandato->vereador->nome
+                )
+                ->values();
+        }
+
+        return view('sessoes.show', compact(
+            'sessao',
+            'podeGerenciarPauta',
+            'proposicoesDisponiveis',
+            'mandatos',
+            'presencasPorMandato',
+            'podeGerenciarPresencas',
+            'deveExibirPresencas'
+        ));
     }
 
     /**

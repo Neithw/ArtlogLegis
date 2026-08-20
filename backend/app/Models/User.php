@@ -156,4 +156,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(ItemPauta::class, 'incluido_por_id');
     }
+
+    public function presencasRegistradas(): HasMany
+    {
+        return $this->hasMany(SessaoPresenca::class, 'registrado_por_id');
+    }
+
+    public function presencasAtualizadas(): HasMany
+    {
+        return $this->hasMany(SessaoPresenca::class, 'atualizado_por_id');
+    }
 }

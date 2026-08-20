@@ -222,6 +222,10 @@ class RbacSeeder extends Seeder
                 'nome' => 'Gerenciar Pauta das Sessões',
                 'codigo' => 'sessoes:gerenciar-pauta',
             ],
+            [
+                'nome' => 'Gerenciar Presenças das Sessões',
+                'codigo' => 'sessoes:gerenciar-presencas',
+            ],
         ])->each(function (array $permission): void {
             Permissao::updateOrCreate(
                 [

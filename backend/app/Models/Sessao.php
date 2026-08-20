@@ -75,4 +75,9 @@ class Sessao extends Model
         return $this->hasMany(ItemPauta::class)
             ->orderBy('ordem');
     }
+
+    public function presencas(): HasMany
+    {
+        return $this->hasMany(SessaoPresenca::class);
+    }
 }

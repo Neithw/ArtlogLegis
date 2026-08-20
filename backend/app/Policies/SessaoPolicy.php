@@ -97,6 +97,17 @@ class SessaoPolicy
             && $sessao->situacao === 'em_preparacao';
     }
 
+    public function gerenciarPresencas(User $user, Sessao $sessao): bool
+    {
+        return $this->pertenceAoEscopo($user, $sessao)
+            && $user->hasPermission('sessoes:gerenciar-presencas')
+            && in_array(
+                $sessao->situacao,
+                ['convocada', 'aberta', 'suspensa'],
+                true
+            );
+    }
+
     private function possuiCamara(User $user): bool
     {
         return $user->camara_id !== null;

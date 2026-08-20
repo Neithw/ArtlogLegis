@@ -3,6 +3,8 @@ import {
     Alpine,
 } from '../../vendor/livewire/livewire/dist/livewire.esm';
 
+import presencasSessao from './components/presencasSessao';
+
 Alpine.data('formularioUsuario', ({
     pacotes = {},
     papelInicial = '',
@@ -367,6 +369,8 @@ Alpine.data('pautaOrdenavel', () => ({
             ?? 'Não foi possível atualizar a ordem da pauta.';
     }
 }));
+
+Alpine.data('presencasSessao', presencasSessao);
 
 Alpine.store('layout', {
     darkMode: document.documentElement.classList.contains('dark'),

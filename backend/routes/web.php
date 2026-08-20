@@ -8,6 +8,7 @@ use App\Http\Controllers\MandatoController;
 use App\Http\Controllers\PartidoController;
 use App\Http\Controllers\ProposicaoController;
 use App\Http\Controllers\SessaoController;
+use App\Http\Controllers\SessaoPresencaController;
 use App\Http\Controllers\TipoProposicaoController;
 use App\Http\Controllers\TramitacaoController;
 use App\Http\Controllers\UnidadeTramitacaoController;
@@ -274,6 +275,10 @@ Route::middleware([
     Route::patch('/sessoes/{sessao}/pauta/{itemPauta}/mover', [ItemPautaController::class, 'mover'])
         ->middleware('can:gerenciarPauta,sessao')
         ->name('sessoes.pauta.mover');
+
+    Route::put('/sessoes/{sessao}/presencas/{mandato}', [SessaoPresencaController::class, 'salvar'])
+        ->middleware('can:gerenciarPresencas,sessao')
+        ->name('sessoes.presencas.salvar');
 
     Route::resource('sessoes', SessaoController::class)
         ->parameters([
