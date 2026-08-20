@@ -128,7 +128,7 @@
                dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-200">
         <div class="flex items-center gap-3">
             {{-- Hambúrguer somente no celular --}}
-            <button type="button" @click="$store.layout.sidebarOpen = !$store.layout.sidebarOpen"
+            <button type="button" @click="$store.layout.toggleSidebar()"
                 class="inline-flex size-10 items-center justify-center rounded-lg
                        text-slate-500 transition hover:bg-slate-100 hover:text-slate-900
                        focus:outline-none focus:ring-2 focus:ring-indigo-500
@@ -260,11 +260,11 @@
            dark:border-neutral-800 dark:bg-neutral-900
            lg:translate-x-0 lg:shadow-none">
         {{-- Cabeçalho da sidebar --}}
-        <div class="flex h-20 shrink-0 items-center justify-between
-                   border-b border-slate-200 px-4
-                   dark:border-neutral-800"
-            :class="$store.layout.sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''">
-            <div data-sidebar-label class="min-w-0" :class="$store.layout.sidebarLabelsVisible ? '' : 'lg:hidden'">
+        <div
+            class="relative flex h-20 shrink-0 items-center
+           border-b border-slate-200 ps-4 pe-16
+           dark:border-neutral-800">
+            <div data-sidebar-label class="min-w-0">
                 <p class="font-semibold text-slate-800 dark:text-neutral-100">
                     Menu
                 </p>
@@ -274,21 +274,17 @@
                 </p>
             </div>
 
-            <button type="button"
-                @click="
-                    if (window.innerWidth >= 1024) {
-                        $store.layout.toggleSidebar();
-                    } else {
-                        $store.layout.sidebarOpen = false;
-                    }
-                "
-                class="inline-flex size-9 shrink-0 items-center justify-center
-                       rounded-lg bg-slate-100 text-slate-500 transition
-                       hover:bg-slate-200 hover:text-slate-900
-                       focus:outline-none focus:ring-2 focus:ring-indigo-500
-                       dark:bg-neutral-800 dark:text-neutral-400
-                       dark:hover:bg-slate-700 dark:hover:text-white"
-                :title="$store.layout.sidebarCollapsed ? 'Expandir menu' : 'Recolher menu'">
+            <button type="button" @click="$store.layout.toggleSidebar()"
+                class="sidebar-toggle absolute right-4 inline-flex size-9
+               items-center justify-center rounded-lg
+               bg-slate-100 text-slate-500
+               hover:bg-slate-200 hover:text-slate-900
+               focus:outline-none focus:ring-2 focus:ring-indigo-500
+               dark:bg-neutral-800 dark:text-neutral-400
+               dark:hover:bg-slate-700 dark:hover:text-white"
+                :title="$store.layout.sidebarCollapsed ?
+                    'Expandir menu' :
+                    'Recolher menu'">
                 <span class="inline-flex lg:hidden">
                     <i class="fa-solid fa-xmark fa-fw"></i>
                 </span>
@@ -308,16 +304,14 @@
             <a href="{{ route('dashboard') }}" wire:navigate.hover
                 wire:current.exact="!bg-indigo-50 !text-indigo-700 dark:!bg-neutral-800 dark:!text-white"
                 @click="$store.layout.sidebarOpen = false" title="Visão geral"
-                :class="$store.layout.sidebarCollapsed ? 'lg:justify-center lg:px-0' : ''"
-                class="flex items-center gap-3 rounded-lg px-3 py-2.5
-           text-sm font-medium text-slate-600 transition
-           hover:bg-slate-100 hover:text-slate-950
-           dark:text-neutral-400 dark:hover:bg-neutral-800
-           dark:hover:text-white">
+                class="flex items-center gap-3 rounded-lg px-4 py-2.5
+                        text-sm font-medium text-slate-600 transition
+                        hover:bg-slate-100 hover:text-slate-950
+                        dark:text-neutral-400 dark:hover:bg-neutral-800
+                        dark:hover:text-white">
                 <i class="fa-solid fa-table-cells-large fa-fw shrink-0 text-base"></i>
 
-                <span data-sidebar-label class="whitespace-nowrap"
-                    :class="$store.layout.sidebarLabelsVisible ? '' : 'lg:hidden'">
+                <span data-sidebar-label class="whitespace-nowrap">
                     Visão geral
                 </span>
             </a>
@@ -325,61 +319,59 @@
             {{-- Grupos --}}
             @foreach ($grupos as $grupo)
                 @if (count($grupo['itens']) > 0)
-                    <div x-data="{
-                        open: {{ request()->routeIs(...$grupo['rotas']) ? 'true' : 'false' }}
-                    }">
-                        <button type="button"
-                            @click="
-                                if ($store.layout.sidebarCollapsed && window.innerWidth >= 1024) {
-                                    $store.layout.toggleSidebar();
-                                    open = true;
-                                } else {
-                                    open = !open;
-                                }
-                            "
-                            :aria-expanded="open"
-                            :class="$store.layout.sidebarCollapsed ? 'lg:justify-center lg:px-0' : ''"
-                            class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5
-                                   text-sm font-medium text-slate-600 transition
-                                   hover:bg-slate-100 hover:text-slate-950
-                                   dark:text-neutral-400 dark:hover:bg-slate-800
-                                   dark:hover:text-white"
+                    <div x-data="grupoSidebar(
+                        @js(request()->routeIs(...$grupo['rotas']))
+                    )">
+                        <button type="button" @click="alternar()" :aria-expanded="aberto"
+                            class="flex w-full items-center gap-3 rounded-lg px-4 py-2.5
+                                    text-sm font-medium text-slate-600 transition
+                                    hover:bg-slate-100 hover:text-slate-950
+                                    dark:text-neutral-400 dark:hover:bg-slate-800
+                                    dark:hover:text-white"
                             title="{{ $grupo['nome'] }}">
                             <i
                                 class="fa-solid {{ $grupo['icone'] }}
-                                       fa-fw shrink-0 text-base"></i>
+                           fa-fw shrink-0 text-base"></i>
 
-                            <span data-sidebar-label class="flex min-w-0 flex-1 items-center justify-between gap-2"
-                                :class="$store.layout.sidebarLabelsVisible ? '' : 'lg:hidden'">
+                            <span data-sidebar-label
+                                class="flex min-w-0 flex-1 items-center
+                           justify-between gap-2">
                                 <span class="truncate">
                                     {{ $grupo['nome'] }}
                                 </span>
 
                                 <i class="fa-solid fa-chevron-down fa-fw shrink-0
-                                           text-xs transition-transform"
-                                    :class="open ? 'rotate-180' : ''"></i>
+                               text-xs transition-transform"
+                                    :class="aberto ? 'rotate-180' : ''"></i>
                             </span>
                         </button>
 
-                        <div x-show="open" data-sidebar-label
-                            @if (!request()->routeIs(...$grupo['rotas'])) style="display: none" @endif
-                            :class="$store.layout.sidebarLabelsVisible ? '' : 'lg:hidden'" class="mt-1 space-y-1 ps-4">
-                            @foreach ($grupo['itens'] as $item)
-                                <a href="{{ route($item['rota']) }}" wire:navigate.hover
-                                    wire:current="!bg-indigo-50 !text-indigo-700 font-medium dark:!bg-neutral-800 dark:!text-white"
-                                    @click="$store.layout.sidebarOpen = false"
-                                    class="flex items-center gap-3 rounded-lg px-3 py-2
-           text-sm text-slate-600 transition
-           hover:bg-slate-100 hover:text-slate-950
-           dark:text-neutral-400 dark:hover:bg-neutral-800
-           dark:hover:text-white">
-                                    <i
-                                        class="fa-solid {{ $item['icone'] }}
-                                               fa-fw shrink-0 text-sm"></i>
+                        <div x-cloak x-show="aberto && !$store.layout.sidebarCollapsed" x-collapse.duration.240ms
+                            data-sidebar-submenu class="mt-1">
+                            <div :class="$store.layout.sidebarCollapsed ?
+                                'opacity-0 delay-0 duration-75' :
+                                'opacity-100 delay-150 duration-100'"
+                                class="space-y-1 ps-4 transition-opacity ease-out">
+                                @foreach ($grupo['itens'] as $item)
+                                    <a href="{{ route($item['rota']) }}" wire:navigate.hover
+                                        wire:current="!bg-indigo-50 !text-indigo-700 font-medium dark:!bg-neutral-800 dark:!text-white"
+                                        @click="$store.layout.sidebarOpen = false"
+                                        class="flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2
+                       text-sm text-slate-600 transition-colors
+                       hover:bg-slate-100 hover:text-slate-950
+                       dark:text-neutral-400
+                       dark:hover:bg-neutral-800
+                       dark:hover:text-white">
+                                        <i
+                                            class="fa-solid {{ $item['icone'] }}
+                           fa-fw shrink-0 text-sm"></i>
 
-                                    <span>{{ $item['nome'] }}</span>
-                                </a>
-                            @endforeach
+                                        <span class="min-w-0 truncate whitespace-nowrap">
+                                            {{ $item['nome'] }}
+                                        </span>
+                                    </a>
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 @endif

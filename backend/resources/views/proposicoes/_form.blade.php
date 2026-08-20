@@ -60,65 +60,19 @@
         ->values();
 @endphp
 
-<div class="grid gap-6 p-4 sm:p-6 md:grid-cols-2" x-data="{
-    camaraId: @js($camaraIdInicial),
-    legislaturaId: @js($legislaturaIdInicial),
-    tipoProposicaoId: @js($tipoProposicaoIdInicial),
-    autorMandatoId: @js($autorMandatoIdInicial),
-    legislaturas: @js($legislaturasAlpine),
-    tiposProposicao: @js($tiposProposicaoAlpine),
-    mandatos: @js($mandatosAlpine),
-
-    get legislaturasFiltradas() {
-        return this.legislaturas.filter(
-            legislatura => String(legislatura.camara_id) === String(this.camaraId)
-        );
-    },
-
-    get tiposProposicaoFiltrados() {
-        return this.tiposProposicao.filter(
-            tipo => String(tipo.camara_id) === String(this.camaraId)
-        );
-    },
-
-    get mandatosFiltrados() {
-        return this.mandatos.filter(
-            mandato =>
-            String(mandato.camara_id) === String(this.camaraId) &&
-            String(mandato.legislatura_id) === String(this.legislaturaId) &&
-            (
-                mandato.elegivel ||
-                String(mandato.id) === String(this.autorMandatoId)
-            )
-        );
-    },
-
-    get autorMandatoSelecionado() {
-        return this.mandatos.find(
-            mandato =>
-            String(mandato.id) === String(this.autorMandatoId)
-        );
-    },
-
-    get autorMandatoIndisponivel() {
-        return this.autorMandatoSelecionado &&
-            !this.autorMandatoSelecionado.elegivel;
-    },
-
-    alterarCamara() {
-        this.legislaturaId = '';
-        this.tipoProposicaoId = '';
-        this.autorMandatoId = '';
-    },
-
-    alterarLegislatura() {
-        this.autorMandatoId = '';
-    },
-}">
+<div class="grid gap-6 p-4 sm:p-6 md:grid-cols-2" x-data="formularioProposicao(@js([
+    'camaraId' => $camaraIdInicial,
+    'legislaturaId' => $legislaturaIdInicial,
+    'tipoProposicaoId' => $tipoProposicaoIdInicial,
+    'autorMandatoId' => $autorMandatoIdInicial,
+    'legislaturas' => $legislaturasAlpine,
+    'tiposProposicao' => $tiposProposicaoAlpine,
+    'mandatos' => $mandatosAlpine,
+]))">
     @if ($usuarioIsRoot)
         @if (!$editando)
             <div class="md:col-span-2">
-                <x-ui::select name="camara_id" label="Câmara" x-model="camaraId" x-on:change="alterarCamara" required>
+                <x-ui::select name="camara_id" label="Câmara" x-model="camaraId" x-on:change="alterarCamara()" required>
                     <option value="">Selecione uma Câmara</option>
 
                     @foreach ($camaras as $camara)
@@ -149,7 +103,7 @@
         @endif
     @endif
 
-    <x-ui::select name="legislatura_id" label="Legislatura" x-model="legislaturaId" x-on:change="alterarLegislatura"
+    <x-ui::select name="legislatura_id" label="Legislatura" x-model="legislaturaId" x-on:change="alterarLegislatura()"
         x-bind:disabled="!camaraId" required>
         <option value="">Selecione uma legislatura</option>
 

@@ -8,26 +8,43 @@
 
     <title>{{ config('app.name', 'ArtLog Legis') }}</title>
 
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
-
     <script>
-        const temaSalvo = localStorage.getItem('theme');
+        (() => {
+            const temaSalvo = localStorage.getItem('theme');
 
-        const usarTemaEscuro =
-            temaSalvo === 'dark' ||
-            (
-                temaSalvo === null &&
-                window.matchMedia('(prefers-color-scheme: dark)').matches
+            const usarTemaEscuro =
+                temaSalvo === 'dark' ||
+                (
+                    temaSalvo === null &&
+                    window.matchMedia('(prefers-color-scheme: dark)').matches
+                );
+
+            document.documentElement.classList.toggle(
+                'dark',
+                usarTemaEscuro
             );
 
-        document.documentElement.classList.toggle('dark', usarTemaEscuro);
-
-        document.documentElement.classList.toggle(
-            'sidebar-collapsed',
-            localStorage.getItem('sidebar-collapsed') === 'true'
-        );
+            document.documentElement.classList.toggle(
+                'sidebar-collapsed',
+                localStorage.getItem('sidebar-collapsed') === 'true'
+            );
+        })();
     </script>
+
+    <style>
+        html {
+            background-color: #f1f5f9;
+            color-scheme: light;
+        }
+
+        html.dark {
+            background-color: #0a0a0a;
+            color-scheme: dark;
+        }
+    </style>
+
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 

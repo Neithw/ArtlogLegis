@@ -1,47 +1,13 @@
 @php
     $palavrasChaveIniciais = collect(old('palavras_chave', isset($proposicao) ? $proposicao->palavras_chave ?? [] : []))
         ->filter(fn($valor) => is_string($valor) && trim($valor) !== '')
-        ->map(
-            fn($valor, $indice) => [
-                'id' => $indice + 1,
-                'valor' => trim($valor),
-            ],
-        )
+        ->map(fn($valor) => trim($valor))
         ->values();
 @endphp
 
-<div class="md:col-span-2" x-data="{
-    proximoId: {{ $palavrasChaveIniciais->count() + 1 }},
-    novaPalavra: '',
-    palavrasChave: @js($palavrasChaveIniciais),
-
-    adicionarPalavraChave() {
-        const valor = this.novaPalavra.trim();
-
-        if (!valor) {
-            return;
-        }
-
-        const repetida = this.palavrasChave.some(
-            palavra => palavra.valor.toLowerCase() === valor.toLowerCase()
-        );
-
-        if (!repetida) {
-            this.palavrasChave.push({
-                id: this.proximoId++,
-                valor,
-            });
-        }
-
-        this.novaPalavra = '';
-    },
-
-    removerPalavraChave(id) {
-        this.palavrasChave = this.palavrasChave.filter(
-            palavra => palavra.id !== id
-        );
-    },
-}">
+<div class="md:col-span-2" x-data="campoPalavrasChave(
+    @js($palavrasChaveIniciais)
+)">
     <label for="nova_palavra_chave" class="block text-sm font-medium text-slate-700 dark:text-neutral-300">
         Palavras-chave
     </label>

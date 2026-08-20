@@ -22,26 +22,17 @@
 @endphp
 
 <div class="grid gap-6 p-4 sm:p-6 md:grid-cols-2"
-    @if ($usarFiltroCamara) x-data="{
-        camaraSelecionada: @js($camaraSelecionada),
-        legislaturaSelecionada: @js($legislaturaSelecionada),
-        legislaturas: @js($legislaturasParaAlpine),
+    @if ($usarFiltroCamara) x-data="formularioSessao(@js([
+    'camaraSelecionada' => $camaraSelecionada,
+    'legislaturaSelecionada' => $legislaturaSelecionada,
+    'legislaturas' => $legislaturasParaAlpine,
+]))" @endif>
 
-        get legislaturasFiltradas() {
-            if (! this.camaraSelecionada) {
-                return [];
-            }
-
-            return this.legislaturas.filter(
-                legislatura => legislatura.camara_id === this.camaraSelecionada
-            );
-        }
-    }" @endif>
     @if ($usuarioIsRoot)
         @if (!$edicao)
             <div class="md:col-span-2">
-                <x-ui::select name="camara_id" label="Câmara" x-model="camaraSelecionada"
-                    x-on:change="legislaturaSelecionada = ''" required>
+                <x-ui::select name="camara_id" label="Câmara" x-model="camaraSelecionada" x-on:change="alterarCamara()"
+                    required>
                     <option value="">
                         Selecione uma Câmara
                     </option>

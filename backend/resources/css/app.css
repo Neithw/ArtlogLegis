@@ -10,6 +10,8 @@
 
 :root {
     --app-sidebar-width: 16rem;
+    --app-layout-duration: 240ms;
+    --app-layout-easing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 :root.sidebar-collapsed {
@@ -29,33 +31,76 @@
         left: var(--app-sidebar-width);
     }
 
+    [data-sidebar-label] {
+        max-width: 14rem;
+        overflow: hidden;
+        opacity: 1;
+        white-space: nowrap;
+        transition:
+            max-width 220ms var(--app-layout-easing),
+            opacity 120ms ease-out 70ms;
+    }
+
     html.sidebar-collapsed [data-sidebar-label] {
-        display: none !important;
+        max-width: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition-delay: 0ms;
     }
 
     html.sidebar-collapsed [data-sidebar-collapse-icon] {
         display: none !important;
     }
 
+    .sidebar-toggle {
+        right: 1rem;
+    }
+
+    html.sidebar-collapsed .sidebar-toggle {
+        right: 1.375rem;
+    }
+
+    .sidebar-toggle {
+        transition:
+            right var(--app-layout-duration) var(--app-layout-easing),
+            background-color 150ms ease-out,
+            color 150ms ease-out;
+    }
+
     html:not(.sidebar-collapsed) [data-sidebar-expand-icon] {
         display: none !important;
     }
 
-    html.layout-ready .app-sidebar {
-        transition: width 150ms ease-out;
+    .app-sidebar {
+        transition:
+            width var(--app-layout-duration) var(--app-layout-easing);
     }
 
-    html.layout-ready .app-content {
-        transition: padding-left 150ms ease-out;
+    .app-content {
+        transition:
+            padding-left var(--app-layout-duration) var(--app-layout-easing);
     }
 
-    html.layout-ready .app-context {
-        transition: left 150ms ease-out;
+    .app-context {
+        transition:
+            left var(--app-layout-duration) var(--app-layout-easing);
     }
 }
 
 @media (max-width: 1023px) {
-    html.layout-ready .app-sidebar {
-        transition: transform 150ms ease-out;
+    .app-sidebar {
+        transition:
+            transform 220ms var(--app-layout-easing);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .app-sidebar,
+    .app-content,
+    .app-context,
+    .sidebar-toggle,
+    [data-sidebar-label] {
+        transition-duration: 1ms !important;
     }
 }
