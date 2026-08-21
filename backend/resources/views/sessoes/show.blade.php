@@ -74,6 +74,12 @@
                 </x-ui::alert>
             @enderror
 
+            @error('votacao')
+                <x-ui::alert type="error">
+                    {{ $message }}
+                </x-ui::alert>
+            @enderror
+
             <div class="space-y-6">
                 @include('sessoes.partials._resumo')
                 @include('sessoes.partials._pauta')

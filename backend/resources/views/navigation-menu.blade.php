@@ -1,6 +1,12 @@
 @php
     $user = Auth::user();
 
+    $user->loadMissing('vereador:id,user_id');
+
+    $podeAcessarPlenario = $user->vereador !== null;
+
+    $plenarioAtivo = request()->routeIs('plenario.*');
+
     $grupos = [
         [
             'nome' => 'Administração',
@@ -316,6 +322,25 @@
                 </span>
             </a>
 
+            @if ($podeAcessarPlenario)
+                <a href="{{ route('plenario.index') }}" wire:navigate.hover @click="$store.layout.sidebarOpen = false"
+                    title="Plenário digital" @if ($plenarioAtivo) aria-current="page" @endif
+                    @class([
+                        'flex items-center gap-3 rounded-lg px-4 py-2.5',
+                        'text-sm font-medium transition',
+                        'hover:bg-slate-100 hover:text-slate-950',
+                        'dark:hover:bg-neutral-800 dark:hover:text-white',
+                        'bg-indigo-50 text-indigo-700 dark:bg-neutral-800 dark:text-white' => $plenarioAtivo,
+                        'text-slate-600 dark:text-neutral-400' => !$plenarioAtivo,
+                    ])>
+                    <i class="fa-solid fa-gavel fa-fw shrink-0 text-base" aria-hidden="true"></i>
+
+                    <span data-sidebar-label class="whitespace-nowrap">
+                        Plenário digital
+                    </span>
+                </a>
+            @endif
+
             {{-- Grupos --}}
             @foreach ($grupos as $grupo)
                 @if (count($grupo['itens']) > 0)
@@ -329,19 +354,14 @@
                                     dark:text-neutral-400 dark:hover:bg-slate-800
                                     dark:hover:text-white"
                             title="{{ $grupo['nome'] }}">
-                            <i
-                                class="fa-solid {{ $grupo['icone'] }}
-                           fa-fw shrink-0 text-base"></i>
+                            <i class="fa-solid {{ $grupo['icone'] }} fa-fw shrink-0 text-base"></i>
 
-                            <span data-sidebar-label
-                                class="flex min-w-0 flex-1 items-center
-                           justify-between gap-2">
+                            <span data-sidebar-label class="flex min-w-0 flex-1 items-center justify-between gap-2">
                                 <span class="truncate">
                                     {{ $grupo['nome'] }}
                                 </span>
 
-                                <i class="fa-solid fa-chevron-down fa-fw shrink-0
-                               text-xs transition-transform"
+                                <i class="fa-solid fa-chevron-down fa-fw shrink-0 text-xs transition-transform"
                                     :class="aberto ? 'rotate-180' : ''"></i>
                             </span>
                         </button>
@@ -353,18 +373,22 @@
                                 'opacity-100 delay-150 duration-100'"
                                 class="space-y-1 ps-4 transition-opacity ease-out">
                                 @foreach ($grupo['itens'] as $item)
+                                    @php
+                                        $itemAtivo = request()->routeIs(...$item['rotas']);
+                                    @endphp
+
                                     <a href="{{ route($item['rota']) }}" wire:navigate.hover
-                                        wire:current="!bg-indigo-50 !text-indigo-700 font-medium dark:!bg-neutral-800 dark:!text-white"
                                         @click="$store.layout.sidebarOpen = false"
-                                        class="flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2
-                       text-sm text-slate-600 transition-colors
-                       hover:bg-slate-100 hover:text-slate-950
-                       dark:text-neutral-400
-                       dark:hover:bg-neutral-800
-                       dark:hover:text-white">
-                                        <i
-                                            class="fa-solid {{ $item['icone'] }}
-                           fa-fw shrink-0 text-sm"></i>
+                                        @if ($itemAtivo) aria-current="page" @endif
+                                        @class([
+                                            'flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2',
+                                            'text-sm transition-colors',
+                                            'hover:bg-slate-100 hover:text-slate-950',
+                                            'dark:hover:bg-neutral-800 dark:hover:text-white',
+                                            'bg-indigo-50 font-medium text-indigo-700 dark:bg-neutral-800 dark:text-white' => $itemAtivo,
+                                            'text-slate-600 dark:text-neutral-400' => !$itemAtivo,
+                                        ])>
+                                        <i class="fa-solid {{ $item['icone'] }} fa-fw shrink-0 text-sm"></i>
 
                                         <span class="min-w-0 truncate whitespace-nowrap">
                                             {{ $item['nome'] }}

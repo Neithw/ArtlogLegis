@@ -19,9 +19,6 @@ use Illuminate\Validation\ValidationException;
 
 class SessaoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request): View
     {
         $usuarioAutenticado = $request->user();
@@ -37,9 +34,6 @@ class SessaoController extends Controller
         return view('sessoes.index', compact('sessoes', 'usuarioIsRoot'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create(Request $request): View
     {
         $usuarioAutenticado = $request->user();
@@ -63,9 +57,6 @@ class SessaoController extends Controller
         return view('sessoes.create', compact('camaras', 'legislaturas', 'tipos', 'usuarioIsRoot'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreSessaoRequest $request): RedirectResponse
     {
         Sessao::create($request->validated());
@@ -74,9 +65,6 @@ class SessaoController extends Controller
             ->with('success', 'Sessão cadastrada com sucesso.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Request $request, Sessao $sessao): View
     {
         $sessao->load([
@@ -87,6 +75,18 @@ class SessaoController extends Controller
             'itensPauta.proposicao:id,tipo_proposicao_id,numero,ano,ementa',
             'itensPauta.proposicao.tipoProposicao:id,nome',
             'itensPauta.incluidoPor:id,name',
+
+            'itensPauta.votacoes' => fn($query) => $query
+                ->with([
+                    'abertaPor:id,name',
+                    'encerradaPor:id,name',
+                    'canceladaPor:id,name',
+
+                    'votos.mandato.vereador:id,nome,nome_parlamentar',
+                    'votos.registradoPor:id,name',
+                    'votos.atualizadoPor:id,name',
+                ])
+                ->orderByDesc('aberta_em'),
 
             'presencas.registradoPor:id,name',
             'presencas.atualizadoPor:id,name',
@@ -165,6 +165,21 @@ class SessaoController extends Controller
                 ->values();
         }
 
+        $mandatosPresentes = $mandatos
+            ->filter(
+                fn(Mandato $mandato) =>
+                $presencasPorMandato
+                    ->get($mandato->id)
+                    ?->situacao === 'presente'
+            )
+            ->values();
+
+        $votacaoAbertaDaSessao = $sessao->itensPauta
+            ->flatMap(
+                fn($itemPauta) => $itemPauta->votacoes
+            )
+            ->firstWhere('situacao', 'aberta');
+
         return view('sessoes.show', compact(
             'sessao',
             'podeGerenciarPauta',
@@ -172,13 +187,12 @@ class SessaoController extends Controller
             'mandatos',
             'presencasPorMandato',
             'podeGerenciarPresencas',
-            'deveExibirPresencas'
+            'deveExibirPresencas',
+            'mandatosPresentes',
+            'votacaoAbertaDaSessao'
         ));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Sessao $sessao): View
     {
         abort_unless($sessao->situacao === 'em_preparacao', 403);
@@ -195,9 +209,6 @@ class SessaoController extends Controller
         return view('sessoes.edit', compact('sessao', 'legislaturas', 'tipos'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateSessaoRequest $request, Sessao $sessao): RedirectResponse
     {
         DB::transaction(function () use ($request, $sessao) {
@@ -387,6 +398,21 @@ class SessaoController extends Controller
             if ($sessao->situacao !== 'aberta') {
                 throw ValidationException::withMessages([
                     'sessao' => 'Somente sessões abertas podem ser encerradas.'
+                ]);
+            }
+
+            $possuiVotacaoAberta = $sessao
+                ->itensPauta()
+                ->whereHas(
+                    'votacoes',
+                    fn($query) => $query
+                        ->where('situacao', 'aberta')
+                )
+                ->exists();
+
+            if ($possuiVotacaoAberta) {
+                throw ValidationException::withMessages([
+                    'sessao' => 'Não é possível encerrar a sessão enquanto houver uma votação aberta.'
                 ]);
             }
 

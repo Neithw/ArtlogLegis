@@ -166,4 +166,29 @@ class User extends Authenticatable
     {
         return $this->hasMany(SessaoPresenca::class, 'atualizado_por_id');
     }
+
+    public function votacoesIniciadas(): HasMany
+    {
+        return $this->hasMany(Votacao::class, 'aberta_por_id');
+    }
+
+    public function votacoesEncerradas(): HasMany
+    {
+        return $this->hasMany(Votacao::class, 'encerrada_por_id');
+    }
+
+    public function votacoesCanceladas(): HasMany
+    {
+        return $this->hasMany(Votacao::class, 'cancelada_por_id');
+    }
+
+    public function votosRegistrados(): HasMany
+    {
+        return $this->hasMany(Voto::class, 'registrado_por_id');
+    }
+
+    public function votosAtualizados(): HasMany
+    {
+        return $this->hasMany(Voto::class, 'atualizado_por_id');
+    }
 }

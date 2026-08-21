@@ -51,11 +51,13 @@ class Mandato extends Model
 
     public function estaVigenteEm(CarbonInterface $data): bool
     {
+        $dataReferencia = $data->toDateString();
+
         return ! $this->trashed()
-            && $this->data_inicio->lte($data)
+            && $this->data_inicio->toDateString() <= $dataReferencia
             && (
                 $this->data_fim === null
-                || $this->data_fim->gte($data)
+                || $this->data_fim->toDateString() >= $dataReferencia
             );
     }
 
@@ -96,5 +98,10 @@ class Mandato extends Model
     public function presencas(): HasMany
     {
         return $this->hasMany(SessaoPresenca::class);
+    }
+
+    public function votos(): HasMany
+    {
+        return $this->hasMany(Voto::class);
     }
 }

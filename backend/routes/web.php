@@ -6,6 +6,7 @@ use App\Http\Controllers\ItemPautaController;
 use App\Http\Controllers\LegislaturaController;
 use App\Http\Controllers\MandatoController;
 use App\Http\Controllers\PartidoController;
+use App\Http\Controllers\PlenarioController;
 use App\Http\Controllers\ProposicaoController;
 use App\Http\Controllers\SessaoController;
 use App\Http\Controllers\SessaoPresencaController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\TramitacaoController;
 use App\Http\Controllers\UnidadeTramitacaoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VereadorController;
+use App\Http\Controllers\VotacaoController;
 use App\Http\Middleware\EnsureUserHasActiveCamara;
 use App\Http\Middleware\EnsureUserIsActive;
 use App\Models\Camara;
@@ -280,6 +282,15 @@ Route::middleware([
         ->middleware('can:gerenciarPresencas,sessao')
         ->name('sessoes.presencas.salvar');
 
+    Route::get('/plenario', [PlenarioController::class, 'index'])
+        ->name('plenario.index');
+
+    Route::get('/sessoes/{sessao}/plenario', [PlenarioController::class, 'show'])
+        ->name('plenario.sessoes.show');
+
+    Route::post('/sessoes/{sessao}/plenario/presenca', [PlenarioController::class, 'confirmarPresenca'])
+        ->name('plenario.sessoes.presenca');
+
     Route::resource('sessoes', SessaoController::class)
         ->parameters([
             'sessoes' => 'sessao'
@@ -289,5 +300,21 @@ Route::middleware([
         ->middlewareFor('show', 'can:view,sessao')
         ->middlewareFor(['create', 'store'], 'can:create,' . Sessao::class)
         ->middlewareFor(['edit', 'update'], 'can:update,sessao');
+    // -----------------------------------------------------------------------------------------------
+
+    Route::post('/itens-pauta/{itemPauta}/votacoes/abrir', [VotacaoController::class, 'abrir'])
+        ->name('votacoes.abrir');
+
+    Route::post('/votacoes/{votacao}/votos', [VotacaoController::class, 'registrarVoto'])
+        ->name('votacoes.votos.registrar');
+
+    Route::patch('/votacoes/{votacao}/encerrar', [VotacaoController::class, 'encerrar'])
+        ->name('votacoes.encerrar');
+
+    Route::patch('/votacoes/{votacao}/cancelar', [VotacaoController::class, 'cancelar'])
+        ->name('votacoes.cancelar');
+
+    Route::post('/votacoes/{votacao}/meu-voto', [PlenarioController::class, 'registrarVoto'])
+        ->name('plenario.votos.registrar');
     // -----------------------------------------------------------------------------------------------
 });

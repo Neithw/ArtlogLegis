@@ -229,6 +229,8 @@
                             em {{ $itemPauta->created_at->format('d/m/Y \à\s H:i') }}
                         </span>
                     </div>
+
+                    @include('sessoes.partials._votacoes', ['itemPauta' => $itemPauta])
                 </div>
             </article>
         @empty

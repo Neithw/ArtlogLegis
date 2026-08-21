@@ -226,6 +226,26 @@ class RbacSeeder extends Seeder
                 'nome' => 'Gerenciar Presenças das Sessões',
                 'codigo' => 'sessoes:gerenciar-presencas',
             ],
+            [
+                'nome' => 'Visualizar Votações',
+                'codigo' => 'votacoes:visualizar'
+            ],
+            [
+                'nome' => 'Abrir Votações',
+                'codigo' => 'votacoes:abrir'
+            ],
+            [
+                'nome' => 'Registrar Votos',
+                'codigo' => 'votacoes:registrar-votos'
+            ],
+            [
+                'nome' => 'Encerrar Votações',
+                'codigo' => 'votacoes:encerrar'
+            ],
+            [
+                'nome' => 'Cancelar Votações',
+                'codigo' => 'votacoes:cancelar'
+            ],
         ])->each(function (array $permission): void {
             Permissao::updateOrCreate(
                 [

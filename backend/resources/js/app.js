@@ -11,6 +11,7 @@ import formularioSessao from './components/formularioSessao';
 import campoPalavrasChave from './components/campoPalavrasChave';
 import pautaOrdenavel from './components/pautaOrdenavel';
 import presencasSessao from './components/presencasSessao';
+import votacaoPlenario from './components/votacaoPlenario';
 
 import grupoSidebar from './components/grupoSidebar';
 import criarLayoutStore from './stores/layout';
@@ -23,6 +24,7 @@ Alpine.data('formularioSessao', formularioSessao);
 Alpine.data('campoPalavrasChave', campoPalavrasChave);
 Alpine.data('pautaOrdenavel', pautaOrdenavel);
 Alpine.data('presencasSessao', presencasSessao);
+Alpine.data('votacaoPlenario', votacaoPlenario);
 
 Alpine.data('grupoSidebar', grupoSidebar);
 Alpine.store('layout', criarLayoutStore());
